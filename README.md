@@ -1,5 +1,4 @@
-# odilon-client
-<h2>Odilon Java SDK </h2>
+<h1>Odilon Java SDK </h1>
 
 <p>Odilon is a scalable and lightweight Open Source Object Storage that runs on standard hardware.</p>
 <p>It is an infrastructure software designed to be used by applications that need to store to store terabytes of medium to large size objects (like photos, pdfs, audio, video) securely and safely through encryption, replication and redundancy. A typical installation would by 100M pdfs 20KB-30MB each.
