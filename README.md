@@ -10,9 +10,10 @@ For more info visit Odilon's website <a href="https://odilon.io/development.html
 
 <h2>Main concepts</h2>
 <p>In order to access the Odilon server from a Java Application you have to include Odilon client JAR in the classpath. The interaction is managed by an instance of OdilonClient that connects to the server using the credentials: AccessKey (ie. username) and SecretKey (ie. password)</p>
+<br/>
+<br/>
 
-<br/>
-<br/>
+
 ```java
 /* these are the default values for the Server */
 String endpoint = "http://localhost";
@@ -30,11 +31,13 @@ if (!ping.equals("ok")) {
 	System.exit(1);
 }
 ```
+
 <br/>
 <br/>
 <p>Odilon stores objects using a flat structure of containers called Buckets. A bucket is like a folder, it just contains binary objects, potentially a very large number. Every object contained by a bucket has a unique ObjectName in that bucket; therefore, the pair BucketName + ObjectName is a Unique ID for each object in Odilon.</p>
 <br/>
 <br/>
+
 ```java
 try {
     String bucketName = "bucket-demo";
@@ -47,6 +50,7 @@ try {
         System.out.println(String.valueOf(e.getHttpStatus())+ " " + e.getMessage()+" " + String.valueOf(e.getErrorCode()));
 }
 ```
+
 <br/>
 <br/>
 <p>Uploading a File requires the Bucket to exist and the ObjectName to be unique for that bucket.</p>
