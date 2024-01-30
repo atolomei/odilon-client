@@ -99,7 +99,28 @@ try {
 <br/>
 <br/>
 
+<h2>Sample Programs</h2>
 
+<ul>
+<li><a href="https://odilon.io/development.html">Create Bucket</a></li>	
+<li><a href="https://odilon.io/development.html">List Buckets</a></li>	
+<li><a href="https://odilon.io/development.html">Upload file</a></li>		
+<li><a href="https://odilon.io/development.html">List all objects in a Bucket</a></li>	
+<li><a href="https://odilon.io/development.html">Get presigned urls of Objects</a></li>	
+<li><a href="https://github.com/atolomei/miniomigration">Minio to Odilon migration</a></li>
+</ul>
+
+<h2>Resources</h2>
+<p>
+<ul>
+<li><a href="https://odilon.io" target="_blank">Odilon website</a></li>	
+<li><a href="https://odilon.io/configuration-linux.html" target="_blank">Installation, Configuration and Operation on Linux</a></li>	
+<li><a href="https://odilon.io/configuration-windows.html" target="_blank">Installation, Configuration and Operation on Windows</a></li>		
+<li><a href="https://odilon.io/development.html" target="_blank">Java Application Development with Odilon</a></li>	
+<li><a href="https://odilon.io/javadoc/index.html" target="_blank">Odilon SDK Javadoc</a></li>	
+<li><a href="https://twitter.com/odilonSoftware" target="_blank">Twitter</a></li>
+</ul>
+</p>
 
 
 <h2>Odilon Server</h2>
