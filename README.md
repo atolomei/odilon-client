@@ -11,7 +11,7 @@
 For more info visit Odilon's website <a href="https://odilon.io/development.html">Java Development with Odilon SDK</a> and also <a href="https://githug.com/odilon-server.html"> GitHub page</a> 	
 </p>
 
-<h2>Java SDK main concepts</h2>
+<h2>Odilon Java SDK Concepts</h2>
 <p>In order to access the Odilon server from a Java Application you have to include Odilon client JAR in the classpath. The interaction is managed by an instance of OdilonClient that connects to the server using the credentials: AccessKey (ie. username) and SecretKey (ie. password)</p>
 <br/>
 <br/>
