@@ -56,6 +56,7 @@ try {
 <p>Uploading a File requires the Bucket to exist and the ObjectName to be unique for that bucket.</p>
 <br/>
 <br/>
+
 ```java
 File file = new File("test.pdf");
 String bucketName = "bucket-demo";
@@ -69,6 +70,7 @@ try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file)
 	System.out.println(e1.getClass().getName() + " " + e1.getMessage());
 }
 ```
+
 <br/>
 <br/>
 <p>In addition to the binary file, an Object has Metadata (called ObjectMetadata) that is returned by some of the API calls. Odilon allows to retrieve Objects individually by BucketName + ObjectName and also supports to list the contents of a bucket and other simple queries.</p>
