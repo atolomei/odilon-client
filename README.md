@@ -101,12 +101,14 @@ try {
 
 <h2>Sample Programs</h2>
 
+
+
 <ul>
-<li><a href="https://odilon.io/development.html">Create Bucket</a></li>	
-<li><a href="https://odilon.io/development.html">List Buckets</a></li>	
-<li><a href="https://odilon.io/development.html">Upload file</a></li>		
-<li><a href="https://odilon.io/development.html">List all objects in a Bucket</a></li>	
-<li><a href="https://odilon.io/development.html">Get presigned urls of Objects</a></li>	
+<li><a href="https://github.com/atolomei/odilon-client/blob/main/src/test/io/odilon/demo/SampleBucketCreation.java">Create Bucket</a></li>	
+<li><a href="https://github.com/atolomei/odilon-client/blob/main/src/test/io/odilon/demo/SampleListBuckets.java">List Buckets</a></li>	
+<li><a href="https://github.com/atolomei/odilon-client/blob/main/src/test/io/odilon/demo/SamplePutObject.java">Upload file</a></li>		
+<li><a href="https://github.com/atolomei/odilon-client/blob/main/src/test/io/odilon/demo/SampleListObjects.java">List all objects in a Bucket</a></li>	
+<li><a href="https://odilon.io/examples/SamplePresignedUrl.java">Get presigned urls of Objects</a></li>	
 <li><a href="https://github.com/atolomei/miniomigration">Minio to Odilon migration</a></li>
 </ul>
 
