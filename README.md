@@ -135,6 +135,6 @@ try {
 
 
 <h2>Odilon Server</h2>
-<p>See <a href="https://github.com/atolomei/odilon-client" target="_blank">odilon Server</a>
+<p>See <a href="https://github.com/atolomei/odilon-server" target="_blank">odilon Server</a>
 </p>
 
