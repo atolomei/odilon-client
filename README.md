@@ -17,9 +17,14 @@ For more info visit Odilon's website <a href="https://odilon.io/development.html
 A typical architecture for a Web Application is</p>
 <br/>
 <br/>
+<br/>
+<br/>
+
 
 ![web-app-odilon-en](https://github.com/atolomei/odilon-client/assets/29349757/aa736909-f247-4a18-99b9-166adacf0929)
 
+<br/>
+<br/>
 
 <br/>
 <br/>
