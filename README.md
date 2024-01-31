@@ -25,6 +25,7 @@ A typical architecture for a Web Application is</p>
 <p>In order to access the Odilon server from a Java Application you have to include Odilon client JAR in the classpath. The interaction is managed by an instance of <b>OdilonClient</b> that connects to the server using the credentials: <b>AccessKey</b> (ie. username) and <b>SecretKey</b> (ie. password)</p>
 <br/>
 <br/>
+
 ```java
 /* these are the default values for the Server */
 String endpoint = "http://localhost";
