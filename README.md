@@ -17,11 +17,12 @@ For more info visit Odilon's website <a href="https://odilon.io/development.html
 A typical architecture for a Web Application is</p>
 <br/>
 <br/>
+
 ![web-app-odilon-en](https://github.com/atolomei/odilon-client/assets/29349757/aa736909-f247-4a18-99b9-166adacf0929)
+
 <br/>
 <br/>
 <p>In order to access the Odilon server from a Java Application you have to include Odilon client JAR in the classpath. The interaction is managed by an instance of <b>OdilonClient</b> that connects to the server using the credentials: <b>AccessKey</b> (ie. username) and <b>SecretKey</b> (ie. password)</p>
-<br/>
 <br/>
 <br/>
 ```java
