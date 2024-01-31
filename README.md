@@ -12,10 +12,11 @@ For more info visit Odilon's website <a href="https://odilon.io/development.html
 </p>
 
 <h2>Odilon Java SDK Concepts</h2>
-<p>In order to access the Odilon server from a Java Application you have to include Odilon client JAR in the classpath. The interaction is managed by an instance of OdilonClient that connects to the server using the credentials: AccessKey (ie. username) and SecretKey (ie. password)</p>
-<br/>
-<br/>
 
+<p>A Java client program that interacts with the Odilon server must include the Odilon SDK jar in the classpath.
+A typical architecture for a Web Application is</p>
+<br/>
+<br/>
 
 ![web-app-odilon-en](https://github.com/atolomei/odilon-client/assets/29349757/aa736909-f247-4a18-99b9-166adacf0929)
 
@@ -23,7 +24,7 @@ For more info visit Odilon's website <a href="https://odilon.io/development.html
 <br/>
 <br/>
 
-
+<p>In order to access the Odilon server from a Java Application you have to include Odilon client JAR in the classpath. The interaction is managed by an instance of <b>OdilonClient</b> that connects to the server using the credentials: <b>AccessKey</b> (ie. username) and <b>SecretKey</b> (ie. password)</p>
 
 ```java
 /* these are the default values for the Server */
