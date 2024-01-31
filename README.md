@@ -30,6 +30,8 @@ A typical architecture for a Web Application is</p>
 
 <br/>
 <br/>
+<br/>
+<br/>
 
 ```java
 /* these are the default values for the Server */
