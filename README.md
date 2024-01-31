@@ -17,6 +17,14 @@ For more info visit Odilon's website <a href="https://odilon.io/development.html
 <br/>
 
 
+![web-app-odilon-en](https://github.com/atolomei/odilon-client/assets/29349757/aa736909-f247-4a18-99b9-166adacf0929)
+
+
+<br/>
+<br/>
+
+
+
 ```java
 /* these are the default values for the Server */
 String endpoint = "http://localhost";
