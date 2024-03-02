@@ -66,6 +66,8 @@ public class SampleEncoder {
         InputStream in = new FileInputStream(inputFile);
         int bytesRead = in.read(allBytes, BYTES_IN_INT, fileSize);
         if (bytesRead != fileSize) {
+        	if (in!=null)
+        		in.close();
             throw new IOException("not enough bytes read");
         }
         in.close();

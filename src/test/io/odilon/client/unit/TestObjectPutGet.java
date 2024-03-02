@@ -40,7 +40,7 @@ public class TestObjectPutGet extends BaseTest {
 	
 	static final int BUFFER_SIZE = 8192;
 	
-	int MAX = 5;
+	int MAX = 8;
 	long MAX_LENGTH =20 * 100 * 10000; // 20 MB
 		
 	long LAPSE_BETWEEN_PUT_MILLISECONDS = 1600;
@@ -72,57 +72,6 @@ public class TestObjectPutGet extends BaseTest {
 			LAPSE_BETWEEN_PUT_MILLISECONDS  = Long.valueOf(lapse.trim()); 
 	}
 	
-	
-	
-	
-
-	/**
-	i.p
-	p.i
-	(2k-1)* n % 4 -> 2k * n % 4
-
-	
-	n=0..(N/2-1)
-	k=1..N/2
-	
-   (2(k+n)-1), 2(k+n)
-	1,3
-	2,4
-	
-	3,2
-	4,1
-	
-*/
-	
-	
-	
-	
-	
-	
-/*
-	i.i
-	p.p
-	k*n % 4 -> (k+4) * n % 4
-*/
-	
-	private void ttt() {
-		
-		String[] equipo = {"1", "2", "3", "4"};
-		
-		for (int n=0; n<equipo.length; n++) {
-			for (int k=0; k<equipo.length; k++) {
-				if (n!=k) {
-					logger.debug((n + "  " + k));
-				}
-			}
-			logger.debug("");
-		}
-		System.exit(0);
-		
-	}
-	
-	
-	
 	/**
 	 * 
 	 * 
@@ -131,11 +80,7 @@ public class TestObjectPutGet extends BaseTest {
 	@Test	
 	public void executeTest() {
 
-		
-		ttt();
-		
 		preCondition();
-	
 
 		if (!testAddObjects())
 			error("testAddObjects");
@@ -327,7 +272,7 @@ public class TestObjectPutGet extends BaseTest {
 						error(e);
 				}
 					
-				String destFileName = DOWNLOAD_DIR_V0+ File.separator + meta.fileName;
+				String destFileName = DOWNLOAD_DIR_V6+ File.separator + meta.fileName;
 				
 				try {
 						getClient().getObject(meta.bucketName, meta.objectName, destFileName);
@@ -370,12 +315,32 @@ public class TestObjectPutGet extends BaseTest {
 	 */
 	public boolean preCondition() {
 
-        File dir = new File(SRC_DIR_V0);
-        
-        if ( (!dir.exists()) || (!dir.isDirectory())) { 
-			error("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+		{
+	        File dir = new File(SRC_DIR_V0);
+	        
+	        if ( (!dir.exists()) || (!dir.isDirectory())) { 
+				error("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+			}
+		}
+		
+
+		{
+	        File dir = new File(SRC_DIR_V1);
+	        
+	        if ( (!dir.exists()) || (!dir.isDirectory())) { 
+				error("Dir not exists or the File is not Dir -> " +SRC_DIR_V1);
+			}
 		}
 
+		
+		{
+	        File dir = new File(SRC_DIR_V6);
+	        
+	        if ( (!dir.exists()) || (!dir.isDirectory())) { 
+				error("Dir not exists or the File is not Dir -> " +SRC_DIR_V6);
+			}
+		}
+		
         try {
 			String p=ping();
 			if (p==null || !p.equals("ok"))
@@ -388,6 +353,7 @@ public class TestObjectPutGet extends BaseTest {
 		}
         
         
+        {
         File tmpdir = new File(DOWNLOAD_DIR_V0);
         
         if ( (tmpdir.exists()) && (tmpdir.isDirectory())) { 
@@ -403,7 +369,49 @@ public class TestObjectPutGet extends BaseTest {
 		} catch (IOException e) {
 				error(e.getClass().getName() + " | " + e.getMessage());
 		}
-		
+        }
+        
+        
+        {
+            File tmpdir = new File(DOWNLOAD_DIR_V1);
+            
+            if ( (tmpdir.exists()) && (tmpdir.isDirectory())) { 
+            	try {
+    				FileUtils.forceDelete(tmpdir);
+    			} catch (IOException e) {
+    				error(e.getClass().getName() + " | " + e.getMessage());
+    			}
+    		}
+           	try {
+    				FileUtils.forceMkdir(tmpdir);
+    				
+    		} catch (IOException e) {
+    				error(e.getClass().getName() + " | " + e.getMessage());
+    		}
+        }
+        
+
+        
+        {
+            File tmpdir = new File(DOWNLOAD_DIR_V6);
+            
+            if ( (tmpdir.exists()) && (tmpdir.isDirectory())) { 
+            	try {
+    				FileUtils.forceDelete(tmpdir);
+    			} catch (IOException e) {
+    				error(e.getClass().getName() + " | " + e.getMessage());
+    			}
+    		}
+           	try {
+    				FileUtils.forceMkdir(tmpdir);
+    				
+    		} catch (IOException e) {
+    				error(e.getClass().getName() + " | " + e.getMessage());
+    		}
+        }
+
+        
+        
         
         String bucketTest = "dev-test";
         
