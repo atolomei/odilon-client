@@ -16,6 +16,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 import io.odilon.client.util.FSUtil;
+import io.odilon.errors.InternalCriticalException;
 import io.odilon.log.Logger;
 import io.odilon.util.Check;
 
@@ -132,6 +133,7 @@ public class RSEncoder {
      */
     public boolean encodeChunk(InputStream is, String objectName, int chunk) {
 
+    	// BUFFER
     	final byte [] allBytes = new byte[ MAX_CHUNK_SIZE ];
 
     	int bytesRead = 0;
@@ -155,6 +157,7 @@ public class RSEncoder {
 		final int storedSize = bytesRead + BYTES_IN_INT;
 		final int shardSize = (storedSize + DATA_SHARDS - 1) / DATA_SHARDS;
 		
+    	// BUFFER
 		byte [] [] shards = new byte [TOTAL_SHARDS] [shardSize];
 		
         // Fill in the data shards
@@ -168,14 +171,12 @@ public class RSEncoder {
 
         
         // Write out the resulting files.
-        for (int disk = 0; disk < TOTAL_SHARDS; disk++) {
+        for (int block = 0; block < TOTAL_SHARDS; block++) {
 
-        	File outputFile = new File(ENCODE_DIR, objectName + "." + String.valueOf(chunk)+"." + String.valueOf(disk));
+        	File outputFile = new File(ENCODE_DIR, objectName + "." + String.valueOf(chunk)+"." + String.valueOf(block));
         							
-			try  (OutputStream out = new FileOutputStream(outputFile)) {
-
-				out.write(shards[disk]);
-				
+			try  (OutputStream out = new BufferedOutputStream( new FileOutputStream(outputFile))) {
+				out.write(shards[block]);
 	        } catch (FileNotFoundException e) {
 				logger.error(e);
 				System.exit(1);
@@ -199,6 +200,7 @@ public class RSEncoder {
     	// Read in any of the shards that are present.
         // (There should be checking here to make sure the input
         // shards are the same size, but there isn't.)
+    	
         final byte [] [] shards = new byte [TOTAL_SHARDS] [];
         final boolean [] shardPresent = new boolean [TOTAL_SHARDS];
         int shardSize = 0;
@@ -229,7 +231,7 @@ public class RSEncoder {
         
         // We need at least DATA_SHARDS to be able to reconstruct the file.
         if (shardCount < DATA_SHARDS) {
-            throw new RuntimeException("We need at least DATA_SHARDS to be able to reconstruct the file.");
+            throw new InternalCriticalException("We need at least DATA_SHARDS to be able to reconstruct the file.");
         }
         
         // Make empty buffers for the missing shards.
