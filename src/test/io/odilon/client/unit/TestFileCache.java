@@ -17,6 +17,7 @@ import io.odilon.log.Logger;
 import io.odilon.model.Bucket;
 import io.odilon.model.MetricsValues;
 import io.odilon.model.ObjectMetadata;
+import io.odilon.model.RedundancyLevel;
 import io.odilon.test.base.BaseTest;
 import io.odilon.test.base.TestFile;
 import io.odilon.util.ODFileUtils;
@@ -290,6 +291,16 @@ public class TestFileCache extends BaseTest {
 		} catch (Exception e)	{
 			error(e.getClass().getName() + " | " + e.getMessage());
 		}
+        
+        try {
+			if (getClient().systemInfo().redundancyLevel!=RedundancyLevel.RAID_6) {
+				error("File cache can only be tested for -> " + RedundancyLevel.RAID_6.getName());
+				
+			}
+		} catch (ODClientException e) {
+			error(e.getClass().getName() + " | " + e.getMessage());
+		}
+        
         
         
         {

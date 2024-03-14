@@ -40,7 +40,7 @@ public class TestObjectPutGet extends BaseTest {
 	
 	static final int BUFFER_SIZE = 8192;
 	
-	int MAX = 4;
+	int MAX = 10;
 	long MAX_LENGTH =120 * 100 * 10000; // 120 MB
 		
 	long LAPSE_BETWEEN_PUT_MILLISECONDS = 1600;
