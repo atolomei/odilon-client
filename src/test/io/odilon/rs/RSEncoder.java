@@ -171,12 +171,12 @@ public class RSEncoder {
 
         
         // Write out the resulting files.
-        for (int block = 0; block < TOTAL_SHARDS; block++) {
+        for (int disk = 0; disk < TOTAL_SHARDS; disk++) {
 
-        	File outputFile = new File(ENCODE_DIR, objectName + "." + String.valueOf(chunk)+"." + String.valueOf(block));
+        	File outputFile = new File(ENCODE_DIR, objectName + "." + String.valueOf(chunk)+"." + String.valueOf(disk));
         							
 			try  (OutputStream out = new BufferedOutputStream( new FileOutputStream(outputFile))) {
-				out.write(shards[block]);
+				out.write(shards[disk]);
 	        } catch (FileNotFoundException e) {
 				logger.error(e);
 				System.exit(1);
