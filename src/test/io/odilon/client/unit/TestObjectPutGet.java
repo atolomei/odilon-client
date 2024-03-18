@@ -108,7 +108,6 @@ public class TestObjectPutGet extends BaseTest {
 	        try {
 				FileUtils.forceMkdir(saveDir);
 			} catch (IOException e) {
-					logger.error(e);
 					error(e.getClass().getName() + " | " + e.getMessage());
 			}
         }
