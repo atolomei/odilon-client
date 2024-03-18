@@ -134,6 +134,9 @@ public class FSUtil {
 	}
  	
  	
+ 	static public boolean isJar(String filename) {
+		return (filename.toLowerCase().matches("^.*\\.(jar|war)$") ); 
+	}
  	
 	static public boolean isZip(String filename) {
 		return (filename.toLowerCase().matches("^.*\\.(zip|gz|gzip|rar|bz2|lz|lzma|lzo|rz|z|arc|arj|zz|tar|par)$") ); 
@@ -149,6 +152,10 @@ public class FSUtil {
     
     static public boolean isExecutable(File srcfile) {
 		return srcfile.getName().matches("^.*\\.(exe|EXE)$"); 
+	}
+    
+    static public boolean isExecutable(String fileName) {
+    	return fileName.matches("^.*\\.(exe|EXE)$"); 
 	}
     
     static public boolean isMsg(File srcfile) {

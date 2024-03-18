@@ -185,23 +185,8 @@ public class SampleRSBlockEncoder extends BaseTest {
 				}
 			}
 
-			
             System.out.println("wrote " + outputFile);
         }
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		
 	}
 	

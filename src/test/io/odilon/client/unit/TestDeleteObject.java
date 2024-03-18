@@ -153,8 +153,6 @@ public class TestDeleteObject extends BaseTest {
 					logger.error(e);
 				}
 			});
-			
-			
 
 			logger.debug("testDeleteAllObjects", "ok");
 			getMap().put("testDeleteAllObjects", "ok");

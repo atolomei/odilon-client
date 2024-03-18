@@ -228,7 +228,6 @@ public class ODClient implements OdilonClient {
 
 	public ODClient(String endpoint, int port, String accessKey, String secretKey, boolean secure)  {
 		
-			  
 			  Check.requireNonNullStringArgument(endpoint,  "endpoint is null or emtpy");
 			  Check.requireNonNullStringArgument(accessKey, "accessKey is null or emtpy");
 			  Check.requireNonNullStringArgument(secretKey, "secretKey is null or emtpy");
@@ -298,8 +297,6 @@ public class ODClient implements OdilonClient {
 			    this.secretKey = secretKey;
 		  }
 		  
-
-	
 	@Override
 	public ObjectMetadata putObjectStream(String bucketName, String objectName,InputStream stream,String fileName) throws ODClientException {
 		return putObjectStream(bucketName,	objectName,	stream,	Optional.ofNullable(fileName),Optional.empty());
@@ -310,7 +307,6 @@ public class ODClient implements OdilonClient {
 		return putObjectStream(bucketName,objectName,stream,fileName,size,Optional.empty());
 	}
 
-	
 	@Override
 	public boolean isValidObjectName(String objectName ) {
 		Check.requireNonNullStringArgument(objectName, "objectName can not be null or emtpy");
@@ -340,9 +336,8 @@ public class ODClient implements OdilonClient {
 		
 		if (contentType.isPresent())
 			cType = contentType.get();
-		else if (fileName.isPresent()) { 
+		else if (fileName.isPresent()) 
 			cType = getContentType(fileName.get());
-		}
 		else
 			cType = DEFAULT_CONTENT_TYPE;
 		

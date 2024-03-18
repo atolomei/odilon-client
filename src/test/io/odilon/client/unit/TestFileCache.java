@@ -1,47 +1,35 @@
- package io.odilon.client.unit;
+package io.odilon.client.unit;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Test;
+import org.junit.Assert;
 
 import io.odilon.client.error.ODClientException;
 import io.odilon.client.util.FSUtil;
 import io.odilon.log.Logger;
 import io.odilon.model.Bucket;
+import io.odilon.model.MetricsValues;
 import io.odilon.model.ObjectMetadata;
+import io.odilon.model.RedundancyLevel;
 import io.odilon.test.base.BaseTest;
 import io.odilon.test.base.TestFile;
 import io.odilon.util.ODFileUtils;
 
-/**
- * 
- * Put Object
- * Get Object
- * Get PresignedUrl
- * Remove Object
- *
- *
- */
-public class TestObjectPutGet extends BaseTest {
-			
+public class TestFileCache extends BaseTest {
+
 	private static final Logger logger = Logger.getLogger(TestObjectPutGet.class.getName());
 	
 	static final int BUFFER_SIZE = 8192;
 	
-	int MAX = 4;
-	long MAX_LENGTH =120 * 100 * 10000; // 120 MB
+	int MAX = 20;
+	long MAX_LENGTH =20 * 100 * 10000; // 20 MB
 		
 	long LAPSE_BETWEEN_PUT_MILLISECONDS = 1600;
 	
@@ -51,12 +39,12 @@ public class TestObjectPutGet extends BaseTest {
 	private final File saveDir = new File(DOWNLOAD_DIR_V0);
 	
 	private OffsetDateTime showStatus = OffsetDateTime.now();
-
-
+	private String bucketTest = "testcache";
+	
 	/**
 	 * 
 	 */
-	public TestObjectPutGet() {
+	public TestFileCache() {
 		
 		String max = System.getProperty("max");
 		String maxLength = System.getProperty("maxLength");
@@ -71,147 +59,24 @@ public class TestObjectPutGet extends BaseTest {
 		if (lapse!=null)
 			LAPSE_BETWEEN_PUT_MILLISECONDS  = Long.valueOf(lapse.trim()); 
 	}
+
 	
-	/**
-	 * 
-	 * 
-	 * 
-	 */
-	@Test	
+	@Override
 	public void executeTest() {
 
 		preCondition();
 
-		if (!testAddObjects())
-			error("testAddObjects");
+		if (!testFileCache())
+			error("testFileCache()");
 
-		
-		if (!testAddObjectsStream("java http"))
-			error("testAddObjectsStream java http");
-	
-		
 		showResults();
+		
 	}
 	
 	/**
-	 */
-	public boolean testAddObjectsStream(String version) {
-		
-	    Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
-        				
-	    final File dir = new File(SRC_DIR_V0);
-	    
-        if ((!dir.exists()) || (!dir.isDirectory()))  
-			throw new RuntimeException("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
-		
-        if ( (!saveDir.exists()) || (!saveDir.isDirectory())) {
-	        try {
-				FileUtils.forceMkdir(saveDir);
-			} catch (IOException e) {
-					error(e.getClass().getName() + " | " + e.getMessage());
-			}
-        }
-
-        int max=MAX;
-        	
-		int counter = 0;
-		String bucketName = this.bucket_1.getName();
-		
-		for (File fi:dir.listFiles()) {
-				
-				if (counter >= max)
-					break;
-				
-				if (isElegible(fi)) {
-					
-					String objectName = FSUtil.getBaseName(fi.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*10000))).intValue());;
-
-					try (InputStream inputStream = new BufferedInputStream(new FileInputStream(fi))) {
-						
-						getClient().putObjectStream(bucketName, objectName, inputStream, Optional.of(fi.getName()), Optional.empty());
-						testFiles.put(bucketName+"-"+objectName, new TestFile(fi, bucketName, objectName));
-						counter++;
-						
-						sleep();
-						
-						if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-							logger.info( "testAddObjectsStream -> " + String.valueOf(testFiles.size()));
-							showStatus = OffsetDateTime.now();
-						}
-						
-					} catch (ODClientException e) {
-						error(String.valueOf(e.getHttpStatus())+ " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
-					} catch (FileNotFoundException e1) {
-						error(e1);
-					} catch (IOException e2) {
-						error(e2);
-					}
-					
-				}
-			}
-			
-			logger.info( "testAddObjectsStream total -> " + String.valueOf(testFiles.size()));
-			
-			testFiles.forEach((k,v) -> {
-					
-				ObjectMetadata meta = null;
-				try {
-					 meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
-				} catch (ODClientException e) {
-						logger.error(e);
-						System.exit(1);
-				}
-					
-				String destFileName = DOWNLOAD_DIR_V0 + File.separator + meta.fileName;
-				
-				try {
-					getClient().getObject(meta.bucketName, meta.objectName, destFileName);
-				} catch (ODClientException | IOException e) {
-						logger.error(e);
-						System.exit(1);
-				}
-				
-				TestFile t_file=testFiles.get(meta.bucketName+"-"+meta.objectName);
-				
-				if (t_file!=null) {
-					
-					try {
-					
-						String src_sha = t_file.getSrcFileSha256(0);
-						String new_sha = ODFileUtils.calculateSHA256String(new File(destFileName));
-						
-						if (!src_sha.equals(new_sha)) {
-							StringBuilder str  = new StringBuilder();
-							str.append("Error sha256 are not equal -> " + meta.bucketName+" / "+meta.objectName);
-							str.append(" | src -> " + String.valueOf(t_file.getSrcFile(0).length()) + "bytes");
-							str.append(" | dest -> " + String.valueOf(new File(destFileName).length()) + "bytes");
-							
-							logger.error(str.toString());
-							error(str.toString());
-						}
-							
-					} catch (NoSuchAlgorithmException | IOException e) {
-						logger.error(e);
-						error(e);
-					}
-				}
-				else {
-					error("Test file does not exist -> " + meta.bucketName+"-"+meta.objectName);
-				}
-			});
-			
-			getMap().put("testAddObjectsStream " + version + " | " + String.valueOf(testFiles.size()), "ok");
-				
-			return true;
-	}
-
-
-	/**
-	 * 
-	 * 
 	 * @return
 	 */
-	public boolean testAddObjects() {
+	public boolean testFileCache() {
 		
         File dir = new File(SRC_DIR_V0);
         
@@ -225,6 +90,20 @@ public class TestObjectPutGet extends BaseTest {
 		bucketName = this.bucket_1.getName();
 			
 		int max=MAX;
+		
+		MetricsValues metrics = null;
+		
+		try {
+			metrics = getClient().metrics();
+		} catch (ODClientException e) {
+			error(e);
+		}
+		
+		
+		long hit0 = metrics.cacheFileHitCounter;
+		long miss0 = metrics.cacheFileMissCounter;
+		long disk0 = metrics.cacheFileHardDiskUsage;
+				
 		
 		// put files
 		//
@@ -246,10 +125,9 @@ public class TestObjectPutGet extends BaseTest {
 					
 					/** display status every 4 seconds or so */
 					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-						logger.info( " testAddObjects -> " + String.valueOf(testFiles.size()));
+						logger.info( " testFileCache -> " + String.valueOf(testFiles.size()));
 						showStatus = OffsetDateTime.now();
 					}
-
 
 					
 				} catch (ODClientException e) {
@@ -259,6 +137,20 @@ public class TestObjectPutGet extends BaseTest {
 		}
 		
 		logger.info( " testAddObjects total -> " + String.valueOf(testFiles.size()));
+		
+		
+		
+		try {
+			metrics = getClient().metrics();
+		} catch (ODClientException e) {
+			error(e);
+		}
+		
+		long hit1 = metrics.cacheFileHitCounter;
+		long miss1 = metrics.cacheFileMissCounter;
+		long disk1 = metrics.cacheFileHardDiskUsage;
+		
+		
 		
 		
 		// -----------
@@ -305,7 +197,54 @@ public class TestObjectPutGet extends BaseTest {
 				}
 		});
 	
-		getMap().put("testAddObjects" + " | " + String.valueOf(testFiles.size()), "ok");
+	
+	// -----------
+		
+		testFiles.forEach( (k,v) -> {
+		
+			ObjectMetadata meta = null;
+				
+				try {
+						 meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
+						
+				} catch (ODClientException e) {
+						error(e);
+				}
+					
+				String destFileName = DOWNLOAD_DIR_V6+ File.separator + meta.fileName;
+				
+				try {
+						getClient().getObject(meta.bucketName, meta.objectName, destFileName);
+						
+				} catch (ODClientException | IOException e) {
+						error(e);
+				}
+		});
+	
+		
+		try {
+			metrics = getClient().metrics();
+		} catch (ODClientException e) {
+			error(e);
+		}
+		
+		long hit2 = metrics.cacheFileHitCounter;
+		long miss2 = metrics.cacheFileMissCounter;
+		long disk2 = metrics.cacheFileHardDiskUsage;
+		
+		try {
+		
+			Assert.assertTrue(hit2>=testFiles.size());
+			Assert.assertTrue((disk2-disk1)>=0);
+			
+		} catch (Exception e) {
+			error(e);
+		}
+		
+		logger.debug("Assert ok (hit2 - hit1) -> " + String.valueOf(hit2) + " - " + String.valueOf(hit1) +"  = " + String.valueOf(hit2-hit1));
+		
+		getMap().put("testFileCache()" + " | " + String.valueOf(testFiles.size()), "ok");
+		
 		return true;
 	
 	}	
@@ -352,6 +291,16 @@ public class TestObjectPutGet extends BaseTest {
 		} catch (Exception e)	{
 			error(e.getClass().getName() + " | " + e.getMessage());
 		}
+        
+        try {
+			if (getClient().systemInfo().redundancyLevel!=RedundancyLevel.RAID_6) {
+				error("File cache can only be tested for -> " + RedundancyLevel.RAID_6.getName());
+				
+			}
+		} catch (ODClientException e) {
+			error(e.getClass().getName() + " | " + e.getMessage());
+		}
+        
         
         
         {
@@ -414,7 +363,6 @@ public class TestObjectPutGet extends BaseTest {
         
         
         
-        String bucketTest = "dev-test";
         
         try {	
 			if (!getClient().existsBucket(bucketTest)) {
@@ -431,55 +379,40 @@ public class TestObjectPutGet extends BaseTest {
 			return false;
 		}
 	}
-	
-	
-	/**
-	 * 
-	 * 
-	 * @param file
-	 * @return
-	 */
-
-	private boolean isElegible(File file) {
-		
-		if (file.isDirectory())
-			return false;
-		
-		if (file.length()>MAX_LENGTH)
-			return false;
-		
-		if (	FSUtil.isText(file.getName()) || 
-				FSUtil.isText(file.getName()) || 
-				FSUtil.isPdf(file.getName())  || 
-				FSUtil.isImage(file.getName()) || 
-				FSUtil.isMSOffice(file.getName()) ||
-				FSUtil.isJar(file.getName()) ||
-				FSUtil.isAudio(file.getName()) ||
-				FSUtil.isVideo(file.getName()) ||
-				FSUtil.isExecutable(file.getName()) ||
-				FSUtil.isZip(file.getName()))
-			
-			return true;
-		
-		return false;
-	}
-
-
-	protected void sleep() {
-		
-		if (LAPSE_BETWEEN_PUT_MILLISECONDS>0) {
-			try {
-				Thread.sleep(LAPSE_BETWEEN_PUT_MILLISECONDS);
-			} catch (InterruptedException e) {
-			}
-		}
-	}
 
 	
+	
+       private boolean isElegible(File file) {
+    		
+    		if (file.isDirectory())
+    			return false;
+    		
+    		if (file.length()>MAX_LENGTH)
+    			return false;
+    		
+    		if (	FSUtil.isText(file.getName()) || 
+    				FSUtil.isText(file.getName()) || 
+    				FSUtil.isPdf(file.getName())  || 
+    				FSUtil.isImage(file.getName()) || 
+    				FSUtil.isMSOffice(file.getName()) || 
+    				FSUtil.isZip(file.getName()))
+    			
+    			return true;
+    		
+    		return false;
+    	}
+
+
+    	protected void sleep() {
+    		
+    		if (LAPSE_BETWEEN_PUT_MILLISECONDS>0) {
+    			try {
+    				Thread.sleep(LAPSE_BETWEEN_PUT_MILLISECONDS);
+    			} catch (InterruptedException e) {
+    			}
+    		}
+    	}
+
+
+
 }
-
-
-
-
-
-

@@ -29,9 +29,11 @@ public abstract class BaseTest {
 	
 	public String SRC_DIR_V0 = SRC_DIR +   File.separator + "v0";
 	public String SRC_DIR_V1 = SRC_DIR + File.separator+"v1";
+	public String SRC_DIR_V6 = SRC_DIR + File.separator+"v6";
 	
 	public String DOWNLOAD_DIR_V0 = DOWNLOAD_DIR+File.separator+"v0";
 	public String DOWNLOAD_DIR_V1 = DOWNLOAD_DIR+File.separator+"v1";
+	public String DOWNLOAD_DIR_V6 = DOWNLOAD_DIR+File.separator+"v6";
 	
 	public String endpoint = "http://localhost";
 	public int port = 9234;
@@ -48,6 +50,7 @@ public abstract class BaseTest {
 	private Map<String, String> map = new TreeMap<String, String>();
 	
 	public BaseTest() {
+		
 		logger.debug("Start " + this.getClass().getName());
 		
 		String tempDir = System.getProperty("tempDir");
