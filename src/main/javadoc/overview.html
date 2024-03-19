@@ -20,9 +20,7 @@
 
 <p><a href="https://odilon.io" target="_blank"> Odilon</a> is a scalable and lightweight <b>Open Source Object</b> Storage that runs on standard hardware.</p>
 
-<p>It is an infrastructure software to be used by applications that need to store large amounts of unstructured digital objects such as pdf, MS Word, XLSX files, backups, videos, photos or audio. 
-</p>
-<p>It  was designed for enterprise software that needs to store terabytes of medium to large size objects (like photos or pdfs) securely and safely through encryption, replication and redundancy. A typical installation would by 100M pdfs 20KB-30MB each.</p>
+<p>It is a single dependency-free binary that runs on Linux and Windows designed to be used by applications that need to store terabytes of medium to large size objects (pdfs, photos, audio, video, etcetera) securely and safely through encryption, replication and redundancy. A typical installation would by 100M pdfs 20KB-30MB each.</p>
 
 <p>It has a simple single-level folder structure similar to the <b>Bucket / Object</b> model of Amazon S3. It is small and easy to integrate, offers encryption, data protection and fault tolerance (<b>software RAID</b> and <b>Erasure Codes</b>) and detection of silent data degradation. Odilon also supports vversion control</b> and <b>master - standby</b> replication over the Internet for disaster recovery and anti ransomware.
 Data replication is done asynchronously using HTTP/S over the local network or the Internet. Setting up a standby server is simple, just add the URL and credentials to the master configuration file and restart. Odilon will propagate each operation to the standby server. It will also run a replication process in background for data existing before connecting the standby server.
@@ -126,20 +124,17 @@ try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file)
 </code>
 </pre>
 </div>
-
-
 <br/>
 
 <h2>Web Resources</h2>
 <ul>
 <li>Sample programs: <a href="https://odilon.io/development.html" target="_blank">https://odilon.io/development.html</a></li>
 <li>Download Odilon server: <a href="https://odilon.io" target="_blank">https://odilon.io</a></li>
+<li><a href="https://github.com/atolomei/odilon-server">Odilon Server - GitHub</a></li>
 <li>How to install and configure Odilon Server: <a href="https://odilon.io/configuration.html" target="_blank">https://odilon.io/configuration.html</a></li>
 <li>Twitter for Odilon news: <a href="https://twitter.com/OdilonSoftware" target="_blank">#OdilonSoftware</a></li>
 <!--li>StackOverflow: <a href="https://stackoverflow.com" target="_blank">https://stackoverflow.com</a></li -->
-
 </ul>
-
 
 </body>
 </html>

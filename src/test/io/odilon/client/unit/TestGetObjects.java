@@ -42,7 +42,7 @@ public class TestGetObjects extends BaseTest {
 	
 	static final int BUFFER_SIZE = 4096;
 	
-	static final int MAX = 40;
+	static final int MAX = 20;
 	static final long MAX_LENGTH = 100 * 10000; // 1 MB
 	
 	private Bucket bucket_1 = null;

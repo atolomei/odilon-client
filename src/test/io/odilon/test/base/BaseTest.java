@@ -23,8 +23,8 @@ public abstract class BaseTest {
 	private static final Logger logger = Logger.getLogger(BaseTest.class.getName());
 
 	
-	private String SRC_DIR = "d:"+File.separator+"test-files";
-	private String DOWNLOAD_DIR = "d:"+File.separator+"test-files-download";
+	private String SRC_DIR = "C:"+File.separator+"test-files";
+	private String DOWNLOAD_DIR = "C:"+File.separator+"test-files-download";
 	
 	
 	public String SRC_DIR_V0 = SRC_DIR +   File.separator + "v0";

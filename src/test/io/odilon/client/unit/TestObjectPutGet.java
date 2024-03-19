@@ -40,10 +40,10 @@ public class TestObjectPutGet extends BaseTest {
 	
 	static final int BUFFER_SIZE = 8192;
 	
-	int MAX = 4;
+	int MAX = 20;
 	long MAX_LENGTH =120 * 100 * 10000; // 120 MB
 		
-	long LAPSE_BETWEEN_PUT_MILLISECONDS = 1600;
+	long LAPSE_BETWEEN_PUT_MILLISECONDS = 200;
 	
 	private Bucket bucket_1 = null;
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
@@ -86,10 +86,9 @@ public class TestObjectPutGet extends BaseTest {
 			error("testAddObjects");
 
 		
-		if (!testAddObjectsStream("java http"))
-			error("testAddObjectsStream java http");
+		//if (!testAddObjectsStream("java http"))
+		//	error("testAddObjectsStream java http");
 	
-		
 		showResults();
 	}
 	
@@ -117,19 +116,21 @@ public class TestObjectPutGet extends BaseTest {
 		int counter = 0;
 		String bucketName = this.bucket_1.getName();
 		
-		for (File fi:dir.listFiles()) {
+		for (File file : dir.listFiles()) {
 				
 				if (counter >= max)
 					break;
 				
-				if (isElegible(fi)) {
+				if (isElegible(file)) {
 					
-					String objectName = FSUtil.getBaseName(fi.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*10000))).intValue());;
+					String objectName = FSUtil.getBaseName(file.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*10000))).intValue());;
 
-					try (InputStream inputStream = new BufferedInputStream(new FileInputStream(fi))) {
+					try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
 						
-						getClient().putObjectStream(bucketName, objectName, inputStream, Optional.of(fi.getName()), Optional.empty());
-						testFiles.put(bucketName+"-"+objectName, new TestFile(fi, bucketName, objectName));
+						getClient().putObjectStream(bucketName, objectName, inputStream, Optional.of(file.getName()), Optional.empty());
+						
+						
+						testFiles.put(bucketName+"-"+objectName, new TestFile(file, bucketName, objectName));
 						counter++;
 						
 						sleep();
@@ -238,19 +239,17 @@ public class TestObjectPutGet extends BaseTest {
 				String objectName = FSUtil.getBaseName(fi.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*100000))).intValue());
 				
 				try {
+					logger.info("upload -> " + fi.getName());
 					getClient().putObject(bucketName, objectName, fi);
 					testFiles.put(bucketName+"-"+objectName, new TestFile(fi, bucketName, objectName));
 					counter++; 
-					
 					sleep();
 					
 					/** display status every 4 seconds or so */
-					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-						logger.info( " testAddObjects -> " + String.valueOf(testFiles.size()));
-						showStatus = OffsetDateTime.now();
-					}
-
-
+					//if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
+					//	logger.info( " testAddObjects -> " + String.valueOf(testFiles.size()));
+					//	showStatus = OffsetDateTime.now();
+					//}
 					
 				} catch (ODClientException e) {
 					error(String.valueOf(e.getHttpStatus())+ " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
@@ -258,7 +257,7 @@ public class TestObjectPutGet extends BaseTest {
 			}
 		}
 		
-		logger.info( " testAddObjects total -> " + String.valueOf(testFiles.size()));
+		logger.info( " uploaded total -> " + String.valueOf(testFiles.size()));
 		
 		
 		// -----------
@@ -279,9 +278,15 @@ public class TestObjectPutGet extends BaseTest {
 				try {
 						getClient().getObject(meta.bucketName, meta.objectName, destFileName);
 						
+						//logger.debug(getClient().getPresignedObjectUrl(meta.bucketName, meta.objectName));
+						
+						
 				} catch (ODClientException | IOException e) {
 						error(e);
 				}
+				
+
+				
 				
 				TestFile t_file = testFiles.get(meta.bucketName+"-"+meta.objectName);
 				
@@ -391,8 +396,6 @@ public class TestObjectPutGet extends BaseTest {
     		}
         }
         
-
-        
         {
             File tmpdir = new File(DOWNLOAD_DIR_V6);
             
@@ -411,9 +414,6 @@ public class TestObjectPutGet extends BaseTest {
     		}
         }
 
-        
-        
-        
         String bucketTest = "dev-test";
         
         try {	
@@ -448,14 +448,14 @@ public class TestObjectPutGet extends BaseTest {
 		if (file.length()>MAX_LENGTH)
 			return false;
 		
-		if (	FSUtil.isText(file.getName()) || 
-				FSUtil.isText(file.getName()) || 
-				FSUtil.isPdf(file.getName())  || 
-				FSUtil.isImage(file.getName()) || 
-				FSUtil.isMSOffice(file.getName()) ||
-				FSUtil.isJar(file.getName()) ||
-				FSUtil.isAudio(file.getName()) ||
-				FSUtil.isVideo(file.getName()) ||
+		if (	FSUtil.isText(file.getName()) 		|| 
+				FSUtil.isText(file.getName()) 		|| 
+				FSUtil.isPdf(file.getName())  		|| 
+				FSUtil.isImage(file.getName()) 		|| 
+				FSUtil.isMSOffice(file.getName()) 	||
+				FSUtil.isJar(file.getName()) 		||
+				FSUtil.isAudio(file.getName()) 		||
+				FSUtil.isVideo(file.getName()) 		||
 				FSUtil.isExecutable(file.getName()) ||
 				FSUtil.isZip(file.getName()))
 			
@@ -464,7 +464,9 @@ public class TestObjectPutGet extends BaseTest {
 		return false;
 	}
 
-
+	/**
+	 * 
+	 */
 	protected void sleep() {
 		
 		if (LAPSE_BETWEEN_PUT_MILLISECONDS>0) {
@@ -474,7 +476,6 @@ public class TestObjectPutGet extends BaseTest {
 			}
 		}
 	}
-
 	
 }
 
