@@ -239,7 +239,7 @@ public class HttpRequest {
 	        outputStream.flush();
         } 
         
-        logger.debug("Written -> " + String.valueOf(bytesWritten) + " bytes");
+        //logger.debug("Written -> " + String.valueOf(bytesWritten) + " bytes");
     }
 
     

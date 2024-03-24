@@ -130,16 +130,17 @@ public class TestObjectPutGet extends BaseTest {
 						
 						getClient().putObjectStream(bucketName, objectName, inputStream, Optional.of(file.getName()), Optional.empty());
 						
-						
 						testFiles.put(bucketName+"-"+objectName, new TestFile(file, bucketName, objectName));
+						logger.info( String.valueOf(testFiles.size() + " testAddObjectsStream -> " + file.getName()));
 						counter++;
+						
 						
 						sleep();
 						
-						if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-							logger.info( "testAddObjectsStream -> " + String.valueOf(testFiles.size()));
-							showStatus = OffsetDateTime.now();
-						}
+						//if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
+						//	logger.info( "testAddObjectsStream -> " + String.valueOf(testFiles.size()));
+						//	showStatus = OffsetDateTime.now();
+						//}
 						
 					} catch (ODClientException e) {
 						error("Http status " + String.valueOf(e.getHttpStatus())+ " " + e.getMessage() + " | Odilon ErrCode: " + String.valueOf(e.getErrorCode()));
@@ -160,8 +161,7 @@ public class TestObjectPutGet extends BaseTest {
 				try {
 					 meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
 				} catch (ODClientException e) {
-						logger.error(e);
-						System.exit(1);
+						error(e);
 				}
 					
 				String destFileName = DOWNLOAD_DIR_V0 + File.separator + meta.fileName;
@@ -169,8 +169,7 @@ public class TestObjectPutGet extends BaseTest {
 				try {
 					getClient().getObject(meta.bucketName, meta.objectName, destFileName);
 				} catch (ODClientException | IOException e) {
-						logger.error(e);
-						System.exit(1);
+					error(e);
 				}
 				
 				TestFile t_file=testFiles.get(meta.bucketName+"-"+meta.objectName);
@@ -240,9 +239,13 @@ public class TestObjectPutGet extends BaseTest {
 				String objectName = FSUtil.getBaseName(fi.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*100000))).intValue());
 				
 				try {
-					logger.info("upload -> " + fi.getName());
+					
+					
+					
 					getClient().putObject(bucketName, objectName, fi);
 					testFiles.put(bucketName+"-"+objectName, new TestFile(fi, bucketName, objectName));
+					logger.info( String.valueOf(testFiles.size() + " testAddObjects -> " + fi.getName()));
+					
 					counter++; 
 					sleep();
 					
