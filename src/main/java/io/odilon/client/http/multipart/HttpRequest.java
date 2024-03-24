@@ -107,7 +107,6 @@ public class HttpRequest {
         	try {
 				write(requestEntity);
 			} catch (IOException e1) {
-				logger.error(e1);
 				throw new InternalCriticalException(e1);
 			}
 
@@ -115,7 +114,6 @@ public class HttpRequest {
         	try {
 				responseCode = getResponseCode();
 			} catch (IOException e1) {
-				logger.error(e1);
 				throw new InternalCriticalException(e1);
 			}
             
@@ -125,7 +123,6 @@ public class HttpRequest {
 				try {
 					response = (T)mapper.readValue(getResponse(), responseType);
 				} catch (IOException e) {
-					logger.error(e);
 					throw new InternalCriticalException(e);
 				}
             	return response;
@@ -138,18 +135,20 @@ public class HttpRequest {
     											   ErrorCode.ACCESS_DENIED.getMessage()
     								);
     			}
-				String rm = null;
+				StringBuilder  rm = new StringBuilder();
 				try {
-
-					rm = getConnection().getResponseMessage() + " |  url -> " + getUrl() ;
-					
-					
+					rm.append(" url -> " + getUrl());
+					BufferedReader r=getErrorReader();
+					if (r!=null) {
+						String s = r.readLine();
+						if (s!=null)
+							rm.append(" | " + s);
+					}
 					throw new ODClientException(responseCode, 
 							   ErrorCode.INTERNAL_ERROR.getCode(), 
-							   rm);
+							   rm.toString());
 					
 				} catch (IOException e) {
-					logger.error(e);
 					throw new InternalCriticalException(e);
 				}
  			}
@@ -223,24 +222,24 @@ public class HttpRequest {
     }
 
     protected void write(HttpEntity entity) throws IOException {
-        InputStream inputStream = entity.getStream();
+        
         OutputStream outputStream = getConnection().getOutputStream();
         byte[] buffer = new byte[BUFFER];
         int bytesRead = -1;
-        long bytesWrited = 0;
+        long bytesWritten = 0;
         long totalBytes = entity.getSize();
         int progress = 0;
-        try {
+        try  (InputStream inputStream = entity.getStream()) {
 	        while ((bytesRead = inputStream.read(buffer)) != -1) {
 	            outputStream.write( buffer, 0, bytesRead);
-	            bytesWrited += bytesRead;
-	            progress = totalBytes>0 ? (int)((double)bytesWrited/(double)totalBytes * 100) : 0;
+	            bytesWritten += bytesRead;
+	            progress = totalBytes>0 ? (int)((double) bytesWritten/(double)totalBytes * 100) : 0;
 	            if (getListener()!=null) getListener().onUpdate(progress);
 	        }
 	        outputStream.flush();
-        } finally {
-        	inputStream.close();
-        }
+        } 
+        
+        logger.debug("Written -> " + String.valueOf(bytesWritten) + " bytes");
     }
 
     
@@ -252,43 +251,8 @@ public class HttpRequest {
         return response;
     }
 
-    /*
-    protected ApiException getApiException() {
-    	int responseCode = 0;
-    	try {
-	        responseCode = getResponseCode();
-	        String errorCode = "", message = "";
-	        if (responseCode!=401) {
-	            IError apiError = getApiError();
-	            if (apiError!=null) {
-	            	errorCode = apiError.getCode();
-	            	message = apiError.getMessage();
-	            }
-	        }
-	        else {
-	            errorCode = String.valueOf(ApiError.ACCESS_DENIED.getCode());
-	            message = String.valueOf(ApiError.ACCESS_DENIED.getMessage());
-	        }
-	        return new ApiException(HttpStatus.valueOf(responseCode), errorCode, message);
-    	}
-    	catch (IOException e) {
-            return new  ApiException(HttpStatus.valueOf(responseCode), ApiError.CLIENT_ERROR, e.getMessage());
-    	}
-    }
-    */
-    /*
-    protected IError getApiError() {
-        try {
-			RestObjectMapper restObjectMapper = new RestObjectMapper();
-			restObjectMapper.setSerializationInclusion(Include.NON_NULL);
-			IError applicationError = restObjectMapper.readValue(getErrorResponse(), IError.class);
-            return applicationError;
-        }
-        catch (Exception e) {
-            return null;
-        }
-    }
-     */
+   
+    
     
     protected String getErrorResponse() throws  IOException {
         String response = null, line;

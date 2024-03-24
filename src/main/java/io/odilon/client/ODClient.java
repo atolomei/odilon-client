@@ -111,6 +111,9 @@ import okhttp3.Response;
  * <p>
  * For examples on using this library, please visit <a href="http://odilon.io">http://odilon.io</a>
  * </p>
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
+ * 
  */
 public class ODClient implements OdilonClient {
 
@@ -204,7 +207,6 @@ public class ODClient implements OdilonClient {
 	 
 	 private boolean isLogStream = false;
 
-	 //private TempCache tempCache = new  TempCache();
 	
 	@Override
 	public String getUrl() {
@@ -226,6 +228,15 @@ public class ODClient implements OdilonClient {
 		}
 
 
+
+	/**
+	 * 
+	 * @param endpoint
+	 * @param port
+	 * @param accessKey
+	 * @param secretKey
+	 * @param secure
+	 */
 	public ODClient(String endpoint, int port, String accessKey, String secretKey, boolean secure)  {
 		
 			  Check.requireNonNullStringArgument(endpoint,  "endpoint is null or emtpy");
@@ -357,17 +368,10 @@ public class ODClient implements OdilonClient {
 		if (getChunk()>0) 
 			 request.setChunk(getChunk());
 		
-		InputStream is = (stream instanceof BufferedInputStream) ? stream : (new BufferedInputStream(stream)); 
-	
-		try {
+		try (InputStream is = (stream instanceof BufferedInputStream) ? stream : (new BufferedInputStream(stream))) {
 			meta = request.exchange(new HttpFileEntity(is, objectName, size.orElse(Long.valueOf(-1).longValue())), new TypeReference<ObjectMetadata>() {});
-		} finally {
-			try {
-				is.close();
-			} catch (IOException e) {
-				logger.error(e);
-				throw new ODClientException(e);
-			}
+		} catch (IOException e) {
+			throw new ODClientException(e);
 		}
 		return meta;
 	}
@@ -602,7 +606,7 @@ public class ODClient implements OdilonClient {
 	}
 	 
 	  
-	@Override 
+	@Override		 
 	public boolean existsBucket(String bucketName) throws ODClientException {
 		Check.requireNonNullStringArgument(bucketName, "bucketName is null");
 		HttpResponse httpResponse = executeReq(API_BUCKET_EXISTS, Method.GET, Optional.of(bucketName));
@@ -610,7 +614,7 @@ public class ODClient implements OdilonClient {
 			String res=httpResponse.body().string();
 			return res.equals("true");
 		} catch (IOException e) {
-			logger.error(e);
+			logger.error("existsBucket error");
 			throw new ODClientException(e);
 		}
 	}
@@ -894,7 +898,6 @@ public class ODClient implements OdilonClient {
 			  		return this.objectMapper.readValue(str, ObjectMetadata.class);
 			  		
 			  } catch (JsonProcessingException e) {
-							logger.error(e);
 							throw new InternalCriticalException(e);
 			  }
 		  }
@@ -1209,7 +1212,6 @@ public class ODClient implements OdilonClient {
 			try {
 				urlEncoded = URLEncoder.encode(str, "UTF-8");
 			} catch (UnsupportedEncodingException e) {
-				logger.error(e);
 				throw new InternalCriticalException(e);
 			}
 			
@@ -1292,6 +1294,11 @@ public class ODClient implements OdilonClient {
 		  requestBuilder.header("Accept-Charset", "utf-8");
 		  requestBuilder.header("Accept-Encoding", "gzip, deflate");
 		  requestBuilder.header("Date", http_date.format(OffsetDateTime.now()));
+		  
+		  //requestBuilder.header("Content-Encoding", "gzip, deflate");
+		  
+		  
+		  
 		  
 		  if (multiPart) {
 			  requestBuilder.header("Transfer-Encoding", "gzip, chunked");
@@ -1516,10 +1523,14 @@ public class ODClient implements OdilonClient {
 			int httpCode = response.code();
 			
 			if (httpCode==ODHttpStatus.UNAUTHORIZED.value()) 
-				   throw new ODClientException(	ODHttpStatus.UNAUTHORIZED.value(), ErrorCode.ACCESS_DENIED.value(), ErrorCode.ACCESS_DENIED.getMessage());
+				   throw new ODClientException(	ODHttpStatus.UNAUTHORIZED.value(), ErrorCode.AUTHENTICATION_ERROR.value(), ErrorCode.AUTHENTICATION_ERROR.getMessage());
 			
 			if (httpCode==ODHttpStatus.INTERNAL_SERVER_ERROR.value()) { 
 				throw new ODClientException(ODHttpStatus.INTERNAL_SERVER_ERROR.value(), ErrorCode.INTERNAL_ERROR.value(), response.toString());
+			}
+			
+			if (httpCode==ODHttpStatus.FORBIDDEN.value()) { 
+				throw new ODClientException(ODHttpStatus.INTERNAL_SERVER_ERROR.value(), ErrorCode.ACCESS_DENIED.value(), response.toString());
 			}
 			
 		   	try {
@@ -1537,7 +1548,6 @@ public class ODClient implements OdilonClient {
 						throw(ex);
 		    		
 	    		} catch (JsonProcessingException e) {
-	    			logger.error(e);
 	    			throw new InternalCriticalException(e, str!=null? str:"");
 	    		}
 	  }
@@ -1570,7 +1580,6 @@ public class ODClient implements OdilonClient {
 	 				 try {
 	 					 headerMap.put("Content-Type", Optional.ofNullable(Files.probeContentType(filePath)).orElse(DEFAULT_CONTENT_TYPE));
 	 				 } catch (IOException e) {
-	 						logger.error(e);
 	 						throw new InternalCriticalException(e);
 	 				 }
 	 				 
@@ -1585,7 +1594,6 @@ public class ODClient implements OdilonClient {
 		 				try {
 		 					raFile = new RandomAccessFile(filePath.toFile(), "r");
 		 				} catch (FileNotFoundException e) {
-		 						logger.error(e);
 		 						throw new InternalCriticalException(e);
 		 				}
 		 															
@@ -1597,12 +1605,10 @@ public class ODClient implements OdilonClient {
 		 							return this.objectMapper.readValue(str, ObjectMetadata.class);
 		 							
 		 						  } catch (JsonProcessingException e) {
- 										logger.error(e);
  										throw new InternalCriticalException(e);
 		 						  }
 		 					  	
 		 				 } catch (IOException e) {
-		 						logger.error(e);
 		 						throw new InternalCriticalException(e);
 		 				 }
 		 				} finally {
@@ -1610,7 +1616,6 @@ public class ODClient implements OdilonClient {
 								try {
 									raFile.close();
 								} catch (IOException e) {
-										logger.error(e);
 										throw new InternalCriticalException(e);
 								}
 		 				}
@@ -1631,7 +1636,6 @@ public class ODClient implements OdilonClient {
 	 					  out.write(buf, 0, bytesRead);
 	 				}
 	 			} catch (IOException e) {
-	 				logger.error(e);
 	 				eThrow=e;
 	 				throw (e);		
 
@@ -1641,18 +1645,21 @@ public class ODClient implements OdilonClient {
 	 					try {
 	 						stream.close();
 	 					} catch (IOException e) {
-	 						logger.error(e);
 	 						if (eThrow==null)
  								eThrow = e;
+	 						else
+	 							logger.error(e, "NOT THROWN");
+	 							
 	 					}	
 	 				}
 	 				if (out!=null) { 
 	 					try {
 	 						out.close();
 	 					} catch (IOException e) {
-	 						logger.error(e);
 	 						if (eThrow==null)
 	 							eThrow = e;
+	 						else
+	 							logger.error(e, "NOT THROWN");
 	 					}	
 	 				}
 	 				
@@ -1735,19 +1742,4 @@ public class ODClient implements OdilonClient {
 }
 
 
-/*
-* 
-@Override
-public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, String fileName, String contentType) throws ODClientException {
-	Check.requireNonNullStringArgument(bucketName, "bucketName is null");
-	Check.requireNonNullStringArgument(objectName, "objectName can not be null | b:"+ bucketName);
-	Check.requireNonNullStringArgument(fileName, "fileName is null");
-	String tempName = bucketName+"-" + objectName + "-" + String.valueOf(System.currentTimeMillis())+ "-" + String.valueOf(Double.valueOf(Math.abs(Math.random()*100000)).intValue()) + fileName;
-	try {
-		return putObjectInternal(bucketName, objectName, this.tempCache.addCache(tempName, stream), fileName);
-	} finally {
-		this.tempCache.removeCache(tempName);	
-	}
-}
- */
 

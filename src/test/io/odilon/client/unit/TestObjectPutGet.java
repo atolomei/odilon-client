@@ -9,7 +9,9 @@ import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -40,7 +42,7 @@ public class TestObjectPutGet extends BaseTest {
 	
 	static final int BUFFER_SIZE = 8192;
 	
-	int MAX = 20;
+	int MAX = 4;
 	long MAX_LENGTH =120 * 100 * 10000; // 120 MB
 		
 	long LAPSE_BETWEEN_PUT_MILLISECONDS = 200;
@@ -72,24 +74,23 @@ public class TestObjectPutGet extends BaseTest {
 			LAPSE_BETWEEN_PUT_MILLISECONDS  = Long.valueOf(lapse.trim()); 
 	}
 	
-	/**
-	 * 
-	 * 
-	 * 
-	 */
+
 	@Test	
 	public void executeTest() {
-
+		
 		preCondition();
 
+		if (!testAddObjectsStream("java http"))
+			error("testAddObjectsStream java http");
+		
 		if (!testAddObjects())
 			error("testAddObjects");
-
-		
-		//if (!testAddObjectsStream("java http"))
-		//	error("testAddObjectsStream java http");
 	
-		showResults();
+		 showResults();
+		
+		
+		
+			
 	}
 	
 	/**
@@ -141,7 +142,7 @@ public class TestObjectPutGet extends BaseTest {
 						}
 						
 					} catch (ODClientException e) {
-						error(String.valueOf(e.getHttpStatus())+ " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
+						error("Http status " + String.valueOf(e.getHttpStatus())+ " " + e.getMessage() + " | Odilon ErrCode: " + String.valueOf(e.getErrorCode()));
 					} catch (FileNotFoundException e1) {
 						error(e1);
 					} catch (IOException e2) {

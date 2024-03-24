@@ -38,8 +38,6 @@ public abstract class BaseTest {
 	public String endpoint = "http://localhost";
 	public int port = 9234;
 
-	
-	
 	private String accessKey = "odilon";
 	private String secretKey = "odilon";
 	private ODClient client;
@@ -158,7 +156,7 @@ public abstract class BaseTest {
 	}
 	
 	public String ping() {
-        return getClient().ping();
+		return getClient().ping();
 	}
 	
 	@Test
