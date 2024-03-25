@@ -791,8 +791,12 @@ public interface OdilonClient {
 	   * @param readTimeout       HTTP read timeout in milliseconds.
 	   */
 
+	
 	public void setTimeout(long connectTimeoutMilliseconds, long writeTimeoutMilliseconds, long readTimeoutMilliseconds);
-
+	
+	public void setChunkSize(int chunkSize);
+	public int getChunkSize();
+	
 	
 	/* =======================================
 	 * DEBUG
@@ -807,8 +811,17 @@ public interface OdilonClient {
 	 * <p>disable printing the request-response raw info to a stream</p>
 	 */
 	public void traceOff() throws IOException;
+
+
+
+
+
+
+
+
+
+
 	
-	//public void addServiceRequest(String requestClass) throws ODClientException;
 	
 	
 	

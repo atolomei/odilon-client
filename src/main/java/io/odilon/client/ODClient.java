@@ -95,6 +95,7 @@ import io.odilon.model.list.ResultSet;
 import io.odilon.net.ErrorCode;
 import io.odilon.net.ODHttpStatus;
 import io.odilon.util.Check;
+import io.odilon.util.RandomIDGenerator;
 import okhttp3.Cache;
 import okhttp3.HttpUrl;
 import okhttp3.MultipartBody;
@@ -207,11 +208,9 @@ public class ODClient implements OdilonClient {
 	 
 	 private boolean isLogStream = false;
 
+	 private RandomIDGenerator rand = new RandomIDGenerator();
+	 
 	
-	@Override
-	public String getUrl() {
-		return urlStr;
-	}
 
 	/***
 	 * 
@@ -365,8 +364,8 @@ public class ODClient implements OdilonClient {
 		
 		HttpMultipart request = new HttpMultipart(urlBuilder.toString(), plainCredentials);
 		
-		if (getChunk()>0) 
-			 request.setChunk(getChunk());
+		if (getChunkSize()>0) 
+			 request.setChunk(getChunkSize());
 		
 		try (InputStream is = (stream instanceof BufferedInputStream) ? stream : (new BufferedInputStream(stream))) {
 			meta = request.exchange(new HttpFileEntity(is, objectName, size.orElse(Long.valueOf(-1).longValue())), new TypeReference<ObjectMetadata>() {});
@@ -1128,13 +1127,65 @@ public class ODClient implements OdilonClient {
 	  return created;
 	}
 
-	public void setChunk(int chunkSize) {
+	
+	
+	@Override
+	public void setChunkSize(int chunkSize) {
 			this.chunkSize=chunkSize;
 	}
 	
-	public int getChunk() {
+	
+	@Override
+	public int getChunkSize() {
 		return this.chunkSize;
 	}
+
+	@Override
+	public String getUrl() {
+		return urlStr;
+	}
+
+	
+	protected ObjectMapper getObjectMapper() {
+		return this.objectMapper;
+	}
+ 
+ 
+	private void transferTo(InputStream stream, String destFileName) throws IOException {
+ 			
+ 	 		byte[] buf = new byte[ BUFFER_SIZE ];
+ 	 		int bytesRead;
+ 			BufferedOutputStream out = null;
+ 			IOException eThrow = null;
+ 			
+ 			try (stream) {
+ 				out = new BufferedOutputStream(new FileOutputStream(destFileName), BUFFER_SIZE);
+ 				while ((bytesRead = stream.read(buf, 0, buf.length)) >= 0) {
+ 					  out.write(buf, 0, bytesRead);
+ 				}
+ 			} catch (IOException e) {
+ 				eThrow=e;
+ 				throw (e);		
+
+ 			} finally {
+ 				
+ 				if (out!=null) { 
+ 					try {
+ 						out.close();
+ 					} catch (IOException e) {
+ 						if (eThrow==null)
+ 							eThrow = e;
+ 						else
+ 							logger.error(e, "NOT THROWN");
+ 					}	
+ 				}
+ 				
+ 				if (eThrow !=null)
+ 					throw eThrow;
+ 			}
+ 		}
+
+ 
 	
 	/**
 	   * Gets object's data of given offset and length as {@link InputStream} in the given bucket. The InputStream must be
@@ -1622,55 +1673,8 @@ public class ODClient implements OdilonClient {
 	 			 }
 	 	  
 
-	 
-	 protected void transferTo(InputStream stream, String destFileName) throws IOException {
-	 			
-	 	 		byte[] buf = new byte[ BUFFER_SIZE ];
-	 	 		int bytesRead;
-	 			BufferedOutputStream out = null;
-	 			IOException eThrow = null;
-	 			
-	 			try {
-	 				out = new BufferedOutputStream(new FileOutputStream(destFileName), BUFFER_SIZE);
-	 				while ((bytesRead = stream.read(buf, 0, buf.length)) >= 0) {
-	 					  out.write(buf, 0, bytesRead);
-	 				}
-	 			} catch (IOException e) {
-	 				eThrow=e;
-	 				throw (e);		
-
-	 			} finally {
-	 				
-	 				if (stream!=null) { 
-	 					try {
-	 						stream.close();
-	 					} catch (IOException e) {
-	 						if (eThrow==null)
- 								eThrow = e;
-	 						else
-	 							logger.error(e, "NOT THROWN");
-	 							
-	 					}	
-	 				}
-	 				if (out!=null) { 
-	 					try {
-	 						out.close();
-	 					} catch (IOException e) {
-	 						if (eThrow==null)
-	 							eThrow = e;
-	 						else
-	 							logger.error(e, "NOT THROWN");
-	 					}	
-	 				}
-	 				
-	 				if (eThrow !=null)
-	 					throw eThrow;
-	 			}
-	 		}
-	 	    
-	 	   protected ObjectMapper getObjectMapper() {
-	 			return this.objectMapper;
-	 	   }
+	 	 	    
+	 	   
 
 	 	  private static boolean isLinux() {
 	 			if  (System.getenv("OS")!=null && System.getenv("OS").toLowerCase().contains("windows")) 
@@ -1678,8 +1682,10 @@ public class ODClient implements OdilonClient {
 	 			return true;
 	 		}
 
+	 	 
+	 			 
 		  private String getCacheWorkDir() {									
-		 		return getHomeDirAbsolutePath() + File.separator + "tmp";
+		 		return getHomeDirAbsolutePath() + File.separator + "tmp" + File.separator +  rand.randomString(6);
 		  }
 		
 		  private String getHomeDirAbsolutePath() {
@@ -1710,7 +1716,7 @@ public class ODClient implements OdilonClient {
 	 }
 	
 	
-	/*
+	/**
 	 * @param endpoint
 	 * @return {@code true} if the endpoint is valid {@link https://en.wikipedia.org/wiki/Hostname#Restrictions_on_valid_host_names}
 	 * 
@@ -1739,6 +1745,8 @@ public class ODClient implements OdilonClient {
 		    }
 		    return true;
 	}
+	
+
 }
 
 
