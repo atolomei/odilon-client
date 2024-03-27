@@ -815,6 +815,12 @@ public interface OdilonClient {
 
 
 
+	public void setCharset(String c);
+	public String getCharset();
+
+
+
+
 
 
 

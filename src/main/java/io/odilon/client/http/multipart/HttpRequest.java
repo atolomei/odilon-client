@@ -41,11 +41,13 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
 import java.util.Base64;
 
 @JsonInclude(Include.NON_NULL)
 public class HttpRequest {
 		
+	@SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(HttpRequest.class.getName());
 
 	private static final int BUFFER = 4096;
@@ -99,7 +101,14 @@ public class HttpRequest {
 		this.chunk = chunk;
 	}
 
-
+	/**
+	 * 
+	 * @param <T>
+	 * @param requestEntity
+	 * @param responseType
+	 * @return
+	 * @throws ODClientException
+	 */
     public <T> T exchange(HttpEntity requestEntity, TypeReference<T> responseType) throws ODClientException {
     
     	int responseCode = 0;
@@ -159,10 +168,11 @@ public class HttpRequest {
     }
 
 
-    public PrintWriter getWriter() throws IOException  {
+    public PrintWriter getWriter( String charset) throws IOException  {
         if (writer==null) {
             OutputStream outputStream = getConnection().getOutputStream();
-            writer = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"), true);
+            //writer = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"), true);
+            writer = new PrintWriter(new OutputStreamWriter(outputStream, charset ), true);
         }
         return writer;
     }
@@ -295,14 +305,12 @@ public class HttpRequest {
             conn.setRequestProperty("Authorization", "Bearer " + getApiToken());
         else
             conn.setRequestProperty("Authorization", "Basic " + base64Credentials);
-        
         return conn;
     }
 
     protected void close() {
         conn = null;
     }
-
 }
 
 

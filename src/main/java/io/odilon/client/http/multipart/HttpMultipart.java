@@ -26,13 +26,15 @@ import java.net.URLConnection;
  */
 public class HttpMultipart extends HttpRequest {
 
-    private String boundary = "===" + System.currentTimeMillis() + "===";
-
-    public HttpMultipart(String url, String credentials) {
-    		this(url, credentials,null);
+    private final String boundary = "===" + System.currentTimeMillis() + "===";
+    private final String charset;
+    
+    public HttpMultipart(String url, String credentials, String charset) {
+    		this(url, credentials, charset, null);
     }
-    public HttpMultipart(String url, String credentials, ProgressListener listener) {
+    public HttpMultipart(String url, String credentials, String charset, ProgressListener listener) {
         super(url, credentials, listener);
+        this.charset=charset;
     }
 
     @Override
@@ -56,11 +58,16 @@ public class HttpMultipart extends HttpRequest {
     protected String getContentType() {
         return "multipart/form-data;boundary=" + boundary;
     }
-    										
+
+    
+    public String getCharSet() {
+		 return charset;
+	 }
+    
     protected void writeStart(HttpEntity requestEntity) throws IOException {
         String fieldName = "file";
         String fileName = requestEntity.getName();
-        PrintWriter writer = getWriter();
+        PrintWriter writer = getWriter(getCharSet());
         writer.append("--" + boundary).append(LINE_FEED);
         writer.append("Content-Disposition: form-data; name=\"" + fieldName + "\"; filename=\"" + fileName + "\"");
         writer.append(LINE_FEED);
@@ -72,7 +79,7 @@ public class HttpMultipart extends HttpRequest {
     }
 
     protected void writeEnd(HttpEntity requestEntity) throws IOException {
-        PrintWriter writer = getWriter();
+        PrintWriter writer = getWriter(getCharSet());
         writer.flush();
         writer.append(LINE_FEED).flush();
         writer.append("--" + boundary + "--").append(LINE_FEED);

@@ -31,6 +31,7 @@ import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -208,10 +209,15 @@ public class ODClient implements OdilonClient {
 	 
 	 private boolean isLogStream = false;
 
+
+	 private String charset = Charset.defaultCharset().name();
+	 
+	 
 	 private RandomIDGenerator rand = new RandomIDGenerator();
 	 
 	
-
+	 
+	 
 	/***
 	 * 
 	 * <p>By default the server has the following settings in file {@code odilon.properties}
@@ -264,9 +270,9 @@ public class ODClient implements OdilonClient {
 		        .cache(cache)
 		        .build();
 		      
-		      urlStr = endpoint;
+		      this.urlStr = endpoint;
 		      
-		      HttpUrl url = HttpUrl.parse(urlStr);
+		      HttpUrl url = HttpUrl.parse(this.urlStr);
 			  
 			  if (url != null) {
 
@@ -361,8 +367,9 @@ public class ODClient implements OdilonClient {
 		
 		urlBuilder.addEncodedQueryParameter("fileName", fileName.orElse(objectName));
 		urlBuilder.addEncodedQueryParameter("Content-Type", cType);
+
 		
-		HttpMultipart request = new HttpMultipart(urlBuilder.toString(), plainCredentials);
+		HttpMultipart request = new HttpMultipart(urlBuilder.toString(), plainCredentials, this.getCharset());
 		
 		if (getChunkSize()>0) 
 			 request.setChunk(getChunkSize());
@@ -1140,6 +1147,17 @@ public class ODClient implements OdilonClient {
 		return this.chunkSize;
 	}
 
+	@Override
+	public void setCharset(String c) {
+		 this.charset=c;
+	 }
+
+	@Override
+	public String getCharset() {
+		 return charset;
+	 }
+
+	 
 	@Override
 	public String getUrl() {
 		return urlStr;
