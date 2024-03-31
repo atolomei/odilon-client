@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 
+import io.odilon.client.OdilonClient;
 import io.odilon.client.error.ODClientException;
 import io.odilon.client.util.FSUtil;
 import io.odilon.log.Logger;
@@ -27,9 +28,6 @@ public class TestFileCache extends BaseTest {
 	private static final Logger logger = Logger.getLogger(TestObjectPutGet.class.getName());
 	
 	static final int BUFFER_SIZE = 8192;
-	
-	int MAX = 20;
-	long MAX_LENGTH =20 * 100 * 10000; // 20 MB
 		
 	long LAPSE_BETWEEN_PUT_MILLISECONDS = 1600;
 	
@@ -41,25 +39,22 @@ public class TestFileCache extends BaseTest {
 	private OffsetDateTime showStatus = OffsetDateTime.now();
 	private String bucketTest = "testcache";
 	
-	/**
-	 * 
-	 */
 	public TestFileCache() {
-		
 		String max = System.getProperty("max");
 		String maxLength = System.getProperty("maxLength");
 		String lapse = System.getProperty("lapseBetweenPutSeconds");
 		
 		if (max!=null)
-			MAX = Integer.valueOf(max.trim());
+			setMax(Integer.valueOf(max.trim()));
 		
 		if (maxLength!=null)
-			MAX_LENGTH = Long.valueOf(maxLength.trim());
+			setMaxLength(Long.valueOf(maxLength.trim()));
 		
 		if (lapse!=null)
-			LAPSE_BETWEEN_PUT_MILLISECONDS  = Long.valueOf(lapse.trim()); 
+			LAPSE_BETWEEN_PUT_MILLISECONDS  = Long.valueOf(lapse.trim());
+		
 	}
-
+	
 	
 	@Override
 	public void executeTest() {
@@ -89,7 +84,7 @@ public class TestFileCache extends BaseTest {
 		String bucketName = null;
 		bucketName = this.bucket_1.getName();
 			
-		int max=MAX;
+		
 		
 		MetricsValues metrics = null;
 		
@@ -109,7 +104,7 @@ public class TestFileCache extends BaseTest {
 		//
 		for (File fi:dir.listFiles()) {
 			
-			if (counter >= max)
+			if (counter >= getMax())
 				break;
 			
 			if (isElegible(fi)) {
@@ -382,25 +377,7 @@ public class TestFileCache extends BaseTest {
 
 	
 	
-       private boolean isElegible(File file) {
-    		
-    		if (file.isDirectory())
-    			return false;
-    		
-    		if (file.length()>MAX_LENGTH)
-    			return false;
-    		
-    		if (	FSUtil.isText(file.getName()) || 
-    				FSUtil.isText(file.getName()) || 
-    				FSUtil.isPdf(file.getName())  || 
-    				FSUtil.isImage(file.getName()) || 
-    				FSUtil.isMSOffice(file.getName()) || 
-    				FSUtil.isZip(file.getName()))
-    			
-    			return true;
-    		
-    		return false;
-    	}
+       
 
 
     	protected void sleep() {

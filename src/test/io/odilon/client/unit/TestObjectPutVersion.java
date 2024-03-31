@@ -13,6 +13,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
+import io.odilon.client.OdilonClient;
 import io.odilon.client.error.ODClientException;
 import io.odilon.client.util.FSUtil;
 import io.odilon.log.Logger;
@@ -21,14 +22,13 @@ import io.odilon.model.ObjectMetadata;
 import io.odilon.test.base.BaseTest;
 import io.odilon.test.base.TestFile;
 import io.odilon.util.ODFileUtils;
-
+			
 public class TestObjectPutVersion extends BaseTest {
 
 	
 	private static final Logger logger = Logger.getLogger(TestObjectPutGet.class.getName());
 	
-	static final int MAX = 10;
-	static final long MAX_LENGTH = 100 * 1000; // 100 KB
+	
 	
 	long LAPSE_BETWEEN_PUT_MILLISECONDS = 2000;
 	
@@ -39,7 +39,17 @@ public class TestObjectPutVersion extends BaseTest {
 	int counter = 0;
 	
 	OffsetDateTime showStatus = OffsetDateTime.now();
+
 	
+	/**
+	 * 
+	 * uploada n files and then a new version for each of them
+	 * 
+	 */
+	public TestObjectPutVersion() {
+	}
+	
+
 	@Override
 	public void executeTest() {
 		
@@ -178,10 +188,10 @@ public class TestObjectPutVersion extends BaseTest {
 		// put files
 		for (File fi:dir.listFiles()) {
 
-			if (counter == MAX)
+			if (counter == getMax())
 				break;
 			
-			if (!fi.isDirectory() && (FSUtil.isPdf(fi.getName()) || FSUtil.isImage(fi.getName())) && (fi.length()<MAX_LENGTH)) {
+			if (!fi.isDirectory() && (FSUtil.isPdf(fi.getName()) || FSUtil.isImage(fi.getName())) && (fi.length()<getMaxLength())) {
 				String objectName = FSUtil.getBaseName(fi.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*100000))).intValue());
 				try {
 					getClient().putObject(bucketName, objectName, fi);

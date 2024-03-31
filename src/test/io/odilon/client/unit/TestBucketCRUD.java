@@ -17,7 +17,6 @@
 package io.odilon.client.unit;
 
 import java.util.List;
-import java.util.Random;
 
 import org.junit.Assert;
 
@@ -35,11 +34,12 @@ import io.odilon.test.base.BaseTest;
  */
 public class TestBucketCRUD extends BaseTest {
 		
-	private static final Logger logger = Logger.getLogger(BucketTest.class.getName());
+	private static final Logger logger = Logger.getLogger(TestBucketCRUD.class.getName());
 
 	private String buckets[] = {"bucket1", "bucket2", "bucket3", "bucket4", "bucket5"};
 	private String bucketEmpty;
 
+	
 	
 	public TestBucketCRUD() {
 		logger.debug("Start " + this.getClass().getName());
@@ -81,13 +81,6 @@ public class TestBucketCRUD extends BaseTest {
         if (!testRemoveBucketDoesNotExist())
         	error("testRemoveBucketDoesNotExist");
         
-        //if (!testCreateBucketExist())
-        //	error("testCreateBucketExist");
-
-        //if (!testRemoveBucketNotEmtpy())
-        //	error("testRemoveBucketNotEmtpy");
-        
-      
         
         showResults();
 	}
@@ -111,7 +104,6 @@ public class TestBucketCRUD extends BaseTest {
 	    	return true;
 	    	
         }  catch (Exception e) {
-        	logger.error(e);	
         	error(e);
         	return false;
     	}
@@ -189,71 +181,8 @@ public class TestBucketCRUD extends BaseTest {
 	}
 	
 
-	private boolean testRemoveBucketNotEmtpy() {
-		
-		Bucket bucket = null;
-		
-        try {
-        	final int size = getClient().listBuckets().size();
-        	if (size==0) { 
-        		throw new RuntimeException("no buckets exist. Aborting");
-        	}
-        	
-        	for (Bucket b: getClient().listBuckets()) {
-        		if (!getClient().isEmpty(b.getName())) {
-        			bucket=b;
-        			break;
-        		}
-        	}
-        	if (bucket==null)
-        		throw new RuntimeException("there is no bucket with items. Aborting");
-        	
-        	
-        }  catch (Exception e) {
-    		error(e);
-    	}
-	    	
-        try {
-        	getClient().deleteBucket(bucket.getName());
-	   		logger.error("must have thrown exception here");
-			return false;
-	   		
-	   	} catch (ODClientException e) {
-	   		logger.debug("This exception is ok -> " + e.toString());
-	   		getMap().put("testRemoveBucketNotEmtpy", "ok");
-	   		return true;
-	   	}
-	}
+ 
 
-	/**
-	 * @return
-
-	private boolean testCreateBucketExist() {
-		
-		final int index = Double.valueOf(Math.abs(Math.random()*10000)).intValue();
-    	Bucket bucket = null;
-    	
-        try {
-        	final int size = getClient().listBuckets().size();
-        	if (size==0)  
-	    		throw new RuntimeException("no buckets exist. Aborting");
-	    	bucket = getClient().listBuckets().get( index % size);
-	    	
-        }  catch (Exception e) {
-        	error(e);
-    	}
-	    	
-
-        try {
-	   		getClient().createBucket(bucket.getName());
-	   	} catch (ODClientException e) {
-	   		logger.debug("This exception is ok -> " + e.toString());
-			getMap().put("testCreateBucketExist", "ok");
-			return true;
-	   	}
-	   	return false;
-	}
-	 */
 
 	/**
 	 * 
@@ -321,22 +250,8 @@ public class TestBucketCRUD extends BaseTest {
     	}
         return false;
 	}
+
 	
 	
-
-/**
-	private String randomString(int size) {
-		int leftLimit = 97; // letter 'a'
-	    int rightLimit = 122; // letter 'z'
-	    int targetStringLength =  size;
-	    Random random = new Random();
-	    String generatedString = random.ints(leftLimit, rightLimit + 1)
-	      .limit(targetStringLength)
-	      .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-	      .toString();
-	    return generatedString;
-	}
-	**/
-
 	
 }

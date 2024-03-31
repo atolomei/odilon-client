@@ -42,8 +42,6 @@ public class TestObjectPutGetShort extends BaseTest {
 	
 	static final int BUFFER_SIZE = 4096;
 	
-	static final int MAX = 20;
-	static final long MAX_LENGTH =20 * 100 * 10000; // 20 MB
 	
 	private Bucket bucket_1 = null;
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
@@ -52,6 +50,7 @@ public class TestObjectPutGetShort extends BaseTest {
 	
 	public TestObjectPutGetShort() {
 	}
+
 	
 	@Test	
 	public void executeTest() {
@@ -60,8 +59,6 @@ public class TestObjectPutGetShort extends BaseTest {
 		
 		if (!testAddObjectsStream("java http"))
 		error("testAddObjectsStream java http");
-	
-
 		showResults();
 	}
 	
@@ -74,13 +71,12 @@ public class TestObjectPutGetShort extends BaseTest {
 	    final File dir = new File(TEMP_DIR);
 	    
         if ((!dir.exists()) || (!dir.isDirectory()))  
-			throw new RuntimeException("Dir not exists or the File is not Dir -> " +TEMP_DIR);
+			error("Dir not exists or the File is not Dir -> " +TEMP_DIR);
 		
         if ( (!saveDir.exists()) || (!saveDir.isDirectory())) {
 	        try {
 				FileUtils.forceMkdir(saveDir);
 			} catch (IOException e) {
-					logger.error(e);
 					error(e.getClass().getName() + " | " + e.getMessage());
 			}
         }
@@ -90,7 +86,7 @@ public class TestObjectPutGetShort extends BaseTest {
 			int counter = 0;
 			String bucketName = this.bucket_1.getName();
 			for (File fi:dir.listFiles()) {
-				if (counter == MAX)
+				if (counter == getMax())
 					break;
 				
 				if (isElegible(fi)) {
@@ -210,7 +206,7 @@ public class TestObjectPutGetShort extends BaseTest {
 		//
 		for (File fi:dir.listFiles()) {
 			
-			if (counter == MAX)
+			if (counter == getMax())
 				break;
 			
 			if (isElegible(fi)) {
@@ -263,7 +259,7 @@ public class TestObjectPutGetShort extends BaseTest {
 						}
 							
 					} catch (NoSuchAlgorithmException | IOException e) {
-						throw new RuntimeException(e);
+						error(e);
 					}
 				}
 				else {
@@ -335,19 +331,6 @@ public class TestObjectPutGetShort extends BaseTest {
 	}
 	
 
-	private boolean isElegible(File file) {
-		
-		if (file.isDirectory())
-			return false;
-		
-		if (file.length()>MAX_LENGTH)
-			return false;
-		
-		if (FSUtil.isText(file.getName()) || FSUtil.isPdf(file.getName()) || FSUtil.isImage(file.getName()) || FSUtil.isMSOffice(file.getName()) || FSUtil.isZip(file.getName()))
-			return true;
-		
-		return false;
-	}
 
 
 }

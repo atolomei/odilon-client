@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
+import io.odilon.client.OdilonClient;
 import io.odilon.client.error.ODClientException;
 import io.odilon.client.util.FSUtil;
 import io.odilon.log.Logger;
@@ -29,12 +30,11 @@ import io.odilon.test.base.TestFile;
 import io.odilon.util.ODFileUtils;
 
 public class TestVersionControlUpload extends BaseTest {
-
+				
 	
 	private static final Logger logger = Logger.getLogger(TestObjectPutGet.class.getName());
 	
-	static final int MAX = 300;
-	static final long MAX_LENGTH = 100 * 1000; // 100 KB
+	
 	
 	private long LAPSE_BETWEEN_PUT_MILLISECONDS = 2000;
 
@@ -55,7 +55,14 @@ public class TestVersionControlUpload extends BaseTest {
 	
 	private Map<Integer, File> secondVersion = new HashMap<Integer, File>();
 	
-	NumberFormatter nf;
+	
+	
+	public TestVersionControlUpload() {
+	
+	}
+	
+	
+	
 	
 	@Override
 	public void executeTest() {
@@ -216,7 +223,7 @@ public class TestVersionControlUpload extends BaseTest {
 		
 		for (File fi:dir.listFiles()) {
 
-			if (counterPutObject.get() == MAX)
+			if (counterPutObject.get() == getMax())
 				break;
 			
 			if ( isValid(fi)) {
@@ -234,7 +241,7 @@ public class TestVersionControlUpload extends BaseTest {
 					
 					counterPutObject.incrementAndGet();
 					
-					sleep();
+					//sleep();
 					
 					/** display status every 3 seconds or so */
 					if ( dateTimeDifference(showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
@@ -259,7 +266,7 @@ public class TestVersionControlUpload extends BaseTest {
 	}
 	
 	private boolean isValid(File fi) {
-		return ( (!fi.isDirectory()) && (FSUtil.isPdf(fi.getName())&& (fi.length()<MAX_LENGTH)));
+		return ( (!fi.isDirectory()) && (FSUtil.isPdf(fi.getName())&& (fi.length()<getMaxLength())));
 	}
 
 	/**
@@ -406,7 +413,7 @@ public class TestVersionControlUpload extends BaseTest {
 				if (!getClient().hasVersions(v.bucketName, v.objectName))
 					error("should have versions -> b:" + v.bucketName + " o:" + v.objectName);
 				
-				sleep();
+				//sleep();
 
 				if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
 					logger.debug( "putObjectNewVersion -> " + String.valueOf(counterNewVersion.get()));

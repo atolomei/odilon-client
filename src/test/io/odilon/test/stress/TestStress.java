@@ -144,26 +144,6 @@ public class TestStress extends BaseTest {
 	}
 	
 	
-	private boolean isElegible(File file) {
-		
-		if (file.length()>MAX_LENGTH)
-				return false;
-		
-		
-		if (FSUtil.isLog(file.getName()))
-			return false;
-
-		if (	 FSUtil.isPdf(file.getName())    		|| 
-				 FSUtil.isImage(file.getName())  		|| 
-				 FSUtil.isAudio(file.getName()) 		|| 
-				 FSUtil.isMSOffice(file.getName()) 		||
-				 FSUtil.isText(file.getName()) 			||
-				 FSUtil.isZip(file.getName())
-				 ) {
-			return true;
-		}
-		return false;
-	}
 	
 	private void add(File dir) {
 		

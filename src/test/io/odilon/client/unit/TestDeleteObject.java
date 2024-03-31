@@ -24,6 +24,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.odilon.client.OdilonClient;
 import io.odilon.client.error.ODClientException;
 import io.odilon.client.util.FSUtil;
 import io.odilon.log.Logger;
@@ -45,12 +46,14 @@ public class TestDeleteObject extends BaseTest {
 	static final int MAX = 10;
 	static final long MAX_LENGTH = 100 * 10000; // 1 MB
 	
-	int LAPSE_BETWEEN_DELETE_MILLISECONDS = 800;
+	private int LAPSE_BETWEEN_DELETE_MILLISECONDS = 800;
+	private int index = 0;
 	
 	private Bucket bucket_1 = null;
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
-	OffsetDateTime showStatus = OffsetDateTime.now();	
-
+	private OffsetDateTime showStatus = OffsetDateTime.now();	
+	
+	
 	public TestDeleteObject() {
 		String lapse = System.getProperty("lapseBetweenDeleteSeconds");
 		if (lapse!=null)
@@ -58,14 +61,8 @@ public class TestDeleteObject extends BaseTest {
 	}
 	
 	
-	int index = 0;
-	
-	
-	
-	@Override
 	public void executeTest() {
 		
-
 		bucket_1 = createTestDeleteBucket();
 		
 		index = 0;
@@ -81,8 +78,8 @@ public class TestDeleteObject extends BaseTest {
 		index = 0;
 		removeTestBucket();
 
-		index = 0;
-		testDeleteAllObjects();
+		//index = 0;
+		//testDeleteAllObjects();
 		
 		showResults();
 
@@ -164,22 +161,14 @@ public class TestDeleteObject extends BaseTest {
 			return false;
 		}
 		
-		
-		
-		
 	}
+	
+	
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	/**
+	 * 
+	 * @return
+	 */
 	public Bucket createTestDeleteBucket() {
 		
 		String bucketName = "test-delete";
@@ -215,7 +204,7 @@ public class TestDeleteObject extends BaseTest {
 						error("should not exist ->" + tf.bucketName + " | " + tf.objectName);
 					}
 					
-					sleep();
+					//sleep();
 
 					/** display status every 4 seconds or so */
 					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
@@ -263,7 +252,7 @@ public class TestDeleteObject extends BaseTest {
 		
 		for (File fi:dir.listFiles()) {
 			
-			if (counter == MAX)
+			if (counter == getMax())
 				break;
 			
 			if (!fi.isDirectory() && (FSUtil.isPdf(fi.getName()) || FSUtil.isImage(fi.getName()) || FSUtil.isZip(fi.getName())) && (fi.length()<MAX_LENGTH)) {
@@ -274,7 +263,7 @@ public class TestDeleteObject extends BaseTest {
 					testFiles.put(bucketName+"-"+objectName, new TestFile(fi, bucketName, objectName));
 					counter++; 
 					
-					sleep();
+					//sleep();
 
 					/** display status every 4 seconds or so */
 					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
@@ -288,6 +277,10 @@ public class TestDeleteObject extends BaseTest {
 				}
 			}
 		}
+		
+		
+		logger.info( "testAddObjects -> Total:  " + String.valueOf(testFiles.size()));
+		
 		
 		testFiles.forEach( (k,v) -> {
 		ObjectMetadata meta = null;
@@ -317,11 +310,11 @@ public class TestDeleteObject extends BaseTest {
 				String new_sha = ODFileUtils.calculateSHA256String(new File(destFileName));
 				
 				if (!src_sha.equals(new_sha)) {
-					throw new RuntimeException("Error sha256 are not equal -> " + meta.bucketName+"-"+meta.objectName);
+					error("Error sha256 are not equal -> " + meta.bucketName+"-"+meta.objectName);
 				}
 					
 			} catch (NoSuchAlgorithmException | IOException e) {
-				throw new RuntimeException(e);
+				error(e);
 			}
 		}
 		else {
@@ -334,6 +327,8 @@ public class TestDeleteObject extends BaseTest {
 	getMap().put("testAddObjects", "ok");
 	return true;
 	}
+
+	
 
 protected void sleep() {
 		

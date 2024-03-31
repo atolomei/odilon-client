@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 
+import io.odilon.client.OdilonClient;
 import io.odilon.client.error.ODClientException;
 import io.odilon.log.Logger;
 import io.odilon.model.Bucket;
@@ -42,8 +43,7 @@ public class TestGetObjects extends BaseTest {
 	
 	static final int BUFFER_SIZE = 4096;
 	
-	static final int MAX = 20;
-	static final long MAX_LENGTH = 100 * 10000; // 1 MB
+	
 	
 	private Bucket bucket_1 = null;
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
@@ -52,6 +52,9 @@ public class TestGetObjects extends BaseTest {
 	
 	public TestGetObjects () {
 	}
+	
+	
+
 	
 	@Override
 	public void executeTest() {
@@ -76,7 +79,7 @@ public class TestGetObjects extends BaseTest {
 			try {
 				resultSet = getClient().listObjects(bucket_1.getName(), Optional.empty(), Optional.empty());
 				
-				while (resultSet.hasNext() && counter++<MAX) {
+				while (resultSet.hasNext() && counter++< getMax()) {
 					
 					Item<ObjectMetadata> item = resultSet.next();
 		    		if (item.isOk()) {
@@ -87,8 +90,7 @@ public class TestGetObjects extends BaseTest {
 		    				getClient().getObject(meta.bucketName, meta.objectName, DOWNLOAD_DIR + File.separator + meta.fileName);
 		    				
 						} catch (IOException e) {
-							logger.error(e);
-							System.exit(1);
+							error(e);
 						}
 		    		}
 		    		else
@@ -96,8 +98,7 @@ public class TestGetObjects extends BaseTest {
 				}
 				
 			} catch (ODClientException e) {
-				logger.error(e);
-				System.exit(1);
+				error(e);
 			}
 			
 			getMap().put("testGetObjects", "ok");
@@ -157,8 +158,10 @@ public class TestGetObjects extends BaseTest {
         
 		try {	
 			if (getClient().listBuckets().isEmpty())
-				throw new RuntimeException("listBuckets().isEmpty()");
+				error("listBuckets().isEmpty()");
+			
 			bucket_1 = getClient().listBuckets().get(0);
+			
 		} catch (ODClientException e) {
 			error(e.getClass().getName() + " | " + e.getMessage());
 		}

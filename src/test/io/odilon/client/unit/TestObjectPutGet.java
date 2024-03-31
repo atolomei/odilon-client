@@ -9,9 +9,7 @@ import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -42,8 +40,6 @@ public class TestObjectPutGet extends BaseTest {
 	
 	static final int BUFFER_SIZE = 8192;
 	
-	int MAX = 4;
-	long MAX_LENGTH =120 * 100 * 10000; // 120 MB
 		
 	long LAPSE_BETWEEN_PUT_MILLISECONDS = 200;
 	
@@ -54,27 +50,14 @@ public class TestObjectPutGet extends BaseTest {
 	
 	private OffsetDateTime showStatus = OffsetDateTime.now();
 
-
-	/**
-	 * 
-	 */
+	
 	public TestObjectPutGet() {
-		
-		String max = System.getProperty("max");
-		String maxLength = System.getProperty("maxLength");
 		String lapse = System.getProperty("lapseBetweenPutSeconds");
-		
-		if (max!=null)
-			MAX = Integer.valueOf(max.trim());
-		
-		if (maxLength!=null)
-			MAX_LENGTH = Long.valueOf(maxLength.trim());
-		
 		if (lapse!=null)
-			LAPSE_BETWEEN_PUT_MILLISECONDS  = Long.valueOf(lapse.trim()); 
+			LAPSE_BETWEEN_PUT_MILLISECONDS  = Long.valueOf(lapse.trim());
 	}
 	
-
+	
 	@Test	
 	public void executeTest() {
 		
@@ -87,10 +70,6 @@ public class TestObjectPutGet extends BaseTest {
 			error("testAddObjects");
 	
 		 showResults();
-		
-		
-		
-			
 	}
 	
 	/**
@@ -112,14 +91,14 @@ public class TestObjectPutGet extends BaseTest {
 			}
         }
 
-        int max=MAX;
+        
         	
 		int counter = 0;
 		String bucketName = this.bucket_1.getName();
 		
 		for (File file : dir.listFiles()) {
 				
-				if (counter >= max)
+				if (counter >= getMax())
 					break;
 				
 				if (isElegible(file)) {
@@ -131,16 +110,15 @@ public class TestObjectPutGet extends BaseTest {
 						getClient().putObjectStream(bucketName, objectName, inputStream, Optional.of(file.getName()), Optional.empty());
 						
 						testFiles.put(bucketName+"-"+objectName, new TestFile(file, bucketName, objectName));
-						logger.info( String.valueOf(testFiles.size() + " testAddObjectsStream -> " + file.getName()));
+						//logger.info( String.valueOf(testFiles.size() + " testAddObjectsStream -> " + file.getName()));
 						counter++;
-						
 						
 						sleep();
 						
-						//if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-						//	logger.info( "testAddObjectsStream -> " + String.valueOf(testFiles.size()));
-						//	showStatus = OffsetDateTime.now();
-						//}
+						if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
+							logger.info( "testAddObjectsStream -> " + String.valueOf(testFiles.size()));
+							showStatus = OffsetDateTime.now();
+						}
 						
 					} catch (ODClientException e) {
 						error("Http status " + String.valueOf(e.getHttpStatus())+ " " + e.getMessage() + " | Odilon ErrCode: " + String.valueOf(e.getErrorCode()));
@@ -225,13 +203,13 @@ public class TestObjectPutGet extends BaseTest {
 		String bucketName = null;
 		bucketName = this.bucket_1.getName();
 			
-		int max=MAX;
+		
 		
 		// put files
 		//
 		for (File fi:dir.listFiles()) {
 			
-			if (counter >= max)
+			if (counter >= getMax())
 				break;
 			
 			if (isElegible(fi)) {
@@ -244,16 +222,16 @@ public class TestObjectPutGet extends BaseTest {
 					
 					getClient().putObject(bucketName, objectName, fi);
 					testFiles.put(bucketName+"-"+objectName, new TestFile(fi, bucketName, objectName));
-					logger.info( String.valueOf(testFiles.size() + " testAddObjects -> " + fi.getName()));
+					//logger.info( String.valueOf(testFiles.size() + " testAddObjects -> " + fi.getName()));
 					
 					counter++; 
 					sleep();
 					
-					/** display status every 4 seconds or so */
-					//if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-					//	logger.info( " testAddObjects -> " + String.valueOf(testFiles.size()));
-					//	showStatus = OffsetDateTime.now();
-					//}
+					/** display status every n seconds */
+					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
+						logger.info( " testAddObjects -> " + String.valueOf(testFiles.size()));
+						showStatus = OffsetDateTime.now();
+					}
 					
 				} catch (ODClientException e) {
 					error(String.valueOf(e.getHttpStatus())+ " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
@@ -282,16 +260,11 @@ public class TestObjectPutGet extends BaseTest {
 				try {
 						getClient().getObject(meta.bucketName, meta.objectName, destFileName);
 						
-						//logger.debug(getClient().getPresignedObjectUrl(meta.bucketName, meta.objectName));
-						
-						
 				} catch (ODClientException | IOException e) {
 						error(e);
 				}
 				
 
-				
-				
 				TestFile t_file = testFiles.get(meta.bucketName+"-"+meta.objectName);
 				
 				if (t_file!=null) {
@@ -438,35 +411,10 @@ public class TestObjectPutGet extends BaseTest {
 	
 	
 	/**
-	 * 
-	 * 
 	 * @param file
 	 * @return
 	 */
 
-	private boolean isElegible(File file) {
-		
-		if (file.isDirectory())
-			return false;
-		
-		if (file.length()>MAX_LENGTH)
-			return false;
-		
-		if (	FSUtil.isText(file.getName()) 		|| 
-				FSUtil.isText(file.getName()) 		|| 
-				FSUtil.isPdf(file.getName())  		|| 
-				FSUtil.isImage(file.getName()) 		|| 
-				FSUtil.isMSOffice(file.getName()) 	||
-				FSUtil.isJar(file.getName()) 		||
-				FSUtil.isAudio(file.getName()) 		||
-				FSUtil.isVideo(file.getName()) 		||
-				FSUtil.isExecutable(file.getName()) ||
-				FSUtil.isZip(file.getName()))
-			
-			return true;
-		
-		return false;
-	}
 
 	/**
 	 * 

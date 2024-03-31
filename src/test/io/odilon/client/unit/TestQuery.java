@@ -1,10 +1,13 @@
 package io.odilon.client.unit;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.Test;
 
+import io.odilon.client.OdilonClient;
 import io.odilon.client.error.ODClientException;
 import io.odilon.log.Logger;
 import io.odilon.model.Bucket;
@@ -22,16 +25,20 @@ public class TestQuery extends BaseTest {
 
 	public TestQuery() {
 	}
-
+	
+	
 	@Test
 	@Override
 	public void executeTest() {
 		
 		preCondition();
+		
+		loadTestBucket();
 		listObjects();
 		listPageSize();
 		listPrefix();
-
+		emptyTestBucket();
+		
 		logger.debug("--------------------");
 		map.forEach((k,v) -> logger.debug(k+" -> "+ v));
 		logger.debug("--------------------");
@@ -39,12 +46,53 @@ public class TestQuery extends BaseTest {
 	}
 
 	
+	
+
+	public void emptyTestBucket() {
+	
+		try {
+			
+			List<ObjectMetadata> list = new ArrayList<ObjectMetadata>();
+			
+			ResultSet<Item<ObjectMetadata>>  rs=getClient().listObjects("test-query");
+			
+			while (rs.hasNext()) {
+				Item<ObjectMetadata> item =rs.next();
+				if (item.isOk()) {
+					list.add(item.getObject());
+				}
+			}
+			
+
+			list.forEach(o -> {
+				try {
+					getClient().deleteObject(o.bucketName, o.objectName);
+				} catch (ODClientException e) {
+					error(e);
+				}
+			});
+			
+			
+		} catch (ODClientException e) {
+			error(e);
+		}
+		
+	}
+	
+	
+	public void loadTestBucket() {
+		putObjects("test-query");
+	}
+	
+	
+	
 	public boolean preCondition() {
 		try {
-			if (getClient().listBuckets().isEmpty())
-				error("listBuckets().isEmpty()");
+			if (!getClient().existsBucket("test-query")) {
+					getClient().createBucket("test-query");
+			}
+			bucket_1 = getClient().getBucket("test-query");
 			
-			bucket_1 = getClient().listBuckets().get(0);
 		} catch (ODClientException e) {
 			error(e);
 		}
@@ -55,13 +103,13 @@ public class TestQuery extends BaseTest {
 	 */
 	public void listPrefix() {
 		
-		logger.debug("listPrefix '0002-'");
 
 		try {
-	    	ResultSet<Item<ObjectMetadata>> resultSet = getClient().listObjects(bucket_1.getName(), Optional.of("0002-"), Optional.of(5));
+
+			ResultSet<Item<ObjectMetadata>> resultSet = getClient().listObjects(bucket_1.getName(), Optional.of("e"), Optional.of(10));
 	    	
 	    	if (resultSet == null)
-	    		throw new RuntimeException("resultSet is null");
+	    		error("resultSet is null");
 	    	
 	    	int counter = 0;
 	    	
@@ -70,7 +118,7 @@ public class TestQuery extends BaseTest {
 	    	while (resultSet.hasNext() && counter<100) {
 	    		Item<ObjectMetadata> item = resultSet.next();
 	    		if (item.isOk()) {
-	    			logger.debug(String.valueOf(counter) + " -> " + item.getObject().objectName);
+	    			logger.debug(String.valueOf(counter+1) + " -> " + item.getObject().objectName);
 	    			map_1.put(item.getObject().bucketName + "-" + item.getObject().objectName, item.getObject());
 	    		}
 	    		else
@@ -102,7 +150,7 @@ public class TestQuery extends BaseTest {
 	    		Item<ObjectMetadata> item = resultSet.next();
 	    		
 	    		if (item.isOk()) {
-	    			logger.debug(String.valueOf(counter) + " -> " + item.getObject().objectName);
+	    			logger.debug(String.valueOf(counter+1) + " -> " + item.getObject().objectName);
 	    			map_1.put(item.getObject().bucketName + "-" + item.getObject().objectName, item.getObject());
 	    		}
 	    		else
@@ -118,6 +166,12 @@ public class TestQuery extends BaseTest {
 		}
 	}
 	
+	
+		
+	/**
+	 * 
+	 * 
+	 */
 	public void listObjects() {
 		
 		logger.debug("list all defaults");
@@ -148,8 +202,7 @@ public class TestQuery extends BaseTest {
 	    	map.put("listObjects", "ok");
 	    
 	    } catch (ODClientException e) {
-	    	logger.error(e);
-			System.exit(1);
+	    		error(e);
 		}
 	}
 }

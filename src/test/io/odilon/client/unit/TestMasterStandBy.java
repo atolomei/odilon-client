@@ -30,39 +30,19 @@ public class TestMasterStandBy extends BaseTest {
 	
 	static final int BUFFER_SIZE = 4096;
 	
-	static final int MAX = 40;
-	static final long MAX_LENGTH =20 * 100 * 10000; // 20 MB
-	
 	private Bucket bucket_1 = null;
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
 	
-	private final File saveDir = new File(DOWNLOAD_DIR);
-	
-	
 	private String standByEndpoint = "http://localhost";
 	private int standByPort = 9211;
+	
 	private String standByAccessKey = "odilon";
 	private String standBySecretKey = "odilon";
+	
 	private ODClient standByClient;
-	private Bucket standByTestBucket;
 	
-	
-	
-	private String pingStandBy() {
-		return getStandByClient().ping();
-		
-	}
-	
-	private ODClient getStandByClient() {
 
-		
-		return standByClient;
-	}
-	
-	
-	
 	public TestMasterStandBy() {
-		
 	}
 	
 	@Override
@@ -75,25 +55,11 @@ public class TestMasterStandBy extends BaseTest {
 		testReadObjectsFromStandBy();		
 		
 		showResults();
-		
-
 	}
 
-	
-	private void connectStandBy() {
-		 try {
-				this.standByClient = new ODClient(standByEndpoint, standByPort, standByAccessKey, standBySecretKey);
-				logger.debug(standByClient.toString());
-		        
-			} catch (Exception e) {
-				error(e.getClass().getName() +( e.getMessage()!=null ? (" | " + e.getMessage()) : ""));
-			}
 
-	}
+
 	public boolean preCondition() {
-
-		
-		
 
         try {
 			String p=ping();
@@ -221,7 +187,7 @@ public class TestMasterStandBy extends BaseTest {
 						}
 							
 					} catch (NoSuchAlgorithmException | IOException e) {
-						throw new RuntimeException(e);
+						error(e);
 					}
 				}
 				else {
@@ -229,7 +195,6 @@ public class TestMasterStandBy extends BaseTest {
 				}
 		
 		});
-		
 		
 		getMap().put("testReadObjectsFromStandBy" + " | (" + String.valueOf(testFiles.size())+")", "ok");
 		return true;
@@ -254,7 +219,7 @@ public class TestMasterStandBy extends BaseTest {
 		//
 		for (File fi:dir.listFiles()) {
 			
-			if (counter == MAX)
+			if (counter == getMax())
 				break;
 			
 			if (isElegible(fi)) {
@@ -321,18 +286,19 @@ public class TestMasterStandBy extends BaseTest {
 	
 	}	
 		
-	
-	private boolean isElegible(File file) {
-		
-		if (file.isDirectory())
-			return false;
-		
-		if (file.length()>MAX_LENGTH)
-			return false;
-		
-		if (FSUtil.isText(file.getName()) || FSUtil.isPdf(file.getName()) || FSUtil.isImage(file.getName()) || FSUtil.isMSOffice(file.getName()) || FSUtil.isZip(file.getName()))
-			return true;
-		
-		return false;
+	private ODClient getStandByClient() {
+		return standByClient;
 	}
+
+	private void connectStandBy() {
+		 try {
+				this.standByClient = new ODClient(standByEndpoint, standByPort, standByAccessKey, standBySecretKey);
+				logger.debug(standByClient.toString());
+		        
+			} catch (Exception e) {
+				error(e.getClass().getName() +( e.getMessage()!=null ? (" | " + e.getMessage()) : ""));
+			}
+
+	}
+
 }

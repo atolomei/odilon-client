@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
+import io.odilon.client.OdilonClient;
 import io.odilon.client.error.ODClientException;
 import io.odilon.client.util.FSUtil;
 import io.odilon.log.Logger;
@@ -28,7 +29,7 @@ import io.odilon.test.base.TestFile;
 import io.odilon.util.ODFileUtils;
 
 public class TestVersionControlWipe extends BaseTest {
-
+			
 	
 	private static final Logger logger = Logger.getLogger(TestObjectPutGet.class.getName());
 	
@@ -37,10 +38,15 @@ public class TestVersionControlWipe extends BaseTest {
 	
 	private OffsetDateTime showStatus = OffsetDateTime.now();
 	
+	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
+	
+	
+	public TestVersionControlWipe() {
+	}
+	
 	
 	@Override
 	public void executeTest() {
-		
 		
 		if (!preCondition()) 
 			error("preCondition");
@@ -100,15 +106,15 @@ public class TestVersionControlWipe extends BaseTest {
 		
 		try {
 			
-			if (!getClient().existsBucket("test-version-control"))
-				error("bucket must exist -> " + "test-version-control");
+			if (!getClient().existsBucket("test-version-control")) {
+				getClient().createBucket("test-version-control");
+			}
 			
 			bucket = getClient().getBucket("test-version-control");
 			
 			if (getClient().isEmpty(bucket.getName())) {
-				error("bucket is empty -> " + bucket.getName());
+				testAddObjects();
 			}
-			
 			
 		} catch (ODClientException e) {
 			error(e);
@@ -116,6 +122,102 @@ public class TestVersionControlWipe extends BaseTest {
 		
 		return true;
 	}
+
+	
+	
+	/**
+	 * @return
+	 */
+	public boolean testAddObjects() {
+		
+        File dir = new File(SRC_DIR_V0);
+        
+        if ( (!dir.exists()) || (!dir.isDirectory())) { 
+			throw new RuntimeException("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+		}
+        
+		int counter = 0;
+		
+		String bucketName = null;
+		
+		
+		
+		bucketName = this.bucket.getName();
+		
+		
+		for (File fi:dir.listFiles()) {
+			
+			if (counter == getMax())
+				break;
+			
+			if (!fi.isDirectory() && (FSUtil.isPdf(fi.getName()) || FSUtil.isImage(fi.getName()) || FSUtil.isZip(fi.getName())) && (fi.length()<getMaxLength())) {
+				String objectName = FSUtil.getBaseName(fi.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*100000))).intValue());
+				try {
+					
+					getClient().putObject(bucketName, objectName, fi);
+					testFiles.put(bucketName+"-"+objectName, new TestFile(fi, bucketName, objectName));
+					counter++; 
+					
+				} catch (ODClientException e) {
+					error(String.valueOf(e.getHttpStatus())+ " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
+
+				}
+			}
+		}
+		
+		
+		logger.info( "testAddObjects -> Total:  " + String.valueOf(testFiles.size()));
+		
+		
+		testFiles.forEach( (k,v) -> {
+		ObjectMetadata meta = null;
+		
+		try {
+				 meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
+				
+		} catch (ODClientException e) {
+				error(e);
+		}
+			
+		String destFileName = DOWNLOAD_DIR_V0 + File.separator + meta.fileName;
+		
+		try {
+				getClient().getObject(meta.bucketName, meta.objectName, destFileName);
+				
+		} catch (ODClientException | IOException e) {
+				error(e);
+		}
+		
+		TestFile t_file=testFiles.get(meta.bucketName+"-"+meta.objectName);
+		
+		if (t_file!=null) {
+			
+			try {
+				String src_sha = t_file. getSrcFileSha256(0);
+				String new_sha = ODFileUtils.calculateSHA256String(new File(destFileName));
+				
+				if (!src_sha.equals(new_sha)) {
+					error("Error sha256 are not equal -> " + meta.bucketName+"-"+meta.objectName);
+				}
+					
+			} catch (NoSuchAlgorithmException | IOException e) {
+				error(e);
+			}
+		}
+		else {
+				error("Test file does not exist -> " + meta.bucketName+"-"+meta.objectName);
+		}
+
+	});
+	
+	logger.debug("testAddObjects", "ok");
+	getMap().put("testAddObjects", "ok");
+	return true;
+	}
+
+	
+
+
 
 	
 }	

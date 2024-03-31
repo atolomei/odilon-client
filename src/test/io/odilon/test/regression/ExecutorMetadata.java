@@ -1,6 +1,7 @@
 package io.odilon.test.regression;
 
 import io.odilon.client.ODClient;
+import io.odilon.client.OdilonClient;
 import io.odilon.client.error.ODClientException;
 import io.odilon.log.Logger;
 import io.odilon.model.Bucket;
@@ -14,7 +15,7 @@ public class ExecutorMetadata extends Executor {
 	
 	private Bucket bucket;
 	
-	public ExecutorMetadata(long sleepTime, ODClient client, Bucket bucket) {
+	public ExecutorMetadata(long sleepTime, OdilonClient client, Bucket bucket) {
 		super(sleepTime, client, bucket);
 	}
 

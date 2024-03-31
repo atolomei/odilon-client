@@ -1,5 +1,6 @@
 package io.odilon.client.unit;
 
+import io.odilon.client.ODClient;
 import io.odilon.client.error.ODClientException;
 import io.odilon.test.base.BaseTest;
 
@@ -13,7 +14,7 @@ public class TestServiceRequest extends BaseTest {
 		int counter = 0;
 		while (counter++ < 100) {
 		try {
-				getClient().addServiceRequest("Test");
+				((ODClient) getClient()).addServiceRequest("Test");
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {

@@ -3,6 +3,7 @@ package io.odilon.test.regression;
 import javax.annotation.PostConstruct;
 
 import io.odilon.client.ODClient;
+import io.odilon.client.OdilonClient;
 import io.odilon.log.Logger;
 import io.odilon.model.Bucket;
 import io.odilon.util.Check;
@@ -17,7 +18,7 @@ public abstract class Executor implements Runnable {
 	
 	private boolean exit = false;
 	
-	private ODClient client;
+	private OdilonClient client;
 	private  Bucket testBucket;
 	boolean isError = false;
 
@@ -29,7 +30,7 @@ public abstract class Executor implements Runnable {
 	public Executor() {
 	}
 
-	public Executor(long sleepTime, ODClient client, Bucket bucket) {
+	public Executor(long sleepTime, OdilonClient client, Bucket bucket) {
 		this.sleepTime=sleepTime;
 		this.client=client;
 		this.testBucket=bucket;
@@ -82,7 +83,7 @@ public abstract class Executor implements Runnable {
 		return sleepTime;
 	}
 
-	public ODClient getClient() {
+	public OdilonClient getClient() {
 		return client;
 	}
 	 
@@ -90,7 +91,6 @@ public abstract class Executor implements Runnable {
 		return isError;
 	}
 	
-
 	
 	public void run() {
 		
