@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
-import io.odilon.client.OdilonClient;
 import io.odilon.client.error.ODClientException;
 import io.odilon.client.util.FSUtil;
 import io.odilon.log.Logger;
@@ -34,10 +33,6 @@ public class TestVersionControlUpload extends BaseTest {
 	
 	private static final Logger logger = Logger.getLogger(TestObjectPutGet.class.getName());
 	
-	
-	
-	private long LAPSE_BETWEEN_PUT_MILLISECONDS = 2000;
-
 	private static Random random = new Random();
 	
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
@@ -75,6 +70,8 @@ public class TestVersionControlUpload extends BaseTest {
 		
 		if (!putObjectNewVersion())
 			error("putObjectNewVersion");
+		
+
 		
 		try {
 			if (getClient().isVersionControl()) {
@@ -276,6 +273,18 @@ public class TestVersionControlUpload extends BaseTest {
 	private boolean restoreObjectVersion() {
 
 		
+		File restoredDir = new File(DOWNLOAD_DIR_RESTORED);
+		
+		if (!restoredDir.exists()) {
+		
+			try {
+				FileUtils.forceMkdir(restoredDir);
+			} catch (IOException e) {
+				error(e);
+			}
+		}
+		
+		
 		counterRestoreObjectVersion.set(0);
 		
 		testFiles.forEach((k,v) -> 
@@ -283,28 +292,35 @@ public class TestVersionControlUpload extends BaseTest {
 			try {
 				if (getClient().hasVersions(v.bucketName, v.objectName)) {
 					
+					ObjectMetadata headMeta = getClient().getObjectMetadata(v.bucketName, v.objectName);
+					
+					//logger.debug("Current File -> " + headMeta.fileName + "  | version: " + String.valueOf(headMeta.version));
+					
+					
 					getClient().restoreObjectPreviousVersions(v.bucketName, v.objectName);
 					
 					ObjectMetadata meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
 					
-					if (meta.version!=0)
+					//logger.debug("Restored File -> " + meta.fileName +  "  | version: " + String.valueOf(meta.version));
+					
+					if (meta.version>=headMeta.version)
 						error("meta version error for -> " + v.bucketName + " " + v.objectName);
 					
-					String v0inServer = DOWNLOAD_DIR_V0 + File.separator + meta.fileName;
+					
 					try {
-						if ((new File(v0inServer)).exists())
-							FileUtils.forceDelete( new File(v0inServer));
+						if ((new File(restoredDir, meta.fileName)).exists())
+							FileUtils.forceDelete(new File(restoredDir, meta.fileName));
 						
 					} catch (IOException e) {
 						error(e);
 					}
-
-					InputStream is0 = null;
+					
+					InputStream isRestored = null;
 					
 					try {
 						
-						is0 = getClient().getObject(meta.bucketName, meta.objectName);
-						Files.copy(is0, (new File(v0inServer)).toPath(), StandardCopyOption.REPLACE_EXISTING);
+						isRestored = getClient().getObject(v.bucketName, v.objectName);
+						Files.copy(isRestored, (new File(restoredDir, meta.fileName)).toPath(), StandardCopyOption.REPLACE_EXISTING);
 						
 						counterRestoreObjectVersion.incrementAndGet();
 						
@@ -312,17 +328,15 @@ public class TestVersionControlUpload extends BaseTest {
 						
 						try {
 							
-							String src_sha0 = v.getSrcFileSha256(0);
+							String src_sha  =  v.getSrcFileSha256(headMeta.version);
+							String dest_sha =  ODFileUtils.calculateSHA256String(new File(restoredDir, meta.fileName));
 							
-							String dest_sha0 = ODFileUtils.calculateSHA256String(new File(v0inServer));
-							
-							
-							if (!dest_sha0.equals(src_sha0)) {
-								error("Error sha256 v0 are not equal -> " + 
+							if (!dest_sha.equals(src_sha)) {
+								error("Error sha256 are not equal -> " + 
 										meta.bucketName + "-" +
 										meta.objectName + 
-										" | dn v0 "  + v0inServer  + " - " + NumberFormatter.formatFileSize((new File(v0inServer)).length()) + " - " + 
-										" | src v0 " + v.getSrcFile(0).getName() + " -"  + NumberFormatter.formatFileSize(v.getSrcFile(0).length()));
+										" | downladed -> "  + meta.fileName  + " - " + NumberFormatter.formatFileSize((new File(restoredDir, meta.fileName)).length()) + " - " + 
+										" | source -> " + v.getSrcFile(headMeta.version).getName() + " -"  + NumberFormatter.formatFileSize(v.getSrcFile(headMeta.version).length()));
 							}
 							
 						} catch (NoSuchAlgorithmException | IOException e) {
@@ -334,11 +348,12 @@ public class TestVersionControlUpload extends BaseTest {
 					}
 					finally {
 						
-						if (is0!=null)
-							is0.close();
+						if(isRestored!=null) {
+							isRestored.close();
+						}
 					}
 					
-					sleep();
+					//sleep();
 					
 					/** display status every 3 seconds or so */
 					
@@ -548,7 +563,7 @@ public class TestVersionControlUpload extends BaseTest {
 						}
 					}
 					
-					sleep();
+					// sleep();
 					
 					/** display status every 3 seconds or so */
 					
@@ -597,14 +612,18 @@ public class TestVersionControlUpload extends BaseTest {
 					
 						ObjectMetadata original = testFiles.get(test.bucketName+"-"+test.objectName).getMetadata(meta.version);
 						
+						
 						/** validate metadata  **/
 						
-						if (!original.sha256.equals(meta.sha256)) {
-							error(test.bucketName+"-"+test.objectName +" ->  sha356 error");
+						if (original.hashCode()!=meta.hashCode()) {
+							
+							logger.debug("original -> " + original.toString());
+							logger.debug("meta -> " + meta.toString());
+							error(test.bucketName+"-"+test.objectName +" ->  hashcode error");
 						}
 					}
 		
-					sleep();
+					//sleep();
 					
 					/** display status every 3 seconds or so */
 					
@@ -684,17 +703,5 @@ public class TestVersionControlUpload extends BaseTest {
 		return true;
 	}
 
-	
-	protected void sleep() {
-		
-		if (LAPSE_BETWEEN_PUT_MILLISECONDS>0) {
-			try {
-				Thread.sleep(LAPSE_BETWEEN_PUT_MILLISECONDS);
-			} catch (InterruptedException e) {
-			}
-		}
-	}
-
-	
 
 }

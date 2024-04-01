@@ -55,11 +55,14 @@ public class TestPresignedUrl extends BaseTest {
 			
 			 ResultSet<Item<ObjectMetadata>> rs = getClient().listObjects(this.bucket_1.getName());
 			 int counter = 0;
+			 int total = 0;
+			 
 			 while (rs.hasNext() && counter++ < getMax()) {
 				 Item<ObjectMetadata> item = rs.next();
 				 if (item.isOk()) {
 					 	ObjectMetadata meta = item.getObject();
-						logger.debug(meta.bucketName + " / " + meta.objectName + " -> " + getClient().getPresignedObjectUrl(meta.bucketName, meta.objectName)) ;	 
+						logger.debug(meta.bucketName + " / " + meta.objectName + " -> " + getClient().getPresignedObjectUrl(meta.bucketName, meta.objectName)) ;
+						total++;
 				 }
 			 }
 			 
@@ -68,7 +71,7 @@ public class TestPresignedUrl extends BaseTest {
 				 // delete bucket
 			 }
 				 
-			getMap().put("presigned test -> " + String.valueOf(counter), "ok");
+			getMap().put("presigned test -> " + String.valueOf(total), "ok");
 			showResults();
 			 
 			 

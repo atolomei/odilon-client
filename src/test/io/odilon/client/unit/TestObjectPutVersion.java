@@ -30,8 +30,6 @@ public class TestObjectPutVersion extends BaseTest {
 	
 	
 	
-	long LAPSE_BETWEEN_PUT_MILLISECONDS = 2000;
-	
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
 	
 	private Bucket bucket_1;
@@ -162,16 +160,7 @@ public class TestObjectPutVersion extends BaseTest {
 	}
 
 	
-	protected void sleep() {
-		
-		if (LAPSE_BETWEEN_PUT_MILLISECONDS>0) {
-			try {
-				Thread.sleep(LAPSE_BETWEEN_PUT_MILLISECONDS);
-			} catch (InterruptedException e) {
-			}
-		}
-	}
-
+	
 	
 	/**
 	 * 
@@ -207,15 +196,12 @@ public class TestObjectPutVersion extends BaseTest {
 					
 					
 				} catch (ODClientException e) {
-					logger.error(String.valueOf(e.getHttpStatus())+ " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
-					System.exit(1);
+					error(String.valueOf(e.getHttpStatus())+ " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
 				}
 			}
 		}
 		
 		logger.info( "putObject total -> " + String.valueOf(getCounter()));
-		
-		logger.debug("putObject", "ok "  + String.valueOf(counter));
 		getMap().put("putObject", "ok "  + String.valueOf(counter));
 		
 		return true;

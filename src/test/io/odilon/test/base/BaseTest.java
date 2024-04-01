@@ -36,12 +36,14 @@ public abstract class BaseTest {
 	
 	
 	public String SRC_DIR_V0 = SRC_DIR + File.separator + "v0";
-	public String SRC_DIR_V1 = SRC_DIR + File.separator+"v1";
-	public String SRC_DIR_V6 = SRC_DIR + File.separator+"v6";
+	public String SRC_DIR_V1 = SRC_DIR + File.separator + "v1";
+	public String SRC_DIR_V2 = SRC_DIR + File.separator + "v2";
 	
 	public String DOWNLOAD_DIR_V0 = DOWNLOAD_DIR + File.separator+"v0";
 	public String DOWNLOAD_DIR_V1 = DOWNLOAD_DIR + File.separator+"v1";
-	public String DOWNLOAD_DIR_V6 = DOWNLOAD_DIR + File.separator+"v6";
+	public String DOWNLOAD_DIR_V2 = DOWNLOAD_DIR + File.separator+"v2";
+	
+	public String DOWNLOAD_DIR_RESTORED = DOWNLOAD_DIR + File.separator+"restored";
 	
 	public String endpoint = "http://localhost";
 	public int port = 9234;
@@ -51,7 +53,7 @@ public abstract class BaseTest {
 	private OdilonClient client;
 	private Bucket testBucket;
 
-	private int max = 10;
+	private int max = 20;
 	private long max_length =120 * 100 * 10000; // 120 MB
 	
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
@@ -61,7 +63,7 @@ public abstract class BaseTest {
 	
 	private Map<String, String> map = new TreeMap<String, String>();
 	
-
+	private long LAPSE_BETWEEN_PUT_MILLISECONDS = 100;
 	
 	
 	public BaseTest() {
@@ -83,6 +85,10 @@ public abstract class BaseTest {
 				
 		String tempEndpoint = System.getProperty("endpoint");
 		String tempPort = System.getProperty("port");
+	
+		String lapse = System.getProperty("lapseBetweenPutSeconds");
+		if (lapse!=null)
+			LAPSE_BETWEEN_PUT_MILLISECONDS  = Long.valueOf(lapse.trim());
 		
 
 		String max = System.getProperty("max");
@@ -108,7 +114,6 @@ public abstract class BaseTest {
 
 		
 		
-
 	}
 	
 		
@@ -286,7 +291,7 @@ public abstract class BaseTest {
         File dir = new File(SRC_DIR_V0);
         
         if ( (!dir.exists()) || (!dir.isDirectory())) { 
-			throw new RuntimeException("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+			error("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
 		}
         
 		int counter = 0;
@@ -393,6 +398,17 @@ public abstract class BaseTest {
 	}
 
 	
+	protected boolean isRAIDZero() {
+		if (getClient()!=null) {
+			try {
+				return (getClient().systemInfo().redundancyLevel==RedundancyLevel.RAID_0);
+			} catch (ODClientException e) {
+				error(e);
+			}
+		}
+		return false;
+	}
+	
 	
 	protected boolean isStandBy() {
 		if (getClient()!=null) {
@@ -407,9 +423,18 @@ public abstract class BaseTest {
 	}
 	
 	
-	
-	
-	
+	/**
+	 * 
+	 */
+	protected void sleep() {
+		
+		if (LAPSE_BETWEEN_PUT_MILLISECONDS>0) {
+			try {
+				Thread.sleep(LAPSE_BETWEEN_PUT_MILLISECONDS);
+			} catch (InterruptedException e) {
+			}
+		}
+	}	
 	
 	
 	

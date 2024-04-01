@@ -40,21 +40,20 @@ public class TestObjectPutGet extends BaseTest {
 	
 	static final int BUFFER_SIZE = 8192;
 	
-		
-	long LAPSE_BETWEEN_PUT_MILLISECONDS = 200;
+	private String sourceDir;
+	private String downloadDir;
+
+	
 	
 	private Bucket bucket_1 = null;
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
 	
-	private final File saveDir = new File(DOWNLOAD_DIR_V0);
 	
 	private OffsetDateTime showStatus = OffsetDateTime.now();
 
 	
 	public TestObjectPutGet() {
-		String lapse = System.getProperty("lapseBetweenPutSeconds");
-		if (lapse!=null)
-			LAPSE_BETWEEN_PUT_MILLISECONDS  = Long.valueOf(lapse.trim());
+		
 	}
 	
 	
@@ -72,25 +71,32 @@ public class TestObjectPutGet extends BaseTest {
 		 showResults();
 	}
 	
+	
+	
 	/**
 	 */
 	public boolean testAddObjectsStream(String version) {
 		
 	    Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
-        				
-	    final File dir = new File(SRC_DIR_V0);
+        	
+	    downloadDir = DOWNLOAD_DIR_V0;
+	    sourceDir = SRC_DIR_V0;
+	    
+	    
+	    final File dir = new File(sourceDir);
+	    final File dndir = new File(downloadDir);
+	    
 	    
         if ((!dir.exists()) || (!dir.isDirectory()))  
-			throw new RuntimeException("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+			error("Dir not exists or the File is not Dir -> " + sourceDir);
 		
-        if ( (!saveDir.exists()) || (!saveDir.isDirectory())) {
+        if ( (!dndir.exists()) || (!dndir.isDirectory())) {
 	        try {
-				FileUtils.forceMkdir(saveDir);
+				FileUtils.forceMkdir(dndir);
 			} catch (IOException e) {
 					error(e.getClass().getName() + " | " + e.getMessage());
 			}
         }
-
         
         	
 		int counter = 0;
@@ -110,10 +116,10 @@ public class TestObjectPutGet extends BaseTest {
 						getClient().putObjectStream(bucketName, objectName, inputStream, Optional.of(file.getName()), Optional.empty());
 						
 						testFiles.put(bucketName+"-"+objectName, new TestFile(file, bucketName, objectName));
-						//logger.info( String.valueOf(testFiles.size() + " testAddObjectsStream -> " + file.getName()));
+						logger.info( String.valueOf(testFiles.size() + " testAddObjectsStream -> " + file.getName()));
 						counter++;
 						
-						sleep();
+						//sleep();
 						
 						if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
 							logger.info( "testAddObjectsStream -> " + String.valueOf(testFiles.size()));
@@ -132,6 +138,9 @@ public class TestObjectPutGet extends BaseTest {
 			}
 			
 			logger.info( "testAddObjectsStream total -> " + String.valueOf(testFiles.size()));
+		
+			
+		
 			
 			testFiles.forEach((k,v) -> {
 					
@@ -142,10 +151,15 @@ public class TestObjectPutGet extends BaseTest {
 						error(e);
 				}
 					
-				String destFileName = DOWNLOAD_DIR_V0 + File.separator + meta.fileName;
+				String destFileName = downloadDir + File.separator + meta.fileName;
+				
+				if (new File(destFileName).exists())
+					FileUtils.deleteQuietly(new File(destFileName));
 				
 				try {
+
 					getClient().getObject(meta.bucketName, meta.objectName, destFileName);
+					
 				} catch (ODClientException | IOException e) {
 					error(e);
 				}
@@ -164,8 +178,6 @@ public class TestObjectPutGet extends BaseTest {
 							str.append("Error sha256 are not equal -> " + meta.bucketName+" / "+meta.objectName);
 							str.append(" | src -> " + String.valueOf(t_file.getSrcFile(0).length()) + "bytes");
 							str.append(" | dest -> " + String.valueOf(new File(destFileName).length()) + "bytes");
-							
-							logger.error(str.toString());
 							error(str.toString());
 						}
 							
@@ -192,11 +204,26 @@ public class TestObjectPutGet extends BaseTest {
 	 */
 	public boolean testAddObjects() {
 		
-        File dir = new File(SRC_DIR_V0);
+		
+	    downloadDir = DOWNLOAD_DIR_V0;
+	    sourceDir = SRC_DIR_V0;
+	    
+        File dir = new File(sourceDir);
+        final File dndir = new File(downloadDir);
+        
         
         if ( (!dir.exists()) || (!dir.isDirectory())) { 
-			throw new RuntimeException("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+			error("Dir not exists or the File is not Dir -> " +sourceDir);
 		}
+
+        if ( (!dndir.exists()) || (!dndir.isDirectory())) {
+	        try {
+				FileUtils.forceMkdir(dndir);
+			} catch (IOException e) {
+					error(e.getClass().getName() + " | " + e.getMessage());
+			}
+        }
+
         
 		int counter = 0;
 		
@@ -222,10 +249,10 @@ public class TestObjectPutGet extends BaseTest {
 					
 					getClient().putObject(bucketName, objectName, fi);
 					testFiles.put(bucketName+"-"+objectName, new TestFile(fi, bucketName, objectName));
-					//logger.info( String.valueOf(testFiles.size() + " testAddObjects -> " + fi.getName()));
+					logger.info( String.valueOf(testFiles.size() + " testAddObjects -> " + fi.getName()));
 					
 					counter++; 
-					sleep();
+					//sleep();
 					
 					/** display status every n seconds */
 					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
@@ -255,7 +282,10 @@ public class TestObjectPutGet extends BaseTest {
 						error(e);
 				}
 					
-				String destFileName = DOWNLOAD_DIR_V6+ File.separator + meta.fileName;
+				String destFileName = downloadDir + File.separator + meta.fileName;
+				
+				if (new File(destFileName).exists())
+					FileUtils.deleteQuietly(new File(destFileName));
 				
 				try {
 						getClient().getObject(meta.bucketName, meta.objectName, destFileName);
@@ -317,10 +347,10 @@ public class TestObjectPutGet extends BaseTest {
 
 		
 		{
-	        File dir = new File(SRC_DIR_V6);
+	        File dir = new File(SRC_DIR_V2);
 	        
 	        if ( (!dir.exists()) || (!dir.isDirectory())) { 
-				error("Dir not exists or the File is not Dir -> " +SRC_DIR_V6);
+				error("Dir not exists or the File is not Dir -> " +SRC_DIR_V2);
 			}
 		}
 		
@@ -374,7 +404,7 @@ public class TestObjectPutGet extends BaseTest {
         }
         
         {
-            File tmpdir = new File(DOWNLOAD_DIR_V6);
+            File tmpdir = new File(DOWNLOAD_DIR_V2);
             
             if ( (tmpdir.exists()) && (tmpdir.isDirectory())) { 
             	try {
@@ -416,18 +446,7 @@ public class TestObjectPutGet extends BaseTest {
 	 */
 
 
-	/**
-	 * 
-	 */
-	protected void sleep() {
-		
-		if (LAPSE_BETWEEN_PUT_MILLISECONDS>0) {
-			try {
-				Thread.sleep(LAPSE_BETWEEN_PUT_MILLISECONDS);
-			} catch (InterruptedException e) {
-			}
-		}
-	}
+
 	
 }
 

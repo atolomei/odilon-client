@@ -51,8 +51,8 @@ public class TestFile {
 		files.put(Integer.valueOf(newVersion), file);
 	}
 
-	public File getSrcFile(int n) {
-		return files.get(n);
+	public File getSrcFile(int version) {
+		return files.get(version);
 	}
 
 			

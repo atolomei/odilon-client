@@ -76,7 +76,7 @@ public class TestFileCache extends BaseTest {
         File dir = new File(SRC_DIR_V0);
         
         if ( (!dir.exists()) || (!dir.isDirectory())) { 
-			throw new RuntimeException("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+			error("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
 		}
         
 		int counter = 0;
@@ -84,7 +84,6 @@ public class TestFileCache extends BaseTest {
 		String bucketName = null;
 		bucketName = this.bucket_1.getName();
 			
-		
 		
 		MetricsValues metrics = null;
 		
@@ -116,7 +115,7 @@ public class TestFileCache extends BaseTest {
 					testFiles.put(bucketName+"-"+objectName, new TestFile(fi, bucketName, objectName));
 					counter++; 
 					
-					sleep();
+					// sleep();
 					
 					/** display status every 4 seconds or so */
 					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
@@ -161,7 +160,12 @@ public class TestFileCache extends BaseTest {
 						error(e);
 				}
 					
-				String destFileName = DOWNLOAD_DIR_V6+ File.separator + meta.fileName;
+				String destFileName = DOWNLOAD_DIR_V0+ File.separator + meta.fileName;
+				
+				
+				if ((new File(destFileName)).exists()) {
+					FileUtils.deleteQuietly(new File(destFileName));
+				}
 				
 				try {
 						getClient().getObject(meta.bucketName, meta.objectName, destFileName);
@@ -206,13 +210,40 @@ public class TestFileCache extends BaseTest {
 						error(e);
 				}
 					
-				String destFileName = DOWNLOAD_DIR_V6+ File.separator + meta.fileName;
+				String destFileName = DOWNLOAD_DIR_V0+ File.separator + meta.fileName;
+				
+				if ((new File(destFileName)).exists()) {
+					FileUtils.deleteQuietly(new File(destFileName));
+				}
+				
+				
 				
 				try {
 						getClient().getObject(meta.bucketName, meta.objectName, destFileName);
 						
 				} catch (ODClientException | IOException e) {
 						error(e);
+				}
+				
+				TestFile t_file = testFiles.get(meta.bucketName+"-"+meta.objectName);
+				
+				if (t_file!=null) {
+					
+					try {
+						String src_sha = t_file.getSrcFileSha256(0);
+						String new_sha = ODFileUtils.calculateSHA256String(new File(destFileName));
+						
+						if (!src_sha.equals(new_sha)) {
+							error("Error sha256 are not equal -> " + meta.bucketName+"-"+meta.objectName);
+						}
+						
+							
+					} catch (NoSuchAlgorithmException | IOException e) {
+						error(e);
+					}
+				}
+				else {
+						error("Test file does not exist -> " + meta.bucketName+"-"+meta.objectName);
 				}
 		});
 	
@@ -269,10 +300,10 @@ public class TestFileCache extends BaseTest {
 
 		
 		{
-	        File dir = new File(SRC_DIR_V6);
+	        File dir = new File(SRC_DIR_V2);
 	        
 	        if ( (!dir.exists()) || (!dir.isDirectory())) { 
-				error("Dir not exists or the File is not Dir -> " +SRC_DIR_V6);
+				error("Dir not exists or the File is not Dir -> " +SRC_DIR_V2);
 			}
 		}
 		
@@ -338,7 +369,7 @@ public class TestFileCache extends BaseTest {
 
         
         {
-            File tmpdir = new File(DOWNLOAD_DIR_V6);
+            File tmpdir = new File(DOWNLOAD_DIR_V2);
             
             if ( (tmpdir.exists()) && (tmpdir.isDirectory())) { 
             	try {
