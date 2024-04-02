@@ -71,7 +71,6 @@ public class TestVersionControlUpload extends BaseTest {
 		if (!putObjectNewVersion())
 			error("putObjectNewVersion");
 		
-
 		
 		try {
 			if (getClient().isVersionControl()) {
@@ -83,13 +82,15 @@ public class TestVersionControlUpload extends BaseTest {
 					error("downloadObjectDataVersions");
 				
 				if (!restoreObjectVersion())
-					error("restoreObjectVersion");
+					error("restoreObjectVersion");		
+				
 				
 				
 			}
 		} catch (ODClientException e) {
 			error(e.getClass().getName() + " | " + e.getMessage());
 		}
+		
 		showResults();
 	}
 
@@ -275,16 +276,14 @@ public class TestVersionControlUpload extends BaseTest {
 		
 		File restoredDir = new File(DOWNLOAD_DIR_RESTORED);
 		
-		if (!restoredDir.exists()) {
-		
-			try {
-				FileUtils.forceMkdir(restoredDir);
-			} catch (IOException e) {
-				error(e);
-			}
+		FileUtils.deleteQuietly(restoredDir);
+		try {
+			FileUtils.forceMkdir(restoredDir);
+		} catch (IOException e) {
+			error(e);
 		}
 		
-		
+
 		counterRestoreObjectVersion.set(0);
 		
 		testFiles.forEach((k,v) -> 
@@ -294,26 +293,22 @@ public class TestVersionControlUpload extends BaseTest {
 					
 					ObjectMetadata headMeta = getClient().getObjectMetadata(v.bucketName, v.objectName);
 					
-					//logger.debug("Current File -> " + headMeta.fileName + "  | version: " + String.valueOf(headMeta.version));
+					logger.debug("Metadata current -> " + headMeta.fileName + "  | version: " + String.valueOf(headMeta.version)  +" | " + NumberFormatter.formatFileSize(headMeta.length));
 					
 					
 					getClient().restoreObjectPreviousVersions(v.bucketName, v.objectName);
 					
 					ObjectMetadata meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
 					
-					//logger.debug("Restored File -> " + meta.fileName +  "  | version: " + String.valueOf(meta.version));
+					logger.debug("Metadata restored -> " + meta.fileName +  "  | version: " + String.valueOf(meta.version) + " | "  + NumberFormatter.formatFileSize(meta.length));
 					
 					if (meta.version>=headMeta.version)
 						error("meta version error for -> " + v.bucketName + " " + v.objectName);
 					
-					
-					try {
-						if ((new File(restoredDir, meta.fileName)).exists())
-							FileUtils.forceDelete(new File(restoredDir, meta.fileName));
+
+					if ((new File(restoredDir, meta.fileName)).exists())
+						FileUtils.deleteQuietly(new File(restoredDir, meta.fileName));
 						
-					} catch (IOException e) {
-						error(e);
-					}
 					
 					InputStream isRestored = null;
 					
@@ -321,6 +316,7 @@ public class TestVersionControlUpload extends BaseTest {
 						
 						isRestored = getClient().getObject(v.bucketName, v.objectName);
 						Files.copy(isRestored, (new File(restoredDir, meta.fileName)).toPath(), StandardCopyOption.REPLACE_EXISTING);
+						logger.debug("Download restored -> " + meta.fileName +  "  | version: " + String.valueOf(meta.version) + " | " + NumberFormatter.formatFileSize(new File(restoredDir, meta.fileName).length()));
 						
 						counterRestoreObjectVersion.incrementAndGet();
 						
@@ -328,16 +324,23 @@ public class TestVersionControlUpload extends BaseTest {
 						
 						try {
 							
-							String src_sha  =  v.getSrcFileSha256(headMeta.version);
+							String src_sha  =  v.getSrcFileSha256(0);
 							String dest_sha =  ODFileUtils.calculateSHA256String(new File(restoredDir, meta.fileName));
 							
 							if (!dest_sha.equals(src_sha)) {
 								error("Error sha256 are not equal -> " + 
-										meta.bucketName + "-" +
+										"b:" + meta.bucketName + "  o:" +
 										meta.objectName + 
 										" | downladed -> "  + meta.fileName  + " - " + NumberFormatter.formatFileSize((new File(restoredDir, meta.fileName)).length()) + " - " + 
-										" | source -> " + v.getSrcFile(headMeta.version).getName() + " -"  + NumberFormatter.formatFileSize(v.getSrcFile(headMeta.version).length()));
+										" | source -> " + v.getSrcFile(0).getName() + " -"  + NumberFormatter.formatFileSize(v.getSrcFile(0).length()));
 							}
+							else {
+								logger.debug("restore ok ->"  + meta.fileName);
+							}
+
+							
+							
+							
 							
 						} catch (NoSuchAlgorithmException | IOException e) {
 							error(e);
@@ -405,6 +408,9 @@ public class TestVersionControlUpload extends BaseTest {
 			} catch (IOException e) {
 				error(e.getClass().getName()+ " - can not delete existing new version locally");
 			}
+			
+			
+			// int index = Math.abs(name.hashCode()) % secondVersion.size();
 			
 			int index = random.nextInt(secondVersion.size());
 					
@@ -534,7 +540,7 @@ public class TestVersionControlUpload extends BaseTest {
 									error("Error sha256 v0 are not equal -> " + 
 											metaPreviousVersion.bucketName + "-" +
 											metaPreviousVersion.objectName + 
-											" | dn v0 "  + previousVersionDestFileName  + " - " + NumberFormatter.formatFileSize((new File(previousVersionDestFileName)).length()) + " - " + 
+											" | restored v0 "  + previousVersionDestFileName  + " - " + NumberFormatter.formatFileSize((new File(previousVersionDestFileName)).length()) + " - " + 
 											" | src v0 " + test.getSrcFile(0).getName() + " -"  + NumberFormatter.formatFileSize(test.getSrcFile(0).length()));
 								}
 								
