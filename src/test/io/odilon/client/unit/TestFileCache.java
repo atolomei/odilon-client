@@ -1,6 +1,7 @@
 package io.odilon.client.unit;
 
 
+
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -23,11 +24,14 @@ import io.odilon.test.base.BaseTest;
 import io.odilon.test.base.TestFile;
 import io.odilon.util.ODFileUtils;
 
+/**
+ * @author atolomei@novamens.com (Alejandro Tolomei)
+ */
 public class TestFileCache extends BaseTest {
 
 	private static final Logger logger = Logger.getLogger(TestObjectPutGet.class.getName());
 	
-	static final int BUFFER_SIZE = 8192;
+	
 		
 	long LAPSE_BETWEEN_PUT_MILLISECONDS = 1600;
 	

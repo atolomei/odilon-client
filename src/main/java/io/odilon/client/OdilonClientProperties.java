@@ -28,6 +28,9 @@ import io.odilon.log.Logger;
 
 /**
  * <p>JVM properties</p>
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
+ * 
  */
 public enum OdilonClientProperties {
 

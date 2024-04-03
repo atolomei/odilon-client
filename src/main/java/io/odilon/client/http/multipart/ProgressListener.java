@@ -16,6 +16,10 @@
  */
 package io.odilon.client.http.multipart;
 
+/**
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
+ */
 public interface ProgressListener {
     public void onUpdate(int progress);
 }

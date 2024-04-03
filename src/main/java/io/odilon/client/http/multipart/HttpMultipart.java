@@ -23,6 +23,9 @@ import java.net.URLConnection;
 
 /**
  * <p>HTTP Multipart request</p>
+ * 
+ *  @author atolomei@novamens.com (Alejandro Tolomei)
+ *  
  */
 public class HttpMultipart extends HttpRequest {
 

@@ -40,9 +40,6 @@ public class TestObjectPutGetShort extends BaseTest {
 	static final String TEMP_DIR = "c:"+File.separator+"temp";
 	static final String DOWNLOAD_DIR = "c:"+File.separator+ "temp" + File.separator + "download";
 	
-	static final int BUFFER_SIZE = 4096;
-	
-	
 	private Bucket bucket_1 = null;
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
 	

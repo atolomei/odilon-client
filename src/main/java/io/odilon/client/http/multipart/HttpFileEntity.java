@@ -19,6 +19,11 @@ package io.odilon.client.http.multipart;
 import java.io.IOException;
 import java.io.InputStream;
 
+
+/**
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
+ */
 public class HttpFileEntity implements HttpEntity {
 
 	private String name;

@@ -25,7 +25,10 @@ import io.odilon.log.Logger;
 
 
 /**
- *<p>HTTP response header class</p>
+ * <p>HTTP response header class</p>
+ *
+ * @author atolomei@novamens.com (Alejandro Tolomei)
+ *
  */
 
 public class ResponseHeader {

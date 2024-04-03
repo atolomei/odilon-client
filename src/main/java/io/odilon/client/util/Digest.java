@@ -26,8 +26,10 @@ import java.util.Locale;
 
 import com.google.common.io.BaseEncoding;
 
-
-
+/**
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
+ */
 public class Digest {
 
 	private Digest() {}

@@ -32,7 +32,8 @@ import org.apache.commons.validator.routines.RegexValidator;
  * This class is a Singleton; you can retrieve the instance via the {@link #getInstance()} method.
  * </p>
  *
- * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
+ *  
  */
 public class InetAddressValidator implements Serializable {
 

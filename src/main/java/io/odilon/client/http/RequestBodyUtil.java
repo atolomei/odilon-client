@@ -26,6 +26,11 @@ import okio.BufferedSink;
 import okio.Okio;
 import okio.Source;
 
+
+/**
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
+ */
 public class RequestBodyUtil {
 
 	

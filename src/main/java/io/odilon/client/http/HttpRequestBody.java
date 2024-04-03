@@ -28,6 +28,9 @@ import okio.Okio;
 
 /**
  * RequestBody that wraps a single data object.
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
+ * 
  */
 public class HttpRequestBody extends RequestBody {
   private final String contentType;

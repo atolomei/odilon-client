@@ -44,6 +44,11 @@ import java.net.URL;
 
 import java.util.Base64;
 
+/**
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
+ * 
+ */
 @JsonInclude(Include.NON_NULL)
 public class HttpRequest {
 		

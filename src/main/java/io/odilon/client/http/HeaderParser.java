@@ -26,7 +26,9 @@ import io.odilon.log.Logger;
 import okhttp3.Headers;
 
 /**
- * HTTP header parser class.
+ *<p>HTTP header parser class.</p>
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
  */
 public class HeaderParser {
 

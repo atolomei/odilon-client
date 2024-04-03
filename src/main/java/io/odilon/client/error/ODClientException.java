@@ -37,7 +37,8 @@ import io.odilon.net.ErrorCode;
  * <li>Odilon error message ({@code String})</li>
  *</ul>
  *</p> 
- * 
+ *
+ * @author atolomei@novamens.com (Alejandro Tolomei)
  */
 public class ODClientException extends Exception {
 

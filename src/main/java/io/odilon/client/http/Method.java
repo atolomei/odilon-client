@@ -18,6 +18,9 @@ package io.odilon.client.http;
 
 /**
  * HTTP methods.
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
+ * 
  */
 public enum Method {
   GET("GET"), 

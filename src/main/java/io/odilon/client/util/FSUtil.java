@@ -22,6 +22,8 @@ import org.apache.commons.io.FilenameUtils;
 
 /**
  * <p>General utilities for files</p>
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
  */
 public class FSUtil {
 

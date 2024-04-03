@@ -18,6 +18,9 @@ package io.odilon.client.http;
 
 /**
  * <p>HTTP schemes</p>
+ * 
+ *  @author atolomei@novamens.com (Alejandro Tolomei)
+ *  
  */
 public enum Scheme {
   HTTP("http"), HTTPS("https");

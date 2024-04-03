@@ -1,12 +1,7 @@
 package io.odilon.client.unit;
 
-import java.io.File;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 
-import io.odilon.client.OdilonClient;
+import java.io.File;
 import io.odilon.client.error.ODClientException;
 import io.odilon.client.util.FSUtil;
 import io.odilon.log.Logger;
@@ -15,15 +10,13 @@ import io.odilon.model.ObjectMetadata;
 import io.odilon.model.list.Item;
 import io.odilon.model.list.ResultSet;
 import io.odilon.test.base.BaseTest;
-import io.odilon.test.base.TestFile;
-import io.odilon.util.ODFileUtils;
 
 
 /**
  * <p>A presigned URL is a way to grant temporary access to an Object, for example in an HTML webpage.
    It remains valid for a limited period of time which is specified when the URL is generated.
  * </p>
- * 
+ *  
  *
  */
 public class TestPresignedUrl extends BaseTest {

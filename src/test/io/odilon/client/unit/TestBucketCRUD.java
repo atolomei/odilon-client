@@ -31,6 +31,8 @@ import io.odilon.test.base.BaseTest;
  * 3. remove a bucket that does exists and is empty-> must return ok
  * 4. remove a bucket that does exists and is not empty-> must throw exception
  * 5. create a bucket that exists -> error -> must throw exception
+ *  
+ *  @author atolomei@novamens.com (Alejandro Tolomei)
  */
 public class TestBucketCRUD extends BaseTest {
 		

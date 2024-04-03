@@ -23,6 +23,8 @@ import java.lang.annotation.Target;
 
 /**
  * <p>HTTP header annotation interface</p>
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})

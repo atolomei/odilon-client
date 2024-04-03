@@ -8,6 +8,8 @@
  * <li>A string with the error message returned by the server ({@code String})</li>
  * </ul>
  * </p>
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
  */
 package io.odilon.client.error;
 

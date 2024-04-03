@@ -1,8 +1,8 @@
 package io.odilon.client.unit;
 
+
 import java.util.Map;
 
-import io.odilon.client.OdilonClient;
 
 import io.odilon.log.Logger;
 import io.odilon.model.SystemInfo;

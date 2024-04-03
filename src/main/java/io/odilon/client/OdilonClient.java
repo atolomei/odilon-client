@@ -57,6 +57,8 @@ import io.odilon.net.ODHttpStatus;
  *	System.exit(1);
  * }
  * }</pre>
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
  */
 public interface OdilonClient {
 

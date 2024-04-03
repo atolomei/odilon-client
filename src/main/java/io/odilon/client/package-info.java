@@ -3,6 +3,9 @@
  * <p>In order to access the Odilon server from a Java Application you have to include Odilon client JAR in the classpath. 
  * The interaction is managed by an instance of {@link OdilonClient} that connects to the server using the credentials: 
  * AccessKey (ie. username) and SecretKey (ie. password)</p>
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
+ * 
  */
 package io.odilon.client;
 

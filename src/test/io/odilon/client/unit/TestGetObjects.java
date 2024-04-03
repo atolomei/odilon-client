@@ -16,15 +16,13 @@
  */
 package io.odilon.client.unit;
 
+
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 
-import io.odilon.client.OdilonClient;
 import io.odilon.client.error.ODClientException;
 import io.odilon.log.Logger;
 import io.odilon.model.Bucket;
@@ -32,8 +30,12 @@ import io.odilon.model.ObjectMetadata;
 import io.odilon.model.list.Item;
 import io.odilon.model.list.ResultSet;
 import io.odilon.test.base.BaseTest;
-import io.odilon.test.base.TestFile;
 
+
+/**
+ * 
+ *  @author atolomei@novamens.com (Alejandro Tolomei)
+ */
 public class TestGetObjects extends BaseTest {
 			
 	private static final Logger logger = Logger.getLogger(TestGetObjects.class.getName());
@@ -41,19 +43,12 @@ public class TestGetObjects extends BaseTest {
 	static final String TEMP_DIR = "c:"+File.separator+"temp";
 	static final String DOWNLOAD_DIR = "c:"+File.separator+"temp" + File.separator+"download";
 	
-	static final int BUFFER_SIZE = 4096;
-	
-	
 	
 	private Bucket bucket_1 = null;
-	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
 	
-	private final File saveDir = new File(DOWNLOAD_DIR);
 	
-	public TestGetObjects () {
-	}
+	public TestGetObjects () {}
 	
-
 	
 	@Override
 	public void executeTest() {

@@ -38,11 +38,9 @@ public class TestObjectPutGet extends BaseTest {
 			
 	private static final Logger logger = Logger.getLogger(TestObjectPutGet.class.getName());
 	
-	static final int BUFFER_SIZE = 8192;
 	
 	private String sourceDir;
 	private String downloadDir;
-
 	
 	
 	private Bucket bucket_1 = null;

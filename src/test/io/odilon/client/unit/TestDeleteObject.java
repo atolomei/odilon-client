@@ -16,6 +16,7 @@
  */
 package io.odilon.client.unit;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -24,7 +25,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.odilon.client.OdilonClient;
 import io.odilon.client.error.ODClientException;
 import io.odilon.client.util.FSUtil;
 import io.odilon.log.Logger;
@@ -36,6 +36,11 @@ import io.odilon.test.base.BaseTest;
 import io.odilon.test.base.TestFile;
 import io.odilon.util.ODFileUtils;
 
+/**
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
+ * 
+ */
 public class TestDeleteObject extends BaseTest {
 			
 	private static Logger logger = Logger.getLogger(TestDeleteObject.class.getName());
@@ -46,7 +51,6 @@ public class TestDeleteObject extends BaseTest {
 	static final int MAX = 10;
 	static final long MAX_LENGTH = 100 * 10000; // 1 MB
 	
-	private int LAPSE_BETWEEN_DELETE_MILLISECONDS = 800;
 	private int index = 0;
 	
 	private Bucket bucket_1 = null;
@@ -55,11 +59,8 @@ public class TestDeleteObject extends BaseTest {
 	
 	
 	public TestDeleteObject() {
-		String lapse = System.getProperty("lapseBetweenDeleteSeconds");
-		if (lapse!=null)
-			LAPSE_BETWEEN_DELETE_MILLISECONDS = Integer.valueOf(lapse.trim()); 
 	}
-	
+		 
 	
 	public void executeTest() {
 		

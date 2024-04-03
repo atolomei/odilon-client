@@ -24,6 +24,9 @@ import okhttp3.ResponseBody;
 
 /**
  * <p>Packs {@link ResponseHeader} and {@link Response} into one object to pass/return in various methods</p>
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
+ * 
  */
 public class HttpResponse {
 	
