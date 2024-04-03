@@ -239,7 +239,7 @@ public class TestVersionControlUpload extends BaseTest {
 					
 					counterPutObject.incrementAndGet();
 					
-					//sleep();
+					sleep();
 					
 					/** display status every 3 seconds or so */
 					if ( dateTimeDifference(showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
@@ -356,7 +356,7 @@ public class TestVersionControlUpload extends BaseTest {
 						}
 					}
 					
-					//sleep();
+					sleep();
 					
 					/** display status every 3 seconds or so */
 					
@@ -434,7 +434,7 @@ public class TestVersionControlUpload extends BaseTest {
 				if (!getClient().hasVersions(v.bucketName, v.objectName))
 					error("should have versions -> b:" + v.bucketName + " o:" + v.objectName);
 				
-				//sleep();
+				sleep();
 
 				if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
 					logger.debug( "putObjectNewVersion -> " + String.valueOf(counterNewVersion.get()));
@@ -629,7 +629,7 @@ public class TestVersionControlUpload extends BaseTest {
 						}
 					}
 		
-					//sleep();
+					sleep();
 					
 					/** display status every 3 seconds or so */
 					

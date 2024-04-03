@@ -63,7 +63,7 @@ public abstract class BaseTest {
 	
 	private Map<String, String> map = new TreeMap<String, String>();
 	
-	private long LAPSE_BETWEEN_PUT_MILLISECONDS = 100;
+	private long LAPSE_BETWEEN_PUT_MILLISECONDS = 0;
 	
 	
 	public BaseTest() {
@@ -86,7 +86,7 @@ public abstract class BaseTest {
 		String tempEndpoint = System.getProperty("endpoint");
 		String tempPort = System.getProperty("port");
 	
-		String lapse = System.getProperty("lapseBetweenPutSeconds");
+		String lapse = System.getProperty("sleepMilliseconds");
 		if (lapse!=null)
 			LAPSE_BETWEEN_PUT_MILLISECONDS  = Long.valueOf(lapse.trim());
 		
@@ -372,10 +372,7 @@ public abstract class BaseTest {
 	protected boolean isVersionControl() {
 		if (getClient()!=null) {
 			try {
-
-				return ((getClient().systemInfo().isVersionControl!=null) && 
-						(getClient().systemInfo().isVersionControl.equals("true")))
-						;
+				return getClient().isVersionControl();
 			} catch (ODClientException e) {
 				error(e);
 			}

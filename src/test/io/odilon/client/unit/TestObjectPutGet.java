@@ -119,7 +119,7 @@ public class TestObjectPutGet extends BaseTest {
 						logger.info( String.valueOf(testFiles.size() + " testAddObjectsStream -> " + file.getName()));
 						counter++;
 						
-						//sleep();
+						sleep();
 						
 						if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
 							logger.info( "testAddObjectsStream -> " + String.valueOf(testFiles.size()));
@@ -252,7 +252,7 @@ public class TestObjectPutGet extends BaseTest {
 					logger.info( String.valueOf(testFiles.size() + " testAddObjects -> " + fi.getName()));
 					
 					counter++; 
-					//sleep();
+					sleep();
 					
 					/** display status every n seconds */
 					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {

@@ -115,7 +115,7 @@ public class TestFileCache extends BaseTest {
 					testFiles.put(bucketName+"-"+objectName, new TestFile(fi, bucketName, objectName));
 					counter++; 
 					
-					// sleep();
+					sleep();
 					
 					/** display status every 4 seconds or so */
 					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
@@ -406,21 +406,7 @@ public class TestFileCache extends BaseTest {
 		}
 	}
 
-	
-	
-       
-
-
-    	protected void sleep() {
-    		
-    		if (LAPSE_BETWEEN_PUT_MILLISECONDS>0) {
-    			try {
-    				Thread.sleep(LAPSE_BETWEEN_PUT_MILLISECONDS);
-    			} catch (InterruptedException e) {
-    			}
-    		}
-    	}
-
+    	
 
 
 }

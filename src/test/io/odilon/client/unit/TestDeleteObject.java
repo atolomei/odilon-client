@@ -204,7 +204,7 @@ public class TestDeleteObject extends BaseTest {
 						error("should not exist ->" + tf.bucketName + " | " + tf.objectName);
 					}
 					
-					//sleep();
+					sleep();
 
 					/** display status every 4 seconds or so */
 					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
@@ -263,7 +263,7 @@ public class TestDeleteObject extends BaseTest {
 					testFiles.put(bucketName+"-"+objectName, new TestFile(fi, bucketName, objectName));
 					counter++; 
 					
-					//sleep();
+					sleep();
 
 					/** display status every 4 seconds or so */
 					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
@@ -330,15 +330,7 @@ public class TestDeleteObject extends BaseTest {
 
 	
 
-protected void sleep() {
-		
-		if (LAPSE_BETWEEN_DELETE_MILLISECONDS>0) {
-			try {
-				Thread.sleep(LAPSE_BETWEEN_DELETE_MILLISECONDS);
-			} catch (InterruptedException e) {
-			}
-		}
-	}
+
 protected int getCounter() {
 	return index++;
 }
