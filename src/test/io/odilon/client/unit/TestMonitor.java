@@ -14,23 +14,16 @@ public class TestMonitor extends BaseTest {
 	
 	
 	public TestMonitor() {
-		this(null);
 	}
 	
 	
-	public TestMonitor(OdilonClient c) {
-		super(c);
-	}
 	
 	@Override
 	public void executeTest() {
-		
 		preCondition();
 		testSystemInfo();
 		showResults();
 	}
-	
-	
 	
 	
 	/**

@@ -36,7 +36,8 @@ public class RegressionTest extends BaseTest {
 		object_t.setClient(getClient());
 		object_t.executeTest();
 		
-		TestMonitor monitor_t = new  TestMonitor(getClient());
+		TestMonitor monitor_t = new  TestMonitor();
+		monitor_t.setClient(getClient());
 		monitor_t.executeTest();
 		
 		TestGetObjects get_t = new  TestGetObjects();

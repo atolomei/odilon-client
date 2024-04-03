@@ -53,7 +53,6 @@ public class TestGetObjects extends BaseTest {
 	public TestGetObjects () {
 	}
 	
-	
 
 	
 	@Override
