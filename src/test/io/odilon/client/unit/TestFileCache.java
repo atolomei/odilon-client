@@ -1,5 +1,6 @@
 package io.odilon.client.unit;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -11,7 +12,6 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 
-import io.odilon.client.OdilonClient;
 import io.odilon.client.error.ODClientException;
 import io.odilon.client.util.FSUtil;
 import io.odilon.log.Logger;
@@ -34,7 +34,6 @@ public class TestFileCache extends BaseTest {
 	private Bucket bucket_1 = null;
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
 	
-	private final File saveDir = new File(DOWNLOAD_DIR_V0);
 	
 	private OffsetDateTime showStatus = OffsetDateTime.now();
 	private String bucketTest = "testcache";
