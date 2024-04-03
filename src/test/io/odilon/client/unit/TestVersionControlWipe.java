@@ -122,11 +122,11 @@ public class TestVersionControlWipe extends BaseTest {
 		
 		try {
 			
-			if (!getClient().existsBucket("test-version-control")) {
-				getClient().createBucket("test-version-control");
+			if (!getClient().existsBucket("test-put-version")) {
+				getClient().createBucket("test-put-version");
 			}
 			
-			bucket = getClient().getBucket("test-version-control");
+			bucket = getClient().getBucket("test-put-version");
 			
 			if (getClient().isEmpty(bucket.getName())) {
 				testAddObjects();
