@@ -34,13 +34,13 @@ import io.odilon.net.ErrorCode;
 import io.odilon.net.ODHttpStatus;
 
 /**
- * <p>{@code OdilonClient} contains the API to interact with an Odilon server.
- *</p>
- * <p>Implementation of this {@code Interface}: {@link ODClient}</p>
+ * <p>{@code OdilonClient} contains the API to interact with an Odilon server.</p>
+ * <p>The implementation of this {@code Interface} is {@link ODClient}</p>
  * 
- * <b>Example</b>
+ * 
+ * <b>Examp	le</b>
  *  <p> This example connects to a Odilon server and sends a ping request to check the status of the server.</p>
- * <pre>{@code // these are the default values for the Server
+ * <pre> {
  * String endpoint = "http://localhost";
  * int port = 9234;
  * String accessKey = "odilon";
@@ -50,7 +50,6 @@ import io.odilon.net.ODHttpStatus;
  * OdilonClient client = new ODClient(endpoint, port, accessKey, secretKey);
  *
  * // ping checks the status of server, it returns the String "ok" if the server is normal
- * 
  * String ping = client.ping();
  * if (!ping.equals("ok")) {
  *	System.out.println("ping error -> " + ping);
@@ -74,27 +73,31 @@ public interface OdilonClient {
 	 *  Every object contained by a bucket has a unique ObjectName in that bucket; therefore, the pair BucketName + ObjectName is 
 	 *  a Unique ID for each object in Odilon.
 	 *  </p>
-	 * </p>The bucket must not exist, if it exists the method will throw a {@link ODClientException}.<br/>
+	 *  
+	 * <p>The bucket must not exist, if it exists the method will throw a {@link ODClientException}.<br/>
 	 *  bucketName length must be lower or equal to {@link io.odilon.model.SharedConstant#MAX_BUCKET_CHARS} and <br/> 
 	 *  match the regular expression {@link io.odilon.model.SharedConstant#bucket_valid_regex SharedConstant.bucket_valid_regex} (see {@link isValidBucketName})
 	 * </p>
 	 * 
 	 *  <b>Example:</b>
 	 * <pre>{@code
-	 * try {
-	 *   String bucketName = "bucket-demo";
-	 *   // check if the bucket exists, if not create it
-	 *   if (client.existsBucket(bucketName))
-	 *       System.out.println("bucket already exists ->" + bucketName );
-	 *   else 
-	 *       client.createBucket(bucketName);
-	 * } catch (ODClientException e) {
-	* 		System.out.println( "HTTP status -> " + String.valueOf(e.getHttpStatus())+ " | ErrorMsg -> " + e.getMessage() + " Odilon Error Code -> " + String.valueOf(e.getErrorCode()) );
-	 * }
+	 * 	try {
+	 *  	 String bucketName = "bucket-demo";
+	 *   	//	check if the bucket exists, if not create it
+	 *   	if (client.existsBucket(bucketName))
+	 *      	 System.out.println("bucket already exists ->" + bucketName );
+	 *   	else 
+	 *      	 client.createBucket(bucketName);
+	 * 		} catch (ODClientException e) {
+	* 			System.out.println( "HTTP status -> " + String.valueOf(e.getHttpStatus())+ " | ErrorMsg -> " + e.getMessage() + " Odilon Error Code -> " + String.valueOf(e.getErrorCode()) );
+	 * 		}
 	 * }</pre>
 	 * 
-	 * @param bucketName Bucket name 
-	 * @throws {@link ODClientException} if the bucket already exists (error code {@link io.odilon.net.ErrorCode#OBJECT_ALREADY_EXIST})
+	 * @param 	bucketName Bucket name
+	 *  
+	 * @throws  ODClientException
+	 * 			if the bucket already exists (error code {@link io.odilon.net.ErrorCode#OBJECT_ALREADY_EXIST})
+	 * 
 	 */
 	public void createBucket(String bucketName) throws ODClientException;
 
@@ -103,8 +106,10 @@ public interface OdilonClient {
 	
 	/**
 	   * <p>Returns all buckets, sorted alphabetically</p>
-	   * <p><b>Example:</b><br>
-	   * <pre>{@code 
+	   * <p><b>Example:</b>
+	   * </p>
+	   * <pre>{@code
+	   *  
 	   * OdilonClient odilonClient = new ODClient(url, port, accessKey, secretKey);
 	   * List<Bucket> bucketList = odilonClient.listBuckets();
 	   * bucketList.forEach( bucket ->  {
@@ -117,11 +122,14 @@ public interface OdilonClient {
 	   * 		System.out.println(bucket.name() + " -> has objects");
 	   * );
 	   * }
+	   * }
 	   * </pre>
-	   * </p>
+	   * 
 	   *
-	   * @return List of Buckets, sorted alphabetically
-	   * @throws {@link ODClientException}  
+	   * @return 
+	   * 			List of Buckets, sorted alphabetically
+	   * @throws  
+	   * 			{@link ODClientException} if there is a problem  
 	   */
 	public List<Bucket> listBuckets() throws ODClientException;
 	
@@ -130,17 +138,15 @@ public interface OdilonClient {
 	
 	/**
 	 * <p>Returns {@code true} if the {@link String} objectName is a valid name for an Odilon object</p>
-	 * <p>
 	 * <ul>
-	 * <li>objectName length less or equal to {@link io.odilon.model.SharedConstant#MMAX_OBJECT_CHARS}</li> 
+	 * <li>objectName length less or equal to {@link io.odilon.model.SharedConstant#MAX_OBJECT_CHARS}</li> 
 	 * <li>objectName must match Java Regular expression {@link io.odilon.model.SharedConstant#object_valid_regex}
 	 * </li>
-	 * <ul>
-	 * </p>
+	 * </ul>
 	 * <p>
 	 * Informally speaking: object names can not have slash (/) or backslash (\)
 	 * <br/><br/>
-	 * Examples of invalid object names:<br/>
+	 * Examples of invalid object names:</p>
 	 * <ul>
 	 * <li>2023/11/349460828-7.2.a.3.implementacion.pdf</li>
 	 * <li>2021/9/346049478-roses-2191636</li>
@@ -152,7 +158,7 @@ public interface OdilonClient {
 	 * <li>2023-6-346227578-Quinquela-773x458.jpeg</li>
 	 * <li>2023-11-349460978-compliance-basic.png.enc</li>
 	 * </ul>
-	 * </p>
+	 * 
 	 * 
 	 * @see {@link io.odilon.model.SharedConstant}
 	 * 
@@ -165,18 +171,17 @@ public interface OdilonClient {
 	
 	/**
 	 * <p>Returns {@code true} if the {@link String} bucketName is a valid name for an Odilon Bucket</p>
-	 * <p>
+	 * 
 	 * <ul>
 	 * <li>bucketName length less or equal to {@link io.odilon.model.SharedConstant#MAX_BUCKET_CHARS}</li> 
 	 * <li>bucketName must match Java Regular expression {@link io.odilon.model.SharedConstant#bucket_valid_regex}
-	 * <p>
-	 * Informally speaking: letters A to Z and/or a to z, numbers, and/or - or _
-	 * </p>
+	 * 		<p>
+	 * 		Informally speaking: letters A to Z and/or a to z, numbers, and/or - or _
+	 * 		</p>
 	 * </li>
-	 * <ul>
-	 * </p>
+	 * </ul>
 	 * 
-	 * @see {@link io.odilon.model.SharedConstant}
+	 * @see {@link io.odilon.model#SharedConstant}
 	 * 
 	 * @param bucketName name of the Bucket
 	 * @return true if the bucketName is a valid Odilon Bucket name
@@ -209,7 +214,7 @@ public interface OdilonClient {
 	 * <p>Returns the {@link Bucket}</p> 
 	 * <p>It will throw a {@link ODClientException} if the bucket does not exist.</p>
 
-	   * <p><b>Example:</b><br>
+	   * <p><b>Example:</b></p>
 	   * <pre>{@code 
 	   * 
 	   * if (odilonClient.existsBucket("test-bucket")( {
@@ -219,8 +224,7 @@ public interface OdilonClient {
 	   * }
 	   * }
 	   * </pre>
-	   * </p>
-	 * 
+	   * 
 	 * @param bucketName Bucket name
 	 * @return Bucket
 	 * @throws {@link ODClientException} <br/> 
@@ -231,7 +235,7 @@ public interface OdilonClient {
 	
 	/**
 	 * <p>Deletes a {@link Bucket}. The bucket must be empty to be deleted</p>
-	 * <p><b>Example:</b><br>
+	 * <p><b>Example:</b></p>
 	 * <pre>{@code try {
 	 * // deletes all buckets that have no objects
 	 * 		for (Bucket bucket:odilonClient.listBuckets()) {
@@ -244,11 +248,11 @@ public interface OdilonClient {
 	 * }
 	 * }
 	 * </pre>
-	 * </p>
+	 * 
 	 * @param bucketName Bucket name
-	 * @throws {@link ODClientException} <br/>
-	 * Bucket does not exist -> {@link ODHttpStatus.NOT_FOUND} with error code {@link ErrorCode.BUCKET_NOT_EXISTS} <br/>
-	 * Bucket is not empty -> {@link ODHttpStatus.CONFLICT with error code {@link ErrorCode.BUCKET_NOT_EMPTY}
+	 * @throws  
+	 * 			Bucket does not exist -> {@link ODHttpStatus#NOT_FOUND} with error code {@link ErrorCode#BUCKET_NOT_EXISTS} <br/>
+	 * 			Bucket is not empty -> {@link ODHttpStatus#CONFLICT} with error code {@link ErrorCode#BUCKET_NOT_EMPTY}
 	 */
 	public void deleteBucket(String bucketName) throws ODClientException;
 
@@ -260,7 +264,7 @@ public interface OdilonClient {
 	* <b>Async execution</b>
 	* <p>This method returns immediately after sending the command to the server, which processes the task asynchronously.
 	* The async command is atomic on each object but not globally, which means that until it finishes some objects can still have versions.</p>
- 	* <p><b>Example:</b>
+ 	* <p><b>Example:</b></p>
 	* <pre>{@code
 	* try {
 	*       Bucket bucket = odilonClient.getBucket("test-version-control");
@@ -270,8 +274,8 @@ public interface OdilonClient {
 	* } catch (ODClientException e) {
 	* 		System.out.println( "HTTP status -> " + String.valueOf(e.getHttpStatus())+ " | ErrorMsg -> " + e.getMessage() + " Odilon Error Code -> " + String.valueOf(e.getErrorCode()) );
 	* }
+	* }
 	* </pre>
-	* </p>	 
 	* @param bucketName Bucket name
 	* @throws {@link ODClientException} <br/>
 	* Bucket does not exist -> {@link ODHttpStatus.NOT_FOUND} with error code {@link ErrorCode.BUCKET_NOT_EXISTS} <br/>
@@ -310,7 +314,7 @@ public interface OdilonClient {
 	 * <p>Every object contained by a bucket has a unique objectName in that bucket; 
 	 * therefore, the pair <b>bucketName</b> + <b>objectName</b> is a Global Unique Identifier for each object in Odilon.
 	 * </p>
- 	* <p><b>Example:</b>
+ 	* <p><b>Example:</b></p>
 	* <pre>{@code try {
 	*       Bucket bucket = odilonClient.getBucket("test-version-control");
 	*       
@@ -322,8 +326,9 @@ public interface OdilonClient {
 	* 	System.out.println( "HTTP status -> " + String.valueOf(e.getHttpStatus())+ " | ErrorMsg -> " + e.getMessage() + " Odilon Error Code -> " + String.valueOf(e.getErrorCode()) );
 	* 	System.exit(1);
 	* }
+	* }	
 	* </pre>
-	* </p>	 
+	* 	 
 	 * @param bucketName Bucket name
 	 * @param objectName Object name
 	 * @return
@@ -426,7 +431,7 @@ public interface OdilonClient {
 	 * <p>The Odilon client closes the {@link InputStream} after sending the data to the server. 
 	 *  However, if an {@link Exception} other than {@link ODClientException} is thrown by this method, the
 	 * {@link InputStream} may not have been closed.</p> 
-	 * <p>Therefore callers must always attempt to close the {@link Inputstream}</p>
+	 * <p>Therefore callers must always attempt to close the {@link InputStream}</p>
 	 * 
 	 * <b>Example:</b>
 	 * <pre>{@code
@@ -442,6 +447,7 @@ public interface OdilonClient {
 	 *		System.out.println(e1.getMessage());
 	 *	}
 	 * }
+	 * </pre>
 	 * 
 	 * @param bucketName Bucket name
 	 * @param objectName Object name
@@ -519,9 +525,8 @@ public interface OdilonClient {
 	/**
 	 *<p> Removes an Object from a {@link Bucket}.</p>
 	 *
-	 * <p><b>Example:</b><br>
+	 * <p><b>Example:</b></p>
 	 * <pre>{@code odilonClient.deleteObject("my-bucketname", "my-objectname"); }</pre>
-	 * </p>
 	 *
 	 * @param bucketName Bucket name
 	 * @param objectName Object name in the bucket
@@ -606,8 +611,7 @@ public interface OdilonClient {
 	
 	/**
 	 * <p>Deletes all the Object's  previous versions, it does not delete the object current version (<b>head version</b>).</p> 
-	 * <p>After calling this method the Object will have only the <b>head version</b>, 
-	 * and trying to retrieve a previous version will throw {@link ObjectNotFoundException}.</p>
+	 * <p>After calling this method the Object will have only the <b>head version</b>.</p>
 	 * 
 	 * @param bucketName
 	 * @param objectName
@@ -622,8 +626,8 @@ public interface OdilonClient {
 
 	/**
 	 * <p>Lists the objects in the {@link Bucket}. </p>
-	 * <p>ResultSet</p> 
-	 * {@link Item Item &ltObjectMetadata&gt} can contain:<br/>
+	 * <p>ResultSet <br/>
+	 * {@link Item Item &lt;ObjectMetadata&gt;} can contain:<br/>
 	 * it item.isOk() ->  a <b>{@code ObjectMetadata}</b> .<br/>
 	 * otherwise -> or an String with an error
 	 * </p>
@@ -656,7 +660,7 @@ public interface OdilonClient {
 	 *<p>Lists the objects in the {@link Bucket}.</p>
 	 *<p> see {@link #listObjects}</p>
 	 * 
- 	 * @param bucketName Bucket name
+ 	 * @param bucketName Bucket's name
 	 * @param prefix
 	 * @return
 	 * @throws {@link ODClientException}
@@ -679,7 +683,7 @@ public interface OdilonClient {
 	 *<p>Lists the objects in the {@link Bucket}.</p> 
 	 *<p> see {@link #listObjects}</p>
 	 * 
- 	 * @param bucketName name of the bucket
+ 	 * @param bucket bucket to list
 	 * @return
 	 * @throws {@link ODClientException}
 	 */
@@ -692,7 +696,6 @@ public interface OdilonClient {
 	  /**
 	   * <p>Returns the String <b>"ok"</b> if the server is normal or a {@code String} with the error reported by the Server. <br/>
 	   * If the client can not connect to the Server, the method returns a message <b>"can not connect"</b></p>
-	   * </p>
 	   * <b>Example:</b>
 	   * <pre>{@code 
 	   * String endpoint = "http://localhost";
@@ -706,6 +709,7 @@ public interface OdilonClient {
 	   * 
 	   * if (!pingResult.equals("ok")) {
 	   *   System.out.println( "Server error -> " + pingResult));
+	   * }
 	   * }</pre>
 	  * 
 	  * @return String "ok" or the error reported by the Server.
@@ -715,7 +719,7 @@ public interface OdilonClient {
 /**
  * 
  * <p>Returns an instance of {@link MetricsValues} with info related to the activity of the server</p>
- * <p>They are counters of events and meters that measure events per second in a 1m 5m and 15m windows
+ * <p>They are counters of events and meters that measure events per second in a 1m 5m and 15m windows</p>
  * <ul>
  * <li><b>Counter</b> 
  * A counter is just a gauge for an AtomicLong instance. You can increment or decrement its value. 
@@ -725,10 +729,8 @@ public interface OdilonClient {
  * A meter measures the rate of events over time (e.g., “requests per second”). In addition to the mean rate, meters also track 1-, 5-, and 15-minute moving averages.
  * <br/>
  * </li>
- *<br/>
  * </ul>
- * See <a href="https://metrics.dropwizard.io/4.2.0/" target="_blank"/>https://metrics.dropwizard.io/4.2.0</a>
- * </p>
+ * <p>See https://metrics.dropwizard.io/4.2.0 <br/>
  * <b>Example</b>: <br/> <br/>
  *   cacheObjectHitCounter -> 1,224 <br/>   
  *   cacheObjectMissCounter -> 637  <br/>
@@ -749,7 +751,6 @@ public interface OdilonClient {
  </p> 
  * 
  * @return {@link MetricsValues} 
- * @throws {@link ODClientException}
  */
 	public MetricsValues metrics() throws ODClientException;
 	
@@ -758,7 +759,6 @@ public interface OdilonClient {
 	 *  
 	 *  
 	 * @return {@link SystemInfo}
-	 * @throws {@link ODClientException}
  	*/
 	public SystemInfo systemInfo() throws ODClientException;
 
@@ -767,7 +767,6 @@ public interface OdilonClient {
 	 * <p>Checks if the server has version control enabled</p>
 	 * 
 	 * @return true if the server has version control enabled
-	 * @throws {@link ODClientException}
 	 */
 	public boolean isVersionControl() throws ODClientException;
 	
@@ -788,9 +787,9 @@ public interface OdilonClient {
 	   * <pre>{@code odilonClient.setTimeout(TimeUnit.SECONDS.toMillis(10), TimeUnit.SECONDS.toMillis(10),
 	   *                            TimeUnit.SECONDS.toMillis(30)); }</pre>
 	   *                            
-	   * @param connectTimeout    HTTP connect timeout in milliseconds.
-	   * @param writeTimeout      HTTP write timeout in milliseconds.
-	   * @param readTimeout       HTTP read timeout in milliseconds.
+	   * @param connectTimeoutMilliseconds    HTTP connect timeout in milliseconds.
+	   * @param writeTimeoutMilliseconds      HTTP write timeout in milliseconds.
+	   * @param readTimeoutMilliseconds       HTTP read timeout in milliseconds.
 	   */
 
 	
@@ -820,78 +819,6 @@ public interface OdilonClient {
 	public void setCharset(String c);
 	public String getCharset();
 
-
-
-
-
-
-
-
-
-
-	
-	
-	
-	
-	
 	
 }
-
-
-
-
-
-
-
-
-/*
- *  
-	// public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, String fileName, String contentType) throws ODClientException;
-
-*
- *   
- * <h2>Bucket</h2>
- * <p>Main methods are:</p>
- * <ul>
- * <li>Creating a bucket</li>
- * <li>Delete bucket</li>
- * <li>get a bucket</li>
- * <li>Listing buckets</li>
- * <li>check if a bucket exist</li>
- * <li>Delete previous versions for all the bucket's objects</li>
- * </ul>
- * <h2>Object</h2>
- * 
- * <h3>Object Get</h3>
- * <ul>
- * <li>Removing an object</li>
- * <li>Read object Metadata</li>
- * <li>Reading an object</li>
- * <li>Deleting an object</li>
- * </ul>
- * 
- * <h3>Object Put</h3>
- * <ul>
- * <li>Removing an object</li>
- * <li>Read object Metadata</li>
- * <li>Reading an object</li>
- * <li>Deleting an object</li>
- * </ul>
- * 
- * <h3>Object Delete</h3>
- *  <ul>
- * <li>Removing an object</li>
- * <li>Read object Metadata</li>
- * <li>Reading an object</li>
- * <li>Deleting an object</li>
- * </ul>
- *  
- * <h3>Object Versioning</h3>
- * <ul>
- * <li>Removing an object</li>
- * <li>Read object Metadata</li>
- * <li>Reading an object</li>
- * <li>Deleting an object</li>
- * </ul>
-*/
 

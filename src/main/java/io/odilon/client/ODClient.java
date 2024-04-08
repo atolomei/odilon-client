@@ -323,6 +323,13 @@ public class ODClient implements OdilonClient {
 		return putObjectStream(bucketName,objectName,stream,fileName,size,Optional.empty());
 	}
 
+
+	
+	public void putObjectStreamVersion(String bucketName, String objectName, InputStream objectVersion, String fileName, int version) {
+		
+		
+	}
+	
 	@Override
 	public boolean isValidObjectName(String objectName ) {
 		Check.requireNonNullStringArgument(objectName, "objectName can not be null or emtpy");
@@ -382,6 +389,7 @@ public class ODClient implements OdilonClient {
 		return meta;
 	}
 
+	
 	/**
 	 * <p>Uploads the {@link File} file to the server</p>
 	 * 
@@ -437,7 +445,7 @@ public class ODClient implements OdilonClient {
 	
 	/**
 	 * <p>
-	 * {@link Item<T>} is a wrapper for Lists and other Iterable structures of T where some elements may not be a T but an error.<br/>
+	 * {@link Item} is a wrapper for Lists and other {@link Iterable} structures of T where some elements may not be a T but an error.<br/>
 	 * {@code T} must be Serializable
 	 * </p>
 	 * Example list all bucket's objects:
@@ -524,13 +532,14 @@ public class ODClient implements OdilonClient {
 
   	  /**
 	   * <p>Returns all buckets, sorted alphabetically</p>
-	   * <p><b>Example:</b><br>
-	   * <pre>{@code List<Bucket> bucketList = odilonClient.listBuckets();
-	   * for (Bucket bucket : bucketList) {
-	   *   	System.out.println(bucket.creationDate() + ", " + bucket.name());
-	   * } }
-	   * </pre>
-	   * </p>
+	   * <p><b>Example:</b></p>
+	   * <pre>{@code 
+	   * 	List<Bucket> bucketList = odilonClient.listBuckets();
+	   * 	for (Bucket bucket : bucketList) {
+	   *   		System.out.println(bucket.creationDate() + ", " + bucket.name());
+	   * 	} 
+	   * }</pre>
+	   * 
 	   *
 	   * @return List of buckets
 	   * @throws ODClientException
@@ -675,9 +684,11 @@ public class ODClient implements OdilonClient {
 	 /** 
 	   *<p> Removes an object from a bucket.</p>
 	   *
-	   * <p><b>Example:</b><br>
-	   * <pre>{@code odilonClient.deleteObject("my-bucketname", "my-objectname"); }</pre>
-	   * </p>
+	   * <p><b>Example:</b></p>
+	   * <pre>{@code 
+	   * 	odilonClient.deleteObject("my-bucketname", "my-objectname"); 
+	   * }</pre>
+	   * 
 	   *
 	   * @param bucketName Bucket name
 	   * @param objectName Object name in the bucket
@@ -726,8 +737,7 @@ public class ODClient implements OdilonClient {
 	 };
 	 
 	 /**
-	  * <p>System info</p>
-	  * @see {@link SystemInfo}
+	  * <p>Returns {@link SystemInfo}</p>
 	  */
 	 @Override
 	 public SystemInfo systemInfo() throws ODClientException {
@@ -771,10 +781,11 @@ public class ODClient implements OdilonClient {
 	   * If the client can not connect to the Server, the method returns a message "can not connect"</p>
 	   * 
 	   * <b>Example:</b><br>
-	   * <pre>{@code String pingResult = odilonClient.ping();
-	   * 
+	   * <pre>{@code 
+	   * String pingResult = odilonClient.ping();
 	   * if (!pingResult.equals("ok")) {
 	   *   System.out.println( "Server error -> " + pingResult));
+	   * }
 	   * }</pre>
 	  * 
 	  * @return String "ok" or the error reported by the Server.
@@ -985,9 +996,9 @@ public class ODClient implements OdilonClient {
 	   * <pre>{@code odilonClient.setTimeout(TimeUnit.SECONDS.toMillis(10), TimeUnit.SECONDS.toMillis(10),
 	   *                            TimeUnit.SECONDS.toMillis(30)); }</pre>
 	   *                            
-	   * @param connectTimeout    HTTP connect timeout in milliseconds.
-	   * @param writeTimeout      HTTP write timeout in milliseconds.
-	   * @param readTimeout       HTTP read timeout in milliseconds.
+	   * @param connectTimeoutMilliseconds    HTTP connect timeout in milliseconds.
+	   * @param writeTimeoutMilliseconds      HTTP write timeout in milliseconds.
+	   * @param readTimeoutMilliseconds       HTTP read timeout in milliseconds.
 	   */
 	  
 	 	@Override
@@ -1763,6 +1774,12 @@ public class ODClient implements OdilonClient {
 		    }
 		    return true;
 	}
+
+
+
+
+	
+	
 	
 
 }

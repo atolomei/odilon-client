@@ -50,7 +50,7 @@ public abstract class BaseTest {
 
 	
 	private String SRC_DIR = "C:"+File.separator+"test-files";
-	private String DOWNLOAD_DIR = "C:"+File.separator+"test-files-download";
+	private String DOWNLOAD_DIR = "d:"+File.separator+"test-files-download";
 	
 	
 	public String SRC_DIR_V0 = SRC_DIR + File.separator + "v0";

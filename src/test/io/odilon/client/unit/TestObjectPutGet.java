@@ -38,7 +38,6 @@ public class TestObjectPutGet extends BaseTest {
 			
 	private static final Logger logger = Logger.getLogger(TestObjectPutGet.class.getName());
 	
-	
 	private String sourceDir;
 	private String downloadDir;
 	
@@ -46,12 +45,10 @@ public class TestObjectPutGet extends BaseTest {
 	private Bucket bucket_1 = null;
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
 	
-	
 	private OffsetDateTime showStatus = OffsetDateTime.now();
 
 	
 	public TestObjectPutGet() {
-		
 	}
 	
 	

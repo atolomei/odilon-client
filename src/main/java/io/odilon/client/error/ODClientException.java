@@ -30,13 +30,14 @@ import io.odilon.net.ErrorCode;
 
 /**
  *	<p>Exception thrown by the Odilon client library.<br/> 
- *It contains three main parts: 
+ *It contains three main parts:
+ *</p> 
  *<ul>
  *  <li>The code of the {@link io.odilon.net.ODHttpStatus ODHttpStatus} status ({@code int})</li>
  * <li>The code of the Odilon {@link  io.odilon.net.ErrorCode ErrorCode} ({@code int})</li>
  * <li>Odilon error message ({@code String})</li>
  *</ul>
- *</p> 
+ * 
  *
  * @author atolomei@novamens.com (Alejandro Tolomei)
  */

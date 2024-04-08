@@ -1,4 +1,4 @@
-package io.odilon.client.unit;
+package io.odilon.test.stress;
 
 
 import java.io.File;
@@ -19,14 +19,14 @@ import io.odilon.test.base.BaseTest;
  *  
  *
  */
-public class TestPresignedUrl extends BaseTest {
-			
-	private static final Logger logger = Logger.getLogger(TestPresignedUrl.class.getName());
+public class TestManyPresignedUrl extends BaseTest {
+
+	private static final Logger logger = Logger.getLogger(TestManyPresignedUrl.class.getName());
 
 	private Bucket bucket_1;
 	private String bucketName = null;
 	
-	public TestPresignedUrl() {
+	public TestManyPresignedUrl() {
 
 	}
 	
@@ -34,6 +34,9 @@ public class TestPresignedUrl extends BaseTest {
 	
 	@Override
 	public void executeTest() {
+
+		 int counter = 0;
+		 int total = 0;
 
 		try {
 			if (getClient().listBuckets().isEmpty()) {
@@ -43,27 +46,21 @@ public class TestPresignedUrl extends BaseTest {
 			
 			org.junit.Assert.assertFalse("must have at least 1 bucket", getClient().listBuckets().isEmpty());
 			
-			this.bucket_1 = getClient().listBuckets().get(0);
-			org.junit.Assert.assertFalse("bucket must not be empty", getClient().isEmpty(this.bucket_1.getName()));
 			
-			 ResultSet<Item<ObjectMetadata>> rs = getClient().listObjects(this.bucket_1.getName());
-			 int counter = 0;
-			 int total = 0;
-			 
-			 while (rs.hasNext() && counter++ < getMax()) {
-				 Item<ObjectMetadata> item = rs.next();
-				 if (item.isOk()) {
-					 	ObjectMetadata meta = item.getObject();
-						logger.debug(meta.bucketName + " / " + meta.objectName + " -> " + getClient().getPresignedObjectUrl(meta.bucketName, meta.objectName)) ;
-						total++;
-				 }
-			 }
-			 
-			 if (bucketName!=null) {
-				 // delete all
-				 // delete bucket
-			 }
+			for (Bucket bucket: getClient().listBuckets()) {
+			
+				ResultSet<Item<ObjectMetadata>> rs = getClient().listObjects(bucket.getName());
 				 
+				 while (rs.hasNext()) {
+					 Item<ObjectMetadata> item = rs.next();
+					 if (item.isOk()) {
+						 	ObjectMetadata meta = item.getObject();
+							logger.debug(meta.bucketName + " / " + meta.objectName + " -> " + getClient().getPresignedObjectUrl(meta.bucketName, meta.objectName)) ;
+							total++;
+					 }
+				 }
+			}
+			
 			getMap().put("presigned test -> " + String.valueOf(total), "ok");
 			showResults();
 			 
@@ -101,7 +98,7 @@ public class TestPresignedUrl extends BaseTest {
         File dir = new File(SRC_DIR_V0);
         
         if ( (!dir.exists()) || (!dir.isDirectory())) { 
-			throw new RuntimeException("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+			error("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
 		}
         
 		int counter = 0;
