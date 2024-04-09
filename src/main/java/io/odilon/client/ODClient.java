@@ -1589,12 +1589,17 @@ public class ODClient implements OdilonClient {
 	   
 	   /** if response is not successful -> throw OdilonException  ---------------------------- */
 	   
+		   
 
 			String str;
 			
 			try {
 				
 				str = response.body().string();
+				
+				if (logger.isDebugEnabled()) {
+					   response.body().string();
+			   }
 				
 			} catch (IOException e) {
 				throw new InternalCriticalException(e, "caused by " + Response.class.getName());
