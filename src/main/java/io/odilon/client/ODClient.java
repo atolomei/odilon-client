@@ -107,12 +107,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
- * <p>
- * This class implements the Interface {@link OdilonClient}, Odilon Object Storage client. 
- * </p>
- * <p>
- * For examples on using this library, please visit <a href="http://odilon.io">http://odilon.io</a>
- * </p>
+ * <p>This class implements the Interface {@link OdilonClient}, Odilon Object Storage client.</p>
+ * <p>For examples on using this library, please visit <a href="http://odilon.io">http://odilon.io</a></p>
  * 
  * @author atolomei@novamens.com (Alejandro Tolomei)
  * 
@@ -123,29 +119,42 @@ public class ODClient implements OdilonClient {
 
 	private static final int BUFFER_SIZE = 8192;
 									
-	private static final String API_SERVICE_REQUES_ADD				[] = {"servicerequest", "add"};
+	private static final String API_SERVICE_REQUES_ADD						[] = {"servicerequest", "add"};
 	
-	private static final String API_PING 							[] = {"ping"};
-	private static final String API_METRICS							[] = {"metrics"};
-	private static final String API_SYSTEM_INFO						[] = {"systeminfo"};
+	private static final String API_PING 									[] = {"ping"};
+	private static final String API_METRICS									[] = {"metrics"};
+	private static final String API_SYSTEM_INFO								[] = {"systeminfo"};
 	
-	private static final String API_BUCKET_LIST 					[] = {"bucket", "list"};
-	private static final String API_BUCKET_GET	 					[] = {"bucket", "get"};
-	private static final String API_BUCKET_EXISTS 					[] = {"bucket", "exists"};
-	private static final String API_BUCKET_CREATE	 				[] = {"bucket", "create"};
-	private static final String API_BUCKET_DELETE	 				[] = {"bucket", "delete"};
-	private static final String API_BUCKET_ISEMPTY					[] = {"bucket", "isempty"};
-	private static final String API_BUCKET_LIST_OBJECTS				[] = {"bucket", "objects"};
+
+	/** 
+	 * 	BUCKET 
+	 */
+	private static final String API_BUCKET_LIST 							[] = {"bucket", "list"};
+	private static final String API_BUCKET_GET	 							[] = {"bucket", "get"};
+	private static final String API_BUCKET_EXISTS 							[] = {"bucket", "exists"};
+	private static final String API_BUCKET_CREATE	 						[] = {"bucket", "create"};
+	private static final String API_BUCKET_DELETE	 						[] = {"bucket", "delete"};
+	private static final String API_BUCKET_ISEMPTY							[] = {"bucket", "isempty"};
+	private static final String API_BUCKET_LIST_OBJECTS						[] = {"bucket", "objects"};
 								
-	// 1
 	private static final String API_BUCKET_DELETE_ALL_PREVIOUS_VERSION		[] = {"bucket", "deleteallpreviousversion"};
+	
+
+	
+	
+	/** 
+	 * OBJECT 
+	 */
 	
 	private static final String API_OBJECT_GET 								[] = {"object", "get"};
 	
-	/** get Inpustream of the version passed as parameter, null if head is version 0 or parameter is non existent, or version were wiped  */
+	/** get Inpustream of the version passed as parameter, 
+	 * null if head is version 0 or parameter is non existent, 
+	 * or version were wiped  */
 	private static final String API_OBJECT_GET_VERSION 						[] = {"object", "getversion"};
 	
-	/** get File of the version previous to head, null if head is version 0 or previous version were wiped */
+	/** get File of the version previous to head, null if head 
+	 * is version 0 or previous version were wiped */
 	private static final String API_OBJECT_GET_PREVIOUS_VERSION				[] = {"object", "getpreviousversion"}; 
 	
 	private static final String API_OBJECT_EXISTS							[] = {"object", "exists"};
@@ -159,42 +168,45 @@ public class ODClient implements OdilonClient {
 	private static final String API_OBJECT_GET_METADATA_PREVIOUS_VERSION	[] = {"object", "getmetadatapreviousversion"};
 	
 												
-	private static final String API_OBJECT_GET_METADATA_VERSION_ALL		[] = {"object", "getmetadatapreviousversionall"};
-	private static final String API_OBJECT_URL_PRESIGNES_PREFIX			[] = {"presigned", "object"};
+	private static final String API_OBJECT_GET_METADATA_VERSION_ALL			[] = {"object", "getmetadatapreviousversionall"};
+	private static final String API_OBJECT_URL_PRESIGNES_PREFIX				[] = {"presigned", "object"};
 	
-	private static final String API_OBJECT_UPLOAD 						[] = {"object", "upload"};
+	private static final String API_OBJECT_UPLOAD 							[] = {"object", "upload"};
 	
-	private static final String API_OBJECT_RESTORE_PREVIOUS_VERSION 	[] = {"object", "restorepreviousversion"};
+	private static final String API_OBJECT_RESTORE_PREVIOUS_VERSION 		[] = {"object", "restorepreviousversion"};
+
+	
+	/** ---------------------------------------------------- */
 	
 	private static final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
 	private static final int HTTP_CACHE_SIZE = 200 * 1024 * 1024; // 200 mb
 	
-    // default network I/O timeout is 15 minutes
+    /** default network I/O timeout is 15 minutes */
 	public static final int DEFAULT_CONNECTION_TIMEOUT = 15 * 60;
 	public static final String DEFAULT_USER_AGENT = "Odilon (" + System.getProperty("os.arch") + "; " + System.getProperty("os.arch") + ") odilon-java/" + OdilonClientProperties.INSTANCE.getVersion();
 	
-	// default expiration for a presigned URL is 7 days in seconds
+	/** default expiration for a presigned URL is 7 days in seconds */
 	private static final int DEFAULT_EXPIRY_TIME = SharedConstant.DEFAULT_EXPIRY_TIME;
 	  
 	private static final String APPLICATION_JSON = "application/json";
 	private static final DateTimeFormatter http_date = DateTimeFormatter.RFC_1123_DATE_TIME;	  
 	  
-	//private static final String NULL_STRING = "(null)";
+	/** private static final String NULL_STRING = "(null)"; */
 	private static final String END_HTTP = "----------END-HTTP----------";
 
 	private static final String linux_home   = (new File(System.getProperty("user.dir"))).getPath();
 	private static final String windows_home = System.getProperty("user.dir");
 
-	// private static final String UPLOAD_ID = "uploadId";
-	// the current client instance's base URL.
+	/** private static final String UPLOAD_ID = "uploadId";
+		the current client instance's base URL. */
 	private HttpUrl baseUrl;
 	
 	private final String urlStr;
 	
-	 // access key to sign all requests with
+	/** access key to sign all requests with */
 	 private String accessKey;
 
-	 // Secret key to sign all requests with
+	 /** Secret key to sign all requests with */
 	 private String secretKey;
 	  
 	 private String userAgent = DEFAULT_USER_AGENT;
@@ -209,14 +221,9 @@ public class ODClient implements OdilonClient {
 	 
 	 private boolean isLogStream = false;
 
-
 	 private String charset = Charset.defaultCharset().name();
 	 
-	 
 	 private RandomIDGenerator rand = new RandomIDGenerator();
-	 
-	
-	 
 	 
 	/***
 	 * 
@@ -227,6 +234,12 @@ public class ODClient implements OdilonClient {
 	 * <li>accessKey. "odilon"</li>
 	 * <li>secretKey. "odilon"</li>
 	 * </ul>
+	 * 
+	 * @param endpoint 	can not be null
+	 * @param port		can not be null (normally default port is 9234)
+	 * @param accessKey can not be null
+	 * @param secretKey can not be null
+	 * 
 	 */
 	public ODClient(String endpoint, int port, String accessKey, String secretKey)  {
 					this(endpoint, port, accessKey, secretKey, false);
@@ -236,11 +249,12 @@ public class ODClient implements OdilonClient {
 
 	/**
 	 * 
-	 * @param endpoint
-	 * @param port
-	 * @param accessKey
-	 * @param secretKey
-	 * @param secure
+	 * @param endpoint 	can not be null
+	 * @param port		can not be null (normally default port is 9234)
+	 * @param accessKey can not be null
+	 * @param secretKey can not be null
+	 * 
+	 * @param secure not used in v1.5 or lower
 	 */
 	public ODClient(String endpoint, int port, String accessKey, String secretKey, boolean secure)  {
 		
@@ -313,23 +327,37 @@ public class ODClient implements OdilonClient {
 			    this.secretKey = secretKey;
 		  }
 		  
+	
+	/**
+	 * 
+	 */
 	@Override
 	public ObjectMetadata putObjectStream(String bucketName, String objectName,InputStream stream,String fileName) throws ODClientException {
 		return putObjectStream(bucketName,	objectName,	stream,	Optional.ofNullable(fileName),Optional.empty());
 	}
 
+	/**
+	 * 
+	 */
 	@Override
 	public ObjectMetadata putObjectStream(String bucketName,String objectName,	InputStream stream,	Optional<String> fileName, Optional<Long> size) throws ODClientException {
 		return putObjectStream(bucketName,objectName,stream,fileName,size,Optional.empty());
 	}
 
 
-	
+	/**
+	 * 
+	 * @param bucketName
+	 * @param objectName
+	 * @param objectVersion
+	 * @param fileName
+	 * @param version
+	 */
 	public void putObjectStreamVersion(String bucketName, String objectName, InputStream objectVersion, String fileName, int version) {
-		
-		
+		throw new RuntimeException("not implemented");
 	}
 	
+
 	@Override
 	public boolean isValidObjectName(String objectName ) {
 		Check.requireNonNullStringArgument(objectName, "objectName can not be null or emtpy");
@@ -343,6 +371,10 @@ public class ODClient implements OdilonClient {
 		return true;
 	}
 	
+	
+	/**
+	 * 
+	 */
 	@Override
 	public ObjectMetadata putObjectStream(String bucketName,String objectName,InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType) throws ODClientException {
 		
@@ -427,6 +459,9 @@ public class ODClient implements OdilonClient {
 		Check.requireNonNullStringArgument(bucketName, "bucketName is null");
 		Check.requireNonNullStringArgument(objectName, "objectName can not be null | b:"+ bucketName);
 		Check.requireNonNullArgument(file, "file is null");
+		Check.requireTrue(file.exists(), "file does not exist");
+		Check.requireTrue(!file.isDirectory(), "file can not be a Directory");
+		
 		return putObjectInternal(bucketName, objectName, file, file.getName());
 	}
 	
@@ -609,7 +644,11 @@ public class ODClient implements OdilonClient {
 			}
 	  }
 
-
+	  
+	  /**
+	   * 
+	   */
+	  @Override
 	  public boolean isEmpty(String bucketName) throws ODClientException {
 		Check.requireNonNullStringArgument(bucketName, "bucketName is null or empty");
 		HttpResponse httpResponse = executeReq(API_BUCKET_ISEMPTY, Method.GET, Optional.of(bucketName));
@@ -621,6 +660,9 @@ public class ODClient implements OdilonClient {
 	}
 	 
 	  
+	  /**
+	   * 
+	   */
 	@Override		 
 	public boolean existsBucket(String bucketName) throws ODClientException {
 		Check.requireNonNullStringArgument(bucketName, "bucketName is null");
@@ -634,6 +676,9 @@ public class ODClient implements OdilonClient {
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	 @Override
 	 public Bucket getBucket(String bucketName) throws ODClientException {
 		Check.requireNonNullStringArgument(bucketName, "bucketName is null or empty");
@@ -651,6 +696,9 @@ public class ODClient implements OdilonClient {
 		}
 	}
 
+	 /**
+	  * 
+	  */
 	@Override
 	public void createBucket(String bucketName) throws ODClientException  {
 		Check.requireNonNullStringArgument(bucketName, "bucketName is null");
@@ -667,13 +715,21 @@ public class ODClient implements OdilonClient {
 	}
 	
 	
+	/**
+	 * 
+	 * @param requestClass
+	 * @throws ODClientException
+	 */
 	public void addServiceRequest(String requestClass) throws ODClientException  {
 		Check.requireNonNullStringArgument(requestClass, "requestClass is null");
 		HttpResponse response = executePost(API_SERVICE_REQUES_ADD, Optional.of(requestClass), Optional.empty(), null, null, "", 0, false);
 		response.body().close();
 	}
+
 	
-	
+	/**
+	 * 
+	 */
 	@Override
 	public void deleteBucket(String bucketName) throws ODClientException {
 		Check.requireNonNullStringArgument(bucketName, "bucketName is null");
@@ -701,6 +757,11 @@ public class ODClient implements OdilonClient {
 		 response.body().close();
 	 }
 
+	 
+	 /**
+	  * 
+	  * 
+	  */
 	 @Override
 	 public void deleteObjectAllVersions(String bucketName, String objectName) throws ODClientException {
 		 Check.requireNonNullStringArgument(bucketName, "bucketName is null or empty");
@@ -713,6 +774,11 @@ public class ODClient implements OdilonClient {
 		 response.body().close();
 	 }
 
+	 
+	 /**
+	  *
+	  * 
+	  */
 	 @Override
 	 public void restoreObjectPreviousVersions(String bucketName, String objectName) throws ODClientException {
 		 Check.requireNonNullStringArgument(bucketName, "bucketName is null or empty");
@@ -725,6 +791,9 @@ public class ODClient implements OdilonClient {
 		 response.body().close();
 	 }
 
+	 /**
+	  * 
+	  */
 	 @Override
 	 public void deleteAllBucketVersions(String bucketName) throws ODClientException  {
 		 Check.requireNonNullStringArgument(bucketName, "bucketName is null or empty");
@@ -755,6 +824,9 @@ public class ODClient implements OdilonClient {
 		}
 	}
 
+	 /**
+	  * 
+	  */
 	 @Override
 	 public boolean isVersionControl() throws ODClientException {
 		 return systemInfo().isVersionControl(); 
@@ -946,6 +1018,8 @@ public class ODClient implements OdilonClient {
 		return httpResponse.body().byteStream();
 	 }
 	 
+	  
+	  @Override
 	 public InputStream getObjectPreviousVersion(String bucketName, String objectName) throws ODClientException {
 		 Check.requireNonNullStringArgument(bucketName, "bucketName is null or empty");
 		 Check.requireNonNullStringArgument(objectName, "objectName can not be null or empty | b:"+ bucketName);
@@ -959,6 +1033,7 @@ public class ODClient implements OdilonClient {
 	  *  parameter is non existent
 	  *  or previous versions were wiped </p>
 	  */
+	  @Override
 	 public InputStream getObjectVersion(String bucketName, String objectName, int version) throws ODClientException {
 		 Check.requireNonNullStringArgument(bucketName, "bucketName is null or empty");
 		 Check.requireNonNullStringArgument(objectName, "objectName can not be null or empty | b:"+ bucketName);
@@ -1068,22 +1143,23 @@ public class ODClient implements OdilonClient {
 	   * <p>Validates if given bucket name is DNS compatible.
 	   * This method was part of the Minio Client SDK 1.4</p>
 	   *
+	   *
 	   * @throws InvalidBucketNameException  upon invalid bucket name is given
 	   * 
 	   */
-	  private void checkBucketName(String name) {
+	  private void checkBucketName(String bucketName) {
 		  
-		Check.requireNonNullStringArgument(name, "bucketName is null or empty");
+		Check.requireNonNullStringArgument(bucketName, "bucketName is null or empty");
 
-		if (name.length()<1 || name.length()>SharedConstant.MAX_BUCKET_CHARS)
+		if (bucketName.length()<1 || bucketName.length()>SharedConstant.MAX_BUCKET_CHARS)
 			throw new IllegalArgumentException( "bucketName must be >0 and <" + String.valueOf(SharedConstant.MAX_BUCKET_CHARS));
 	    
 	    // Successive periods in bucket names are not allowed.
-	    if (name.matches("\\.\\.")) 
-	    	  throw new IllegalArgumentException("bucket name cannot contain successive periods -> " + name);
+	    if (bucketName.matches("\\.\\.")) 
+	    	  throw new IllegalArgumentException("bucket name cannot contain successive periods -> " + bucketName);
 	    
-	    if (!name.matches(SharedConstant.bucket_valid_regex)) 
-	    	  throw new IllegalArgumentException("bucket name not valid -> " + name);
+	    if (!bucketName.matches(SharedConstant.bucket_valid_regex)) 
+	    	  throw new IllegalArgumentException("bucket name not valid -> " + bucketName);
 	  }
 	  
 	  /**
@@ -1182,6 +1258,8 @@ public class ODClient implements OdilonClient {
  
 	private void transferTo(InputStream stream, String destFileName) throws IOException {
  			
+			Check.requireNonNullArgument(stream, "stream is null");
+		
  	 		byte[] buf = new byte[ BUFFER_SIZE ];
  	 		int bytesRead;
  			BufferedOutputStream out = null;
@@ -1707,26 +1785,23 @@ public class ODClient implements OdilonClient {
 	 			 }
 	 	  
 
-	 	 	    
-	 	   
-
-	 	  private static boolean isLinux() {
+ 	  private static boolean isLinux() {
 	 			if  (System.getenv("OS")!=null && System.getenv("OS").toLowerCase().contains("windows")) 
 	 				return false;
 	 			return true;
-	 		}
+ 		}
 
 	 	 
 	 			 
-		  private String getCacheWorkDir() {									
+	  private String getCacheWorkDir() {									
 		 		return getHomeDirAbsolutePath() + File.separator + "tmp" + File.separator +  rand.randomString(6);
-		  }
+	  }
 		
-		  private String getHomeDirAbsolutePath() {
+	  private String getHomeDirAbsolutePath() {
 				if (isLinux())
 					return linux_home;
 				return windows_home;
-		  }
+	  }
 
 
 	private String getContentType(String src) {

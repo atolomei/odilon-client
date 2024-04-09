@@ -101,6 +101,8 @@ public interface OdilonClient {
 	 */
 	public void createBucket(String bucketName) throws ODClientException;
 
+	
+	
 
 	
 	
@@ -162,14 +164,15 @@ public interface OdilonClient {
 	 * 
 	 * @see {@link io.odilon.model.SharedConstant}
 	 * 
-	 * @param objectName name of the Object
+	 * @param objectName 		can not be null
+	 * 
 	 * @return true if the objectName is a valid Odilon Object name
 	 */
 	public boolean isValidObjectName(String objectName);
 	
 	
-	
 	/**
+	 * 
 	 * <p>Returns {@code true} if the {@link String} bucketName is a valid name for an Odilon Bucket</p>
 	 * 
 	 * <ul>
@@ -181,10 +184,11 @@ public interface OdilonClient {
 	 * </li>
 	 * </ul>
 	 * 
-	 * @see {@link io.odilon.model#SharedConstant}
+	 * @param buckettName 		can not be null
 	 * 
-	 * @param bucketName name of the Bucket
 	 * @return true if the bucketName is a valid Odilon Bucket name
+	 * 
+	 * @see {@link io.odilon.model#SharedConstant}
 	 */
 	public boolean isValidBucketName(String bucketName);
 	
@@ -192,19 +196,24 @@ public interface OdilonClient {
 
 
 	/**
-	 * <p>Returns {@code true} if a bucket with name {@code bucketName} exists </p> 
-	 * @param bucketName
+	 * <p>Returns {@code true} if a bucket with name {@code bucketName} exists </p>
+	 *  
+	 * @param bucketName	can not be null
+	 * 
 	 * @return whether the bucket exists in the Server
-	 * @throws {@link ODClientException}
+	 * 
 	 */
 	public boolean existsBucket(String bucketName) throws ODClientException;
 	
 	/**
 	 * <p>Returns {@code true} if the bucket has no Objects, otherwise {@code false}</p>
-	 * @param bucketName Bucket name
-	 * @return true if the bucket has no Objects
-	 * @throws {@link ODClientException} <br/> 
-	 * BucketName is not an existing Bucket -> {@link ODHttpStatus.NOT_FOUND} with error code {@link ErrorCode.BUCKET_NOT_EXISTS} <br/>  
+
+	 * @param 		bucketName can not be null
+	 * 
+	 * @return 		true if the bucket has no Objects
+	 * 
+	 * @throws 		{@link ODClientException} <br/> 
+	 * 				BucketName is not an existing Bucket -> {@link ODHttpStatus.NOT_FOUND} with error code {@link ErrorCode.BUCKET_NOT_EXISTS} <br/>  
 	 */
 	public boolean isEmpty(String bucketName) throws ODClientException;
 
@@ -233,6 +242,8 @@ public interface OdilonClient {
 	public Bucket getBucket(String bucketName) throws ODClientException;
 	
 	
+	
+	
 	/**
 	 * <p>Deletes a {@link Bucket}. The bucket must be empty to be deleted</p>
 	 * <p><b>Example:</b></p>
@@ -256,6 +267,11 @@ public interface OdilonClient {
 	 */
 	public void deleteBucket(String bucketName) throws ODClientException;
 
+	
+	
+	
+	
+	
 	/**
 	* <p>Deletes all the previous versions of all the Objects in the {@link Bucket}.<br/> 
 	*  Note that it does not delete the current version of the objects (called <b>head version</b>). <br/>
@@ -283,6 +299,10 @@ public interface OdilonClient {
 	*/
 	public void deleteAllBucketVersions(String bucketName) throws ODClientException;
 	
+	
+	
+	
+	
 	/* =======================================
 	 * OBJECT
 	 ==========================================*/
@@ -295,13 +315,16 @@ public interface OdilonClient {
 	 * <p>Checks for the existence of an Object.</p>
 	 * <p>Note that if the {@link Bucket} does not exist, the method does not throw an {@code Exception}, it returns {@code false}</p>
 	 * 
-	 * @param bucketName Bucket name of the Bucket
-	 * @param objectName name if object
+	 * @param bucketName 	can not be null
+	 * @param objectName	can not be null
 	 * @return true if the Object exist
 	 * @throws {@link ODClientException}
 	 * @throws IOException
 	 */
 	public boolean existsObject(String bucketName, String objectName) throws ODClientException, IOException;
+	
+	
+	
 	
 	
 
@@ -329,36 +352,47 @@ public interface OdilonClient {
 	* }	
 	* </pre>
 	* 	 
-	 * @param bucketName Bucket name
-	 * @param objectName Object name
-	 * @return
-	 * @throws {@link ODClientException}
-	 */
+	* @param bucketName 	can not be null
+	* @param objectName		can not be null
+	* @return 				{@link ObjectMetadata} from server
+	* @throws 				{@link ODClientException} 
+	* 						if object does not exist 
+	*/
 	public ObjectMetadata getObjectMetadata(String bucketName, String objectName) throws ODClientException;
 	
+	
+	
+	
 
+	
 	/**
 	 * <p>Returns the binary data (File) of this Object</p> 
-	 * @param bucketName Bucket name
-	 * @param objectName Object name
+	* @param bucketName 	can not be null
+	* @param objectName		can not be null
 	 * 
 	 * @throws {@link ODClientException}
 	 */
 	public InputStream getObject(String bucketName, String objectName) throws ODClientException;
+
+	
+	
+	
+	
 	
 	/**
 	 * <p>Retrieves the binary data of this Object and saves it to a {@link File} with path {@code filePath}</p>
-	 * @param bucketName Bucket name
-	 * @param objectName Object name
-	 * @param filePath path and file name where to save the data downloaded (example: "c:\temp\myfile.pdf")
 	 * 
-	 * @throws 
-	 * 			if object does not exist -> {@link ObjectNotFoundException} ODHttpStatus.NOT_FOUND, ErrorCode.OBJECT_NOT_FOUND
+	 * @param bucketName 		can not be null
+	 * @param objectName		can not be null
+	 * @param 					filePath path and file name where to save the data downloaded (example: "c:\temp\myfile.pdf")
 	 * 
-	 * @throws IOException
+	 * @throws		 			if object does not exist -> {@link ObjectNotFoundException} ODHttpStatus.NOT_FOUND, ErrorCode.OBJECT_NOT_FOUND
+	 * 
+	 * @throws IOException		
 	 */
 	public void getObject(String bucketName, String objectName, String filePath) throws ODClientException, IOException;
 	
+
 	
 	/**
 	 * <p>Returns a temporary URL to access or download the binary data of an Object without authentication</p>
@@ -388,25 +422,28 @@ public interface OdilonClient {
 	 *	}
 	 * </pre>
 	 * 
-	 * @param bucketName Bucket name
-	 * @param objectName Object name
-	 * @param expiresInSeconds duration in seconds for the url to be valid
+	 * @param bucketName 		can not be null
+	 * @param objectName		can not be null
+	 * @param expiresInSeconds 	duration in seconds for the url to be valid
+	 * 
 	 * @return temporary url to download the file without authentication
 	 * 
 	 * @throws {@link ODClientException}
 	 */
-	
-	
 	public String getPresignedObjectUrl(String bucketName, String objectName, Optional<Integer> expiresInSeconds) throws ODClientException;
 
+	
+	
 	
 	/**
 	 * <p>Returns a temporary URL to access or download the binary data of an Object without authentication</p>
 	 * <p>This is method calls {@link #getPresignedObjectUrl} with the default value for  {@code expiresInSeconds} (ie. 7 days in seconds)</p>
 	 * 
-	 * @param bucketName Bucket name
-	 * @param objectName Object name
-	 * @return
+	 * @param bucketName 		can not be null
+	 * @param objectName		can not be null
+	 * 
+	 * @return 					temporary url to download the file without authentication
+	 * 
 	 * @throws {@link ODClientException}
 	 */
 	public String getPresignedObjectUrl(String bucketName, String objectName) throws ODClientException;
@@ -449,37 +486,47 @@ public interface OdilonClient {
 	 * }
 	 * </pre>
 	 * 
-	 * @param bucketName Bucket name
-	 * @param objectName Object name
-	 * @param stream 
+	 * @param bucketName 		can not be null
+	 * @param objectName		can not be null
+	 * @param stream			can not be null
+	 *  
 	 * @param fileName
 	 * @param contentType
+	 * 
 	 * @return {@link ObjectMetadata} of the Object created or updated
 	 * 
 	 * @throws {@link ODClientException}
+	 * 
 	 */
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, String fileName, String contentType) throws ODClientException;
 		
+	
+	
 	/**
 	 * <p>Uploads a File or any other binary stream to the server. It will create a new object or update an existing one.</p> 
 	 * <p>This method does the same as {@link #putObject} <br/>
 	 * but with a local {@link File} instead of an {@link InputStream}</p>
 	 * 
-	 * @param bucketName Bucket name
-	 * @param objectName Object name
-	 * @param file
+	 * @param bucketName 		can not be null
+	 * @param objectName		can not be null
+	 * @param file				can not be null, file.exists() must be true, file.isDirectory() must be false, Files.isRegularFile(file.toPath()) must be true
+	 * 
 	 * @return {@link ObjectMetadata} of the Object created or updated
 	 * @throws {@link ODClientException}
 	 */
 	public ObjectMetadata putObject(String bucketName, String objectName, File file) throws ODClientException;
 	
 	
+	
+	
+	
+	
 	/**
 	 * <p>Uploads a File or any other binary stream to the server. It will create a new object or update an existing one.</p>
 	 * <p>This method calls {@link #putObject} 
 	 * </p>
-	 * @param bucketName Bucket name
-	 * @param objectName Object name
+	 * @param bucketName 		can not be null
+	 * @param objectName		can not be null
 	 * @param stream InputStream with the binary data to upload
 	 * @param fileName name of the File uploaded
 	 * @return the {@link ObjectMetadata} of the Object
@@ -487,12 +534,15 @@ public interface OdilonClient {
 	 */
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, String fileName) throws ODClientException;
 	
+	
+	
 	/**
-	 * <p>Uploads a File or any other binary stream to the server. It will create a new object or update an existing one.</p>	  
+	 * <p>Uploads a  InputStream to the server. It will create a new object or update it if already exists.</p>
+	 * 	  
 	 * <p>This method calls {@link #putObject}</p>
 	 * 
-	 * @param bucketName Bucket name
-	 * @param objectName Object name
+	 * @param bucketName 		can not be null
+	 * @param objectName		can not be null
 	 * @param stream
 	 * @param fileName
 	 * @param size
@@ -502,6 +552,7 @@ public interface OdilonClient {
 	 */
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType) throws ODClientException;
 
+	
 	
 	/**
 	 * <p>Uploads a File or any other binary stream to the server. It will create a new object or update an existing one.</p>
@@ -528,8 +579,9 @@ public interface OdilonClient {
 	 * <p><b>Example:</b></p>
 	 * <pre>{@code odilonClient.deleteObject("my-bucketname", "my-objectname"); }</pre>
 	 *
-	 * @param bucketName Bucket name
-	 * @param objectName Object name in the bucket
+	 * @param bucketName 		can not be null
+	 * @param objectName		can not be null
+
 	 * @throws {@link ODClientException}
 	 */
 	public void deleteObject(String bucketName, String objectName) throws ODClientException;
@@ -540,8 +592,9 @@ public interface OdilonClient {
 	  ------------------------*/
 	/**
 	 * <p>Returns {@code true} if the Object has previous versions, ie. at least there is one version older than the <b>head version</b> (in which case the head version must be greater than 0)</p>
-	 * @param bucketName Bucket name
-	 * @param objectName Object name
+	 * 
+	 * @param bucketName 		can not be null
+	 * @param objectName		can not be null
 	 * @return {@code true} if the Object has more versions than the head version (ie. the head version must be greater than 0)
 	 * @throws {@link ODClientException}
 	 * @throws IOException
@@ -551,8 +604,8 @@ public interface OdilonClient {
 	/**
 	 * <p>Returns {@link ObjectMetadata} of the version immediately previous to the <b>head version</b>, or {@code null} if there is no previous version</p>
 	 * 
-	 * @param bucketName
-	 * @param objectName
+	 * @param bucketName 		can not be null
+	 * @param objectName		can not be null
 	 * @return
 	 * @throws {@link ODClientException}
 	 */
@@ -564,8 +617,8 @@ public interface OdilonClient {
 	 * <p>Restores the previous version of the Object and deletes current version. </p>
 	 * <p>If the object does not have any previous versions, it throws an {@link ODClientException}</p>
 	 * 
-	 * @param bucketName
-	 * @param objectName
+	 * @param bucketName 		can not be null
+	 * @param objectName		can not be null
 	 * @throws {@link ODClientException} <br/>
 	 * <ul>
 	 * <li>The server does not have Version Control enabled -> {@link OdilonServerAPIException} ODHttpStatus.METHOD_NOT_ALLOWED, ErrorCode.API_NOT_ENABLED <br/><br/></li>
@@ -580,8 +633,8 @@ public interface OdilonClient {
 	
 	/**
 	 * <p>Returns all the previous versions of an Object, the current version (head version) is not included in the List returned</p>
-	 * @param bucketName
-	 * @param objectName
+	 * @param bucketName 		can not be null
+	 * @param objectName		can not be null
 	 * @return list of {@link ObjectMetadata} sorted by version number, from 0 to (head version - 1)
 	 * @throws {@link ODClientException}
 	 */
@@ -590,8 +643,8 @@ public interface OdilonClient {
 	
 	/**
 	 * <p>Returns the binary data of the object's previous version or {@code null} if there is no previous version.</p>
-	 * @param bucketName
-	 * @param objectName
+	 * @param bucketName 		can not be null
+	 * @param objectName		can not be null
 	 * @return ObjectMetadata of the object's previous version
 	 * @throws {@link ODClientException}
 	 */
@@ -600,8 +653,8 @@ public interface OdilonClient {
 	
 	/**
 	 * <p>Returns the binary data of the version #{@code version} of the object's or {@code null} if the object does not have a version #{@code version}.</p> 
-	 * @param bucketName
-	 * @param objectName
+	 * @param bucketName 		can not be null
+	 * @param objectName		can not be null
 	 * @param version
 	 * @return
 	 * @throws {@link ODClientException}
@@ -613,8 +666,8 @@ public interface OdilonClient {
 	 * <p>Deletes all the Object's  previous versions, it does not delete the object current version (<b>head version</b>).</p> 
 	 * <p>After calling this method the Object will have only the <b>head version</b>.</p>
 	 * 
-	 * @param bucketName
-	 * @param objectName
+	 * @param bucketName 		can not be null
+	 * @param objectName		can not be null
 	 * @throws {@link ODClientException}
 	 */
 	public void deleteObjectAllVersions(String bucketName, String objectName) throws ODClientException;
@@ -634,8 +687,13 @@ public interface OdilonClient {
 	 * 
 	 * <p>If prefix is not {@code Optional.empty()} the list will include only objects where the objectName starts with the prefix. <br/>
 	 * {@code pageSize} is the number of items retrieved by each call to the server, if the value is {@code Optional.empty()} the client will use the default pageSize value.<br/>
-	 * </p> 
+	 * </p>
+ 	 * @param bucketName 		can not be null
+	 * @param prefix
+	 * @param pageSize 
 
+	 * @return	 {@code ResultSet<Item<ObjectMetadata>>} . ResultSet is {@link Iterable} Item if ok() contain a instance of ObjectMetadata, otherwise a error() returns a String with the error 
+	 *  
 	 * <p>Example list all bucket's objects:
 	 * <pre> {@code 
 	 * try {
@@ -656,11 +714,14 @@ public interface OdilonClient {
 	 */
 	public ResultSet<Item<ObjectMetadata>> listObjects(String bucketName, Optional<String> prefix, Optional<Integer> pageSize) throws ODClientException;
 	
+	
+	
+	
 	/**
 	 *<p>Lists the objects in the {@link Bucket}.</p>
 	 *<p> see {@link #listObjects}</p>
 	 * 
- 	 * @param bucketName Bucket's name
+	 * @param bucketName 		can not be null
 	 * @param prefix
 	 * @return
 	 * @throws {@link ODClientException}
@@ -672,7 +733,7 @@ public interface OdilonClient {
 	 *<p>Lists the objects in the {@link Bucket}.</p> 
 	 *<p> see {@link #listObjects}</p>
 	 * 
- 	 * @param bucketName name of the bucket
+	 * @param bucketName 		can not be null
 	 * @return
 	 * @throws {@link ODClientException}
 	 */
@@ -683,11 +744,14 @@ public interface OdilonClient {
 	 *<p>Lists the objects in the {@link Bucket}.</p> 
 	 *<p> see {@link #listObjects}</p>
 	 * 
- 	 * @param bucket bucket to list
+	 * @param bucketName 		can not be null
 	 * @return
 	 * @throws {@link ODClientException}
 	 */
 	public ResultSet<Item<ObjectMetadata>> listObjects(Bucket bucket) throws ODClientException;
+	
+	
+	
 	
 	
 	/* =======================================
@@ -715,6 +779,8 @@ public interface OdilonClient {
 	  * @return String "ok" or the error reported by the Server.
 	  */
 	public String ping();
+	
+	
 	
 /**
  * 
@@ -815,8 +881,17 @@ public interface OdilonClient {
 
 
 
-
+	/**
+	 * 
+	 * @param c 
+	 */
 	public void setCharset(String c);
+	
+	
+	/**
+	 * 
+	 * @return Charsert "UTF-8" is the default value.
+	 */
 	public String getCharset();
 
 	

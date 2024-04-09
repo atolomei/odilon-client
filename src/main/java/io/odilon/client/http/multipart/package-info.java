@@ -14,15 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /**
- * <p>The Interface {@link OdilonClient} contains the API to interact with the Server, the Implementation class is {@link ODClient}.</p>
- * <p>In order to access the Odilon server from a Java application you have to include Odilon client JAR in the classpath. 
- * The interaction is managed by an instance of {@link OdilonClient} that connects to the server using the credentials: 
- * AccessKey (ie. username) and SecretKey (ie. password)</p>
- * 
+ * <p>Utility classes used by {@link ODClient} for POST Multipart using Java HTTTP client.</p>
+
  * @author atolomei@novamens.com (Alejandro Tolomei)
  * 
  */
-package io.odilon.client;
+package io.odilon.client.http.multipart;
 
