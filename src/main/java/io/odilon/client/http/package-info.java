@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 /**
- * <p>Utility classes used by {@link ODClient}. Should not be used by client applications.</p>
+ * <p>Utility classes used by {@link io.odilon.client.ODClient}. Should not be used by client applications.</p>
 
  * @author atolomei@novamens.com (Alejandro Tolomei)
  * 

@@ -162,8 +162,6 @@ public interface OdilonClient {
 	 * </ul>
 	 * 
 	 * 
-	 * @see {@link io.odilon.model.SharedConstant}
-	 * 
 	 * @param objectName 		can not be null
 	 * 
 	 * @return true if the objectName is a valid Odilon Object name
@@ -184,7 +182,7 @@ public interface OdilonClient {
 	 * </li>
 	 * </ul>
 	 * 
-	 * @param buckettName 		can not be null
+	 * @param bucketName 		can not be null
 	 * 
 	 * @return true if the bucketName is a valid Odilon Bucket name
 	 * 
@@ -261,9 +259,9 @@ public interface OdilonClient {
 	 * </pre>
 	 * 
 	 * @param bucketName Bucket name
-	 * @throws  
-	 * 			Bucket does not exist -> {@link ODHttpStatus#NOT_FOUND} with error code {@link ErrorCode#BUCKET_NOT_EXISTS} <br/>
-	 * 			Bucket is not empty -> {@link ODHttpStatus#CONFLICT} with error code {@link ErrorCode#BUCKET_NOT_EMPTY}
+	 * 
+	 * @throws	 {@link ODHttpStatus#NOT_FOUND} if Bucket does not exist, with error code {@link ErrorCode#BUCKET_NOT_EXISTS} <br/>
+	 * 			 {@link ODHttpStatus#CONFLICT} if Bucket does not exist, with error code {@link ErrorCode#BUCKET_NOT_EMPTY}
 	 */
 	public void deleteBucket(String bucketName) throws ODClientException;
 
@@ -386,7 +384,8 @@ public interface OdilonClient {
 	 * @param objectName		can not be null
 	 * @param 					filePath path and file name where to save the data downloaded (example: "c:\temp\myfile.pdf")
 	 * 
-	 * @throws		 			if object does not exist -> {@link ObjectNotFoundException} ODHttpStatus.NOT_FOUND, ErrorCode.OBJECT_NOT_FOUND
+	 * @throws		 			if object does not exist -> {@link ObjectNotFoundException} {@link ODHttpStatus#NOT_FOUND}, {@link ErrorCode#OBJECT_NOT_FOUND}
+	 * 
 	 * 
 	 * @throws IOException		
 	 */
@@ -744,7 +743,7 @@ public interface OdilonClient {
 	 *<p>Lists the objects in the {@link Bucket}.</p> 
 	 *<p> see {@link #listObjects}</p>
 	 * 
-	 * @param bucketName 		can not be null
+	 * @param bucket		can not be null
 	 * @return
 	 * @throws {@link ODClientException}
 	 */

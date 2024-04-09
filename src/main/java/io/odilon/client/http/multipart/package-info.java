@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 /**
- * <p>Utility classes used by {@link ODClient} for POST Multipart using Java HTTTP client.</p>
+ * <p>Utility classes used by {@link io.odilon.client.ODClient} for POST Multipart using Java HTTTP client.</p>
 
  * @author atolomei@novamens.com (Alejandro Tolomei)
  * 
