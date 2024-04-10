@@ -121,6 +121,9 @@ public class ODClient implements OdilonClient {
 									
 	private static final String API_SERVICE_REQUES_ADD						[] = {"servicerequest", "add"};
 	
+	/** 
+	 * 	MONITOR  
+	 */
 	private static final String API_PING 									[] = {"ping"};
 	private static final String API_METRICS									[] = {"metrics"};
 	private static final String API_SYSTEM_INFO								[] = {"systeminfo"};
@@ -1676,7 +1679,7 @@ public class ODClient implements OdilonClient {
 				str = response.body().string();
 				
 				if (logger.isDebugEnabled()) {
-					   response.body().string();
+					logger.debug("error response body -> " + (str!=null?str:"null"));
 			   }
 				
 			} catch (IOException e) {
