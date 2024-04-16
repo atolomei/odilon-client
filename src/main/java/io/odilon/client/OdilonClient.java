@@ -79,6 +79,8 @@ public interface OdilonClient {
 	 *  match the regular expression {@link io.odilon.model.SharedConstant#bucket_valid_regex SharedConstant.bucket_valid_regex} (see {@link isValidBucketName})
 	 * </p>
 	 * 
+	 * <p>Note that as of version 1.6 Buckets can not be renamed after creation</p>
+	 * 
 	 *  <b>Example:</b>
 	 * <pre>{@code
 	 * 	try {
@@ -102,6 +104,64 @@ public interface OdilonClient {
 	public void createBucket(String bucketName) throws ODClientException;
 
 	
+
+	
+	
+	
+	/*
+	 * <p>Renames existing {@link Bucket}.</p> 
+	 *  
+	 * <p>The bucket must exist, if it does exists the method will throw a {@link ODClientException}.<br/>
+	 *  newBucketName length must be lower or equal to {@link io.odilon.model.SharedConstant#MAX_BUCKET_CHARS} and <br/> 
+	 *  match the regular expression {@link io.odilon.model.SharedConstant#bucket_valid_regex SharedConstant.bucket_valid_regex} (see {@link isValidBucketName})
+	 *  
+	 *  If an existing bucket has the name newBucketName the method will thrown an exception
+	 * </p>
+	 * 
+	 *  <b>Example:</b>
+	 * <pre>{@code
+	 * 	
+	 * String bucketName = "bucket-demo-1";
+	 * 
+	 * try {
+	 *   	//	check if the bucket exists, if not create it
+	 *   	if (client.existsBucket(bucketName))
+	 *      	 System.out.println("bucket already exists ->" + bucketName );
+	 *   	else 
+	 *      	 client.createBucket(bucketName);
+	 * 		} catch (ODClientException e) {
+	* 			System.out.println( "HTTP status -> " + String.valueOf(e.getHttpStatus())+ " | ErrorMsg -> " + e.getMessage() + " Odilon Error Code -> " + String.valueOf(e.getErrorCode()) );
+	 * 		}
+	 * 
+	 * String newBucketName = "bucket-demo-2";
+	 * 
+	 * try {
+	 *   		//	check if the bucket exists, if not create it
+	 *   		if (client.existsBucket(newBucketName))
+	 *      		 System.out.println("bucket already exists ->" + newBucketName );
+	 *   		else {
+	 *      	 	client.renameBucketName(bucketName, newBucketName);
+	 *      		System.out.println("bucket name changed from -> " bucketName  +"  to -> " + newBucketName);
+	 *      	}
+	 * 		} catch (ODClientException e) {
+	* 			System.out.println( "HTTP status -> " + String.valueOf(e.getHttpStatus())+ " | ErrorMsg -> " + e.getMessage() + " Odilon Error Code -> " + String.valueOf(e.getErrorCode()) );
+	 * 		}
+	 * 
+	 * 
+	 * }</pre>
+	 * 
+	 * @param 	bucketName Bucket name
+	 * @param 	newBucketName new name for Bucket
+	 * 
+	 * @throws  ODClientException
+	 * 			if newBucketName is the name of an existing Bucket -> (error code {@link io.odilon.net.ErrorCode#OBJECT_ALREADY_EXIST})
+	 * 
+	 * 	@throws  ODClientException
+	 * 			 if bucketName is not an existing Bucket -> {@link ODHttpStatus.NOT_FOUND} with error code {@link ErrorCode.BUCKET_NOT_EXISTS} <br/>
+	 * 
+	
+	public void renameBucket(String bucketName, String newBucketName) throws ODClientException;
+	 */
 	
 
 	

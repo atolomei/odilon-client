@@ -136,13 +136,12 @@ public class ODClient implements OdilonClient {
 	private static final String API_BUCKET_GET	 							[] = {"bucket", "get"};
 	private static final String API_BUCKET_EXISTS 							[] = {"bucket", "exists"};
 	private static final String API_BUCKET_CREATE	 						[] = {"bucket", "create"};
+	private static final String API_BUCKET_RENAME	 						[] = {"bucket", "rename"};
 	private static final String API_BUCKET_DELETE	 						[] = {"bucket", "delete"};
 	private static final String API_BUCKET_ISEMPTY							[] = {"bucket", "isempty"};
 	private static final String API_BUCKET_LIST_OBJECTS						[] = {"bucket", "objects"};
 								
 	private static final String API_BUCKET_DELETE_ALL_PREVIOUS_VERSION		[] = {"bucket", "deleteallpreviousversion"};
-	
-
 	
 	
 	/** 
@@ -716,6 +715,30 @@ public class ODClient implements OdilonClient {
 		HttpResponse response = executePost(API_BUCKET_CREATE, Optional.of(bucketName), Optional.empty(), null, null, "", 0, false);
 		response.body().close();
 	}
+	
+
+	 /**
+	  * 
+	  
+	@Override
+	public void renameBucket(String bucketName, String newBucketName) throws ODClientException  {
+		
+		Check.requireNonNullStringArgument(bucketName, "bucketName is null");
+		Check.requireNonNullStringArgument(newBucketName, "newBucketName is null");
+		
+		if (newBucketName.length()<1 || newBucketName.length()>SharedConstant.MAX_BUCKET_CHARS) {
+			throw new IllegalArgumentException( "newBucketName must be >0 and <" + String.valueOf(SharedConstant.MAX_BUCKET_CHARS) + "' | b:" + newBucketName);
+		}
+		if (!newBucketName.matches(SharedConstant.bucket_valid_regex)) { 
+			throw new IllegalArgumentException("newBucketName must match java regex = '" + SharedConstant.bucket_valid_regex + "' | b:" + newBucketName);
+		}
+		
+		
+		HttpResponse response = executePost(API_BUCKET_RENAME, Optional.of(bucketName), Optional.of(newBucketName), null, null, "", 0, false);
+		response.body().close();
+	}
+*/
+	
 	
 	
 	/**
