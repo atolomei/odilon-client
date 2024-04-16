@@ -246,7 +246,7 @@ public interface OdilonClient {
 	 * 
 	 * @return true if the bucketName is a valid Odilon Bucket name
 	 * 
-	 * @see {@link io.odilon.model#SharedConstant}
+	 * @see {@link io.odilon.model#SharedConstant SharedConstant}
 	 */
 	public boolean isValidBucketName(String bucketName);
 	
@@ -270,11 +270,14 @@ public interface OdilonClient {
 	 * 
 	 * @return 		true if the bucket has no Objects
 	 * 
-	 * @throws 		{@link ODClientException} <br/> 
-	 * 				BucketName is not an existing Bucket -> {@link ODHttpStatus.NOT_FOUND} with error code {@link ErrorCode.BUCKET_NOT_EXISTS} <br/>  
+	 * @throws		{@link ODClientException} if bucketName is not an existing Bucket<br/>
+	 * 				http error code {@link ODHttpStatus.NOT_FOUND} and Odilon error code {@link ErrorCode.BUCKET_NOT_EXISTS}) <br/>  
 	 */
 	public boolean isEmpty(String bucketName) throws ODClientException;
 
+	
+	
+	
 	
 	
 	/**

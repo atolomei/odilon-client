@@ -6,7 +6,7 @@
 
   <groupId>io.odilon</groupId>
   <artifactId>odilon-client</artifactId>
-  <version>1.5-beta</version>
+  <version>1.6-beta</version>
   <name>odilon client</name>
   <description>Odilon client</description>
 
@@ -34,7 +34,7 @@
 	
 
 	<maven.test.skip>true</maven.test.skip>
-	<odilon-model-version>1.5-beta</odilon-model-version>
+	<odilon-model-version>1.6-beta</odilon-model-version>
 	
 	
   </properties>
