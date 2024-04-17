@@ -229,18 +229,18 @@ public class ODClient implements OdilonClient {
 	 
 	/***
 	 * 
-	 * <p>By default the server has the following settings in file {@code odilon.properties}
+	 * <p>By default the server has the following settings in file {@code odilon.properties}</p>
+	 * <p>Note that these parameters can not be defined or modified by the client. They are configured on the server's odilon.properties file</p> 
 	 * <ul>
-	 * <li>endpoint. "http://localhost"</li>
 	 * <li>port. 9234</li>
 	 * <li>accessKey. "odilon"</li>
 	 * <li>secretKey. "odilon"</li>
 	 * </ul>
 	 * 
-	 * @param endpoint 	can not be null
+	 * @param endpoint 	can not be null 
 	 * @param port		can not be null (normally default port is 9234)
-	 * @param accessKey can not be null
-	 * @param secretKey can not be null
+	 * @param accessKey can not be null (default is "odilon")
+	 * @param secretKey can not be null (default is "odilon")
 	 * 
 	 */
 	public ODClient(String endpoint, int port, String accessKey, String secretKey)  {
@@ -256,7 +256,7 @@ public class ODClient implements OdilonClient {
 	 * @param accessKey can not be null
 	 * @param secretKey can not be null
 	 * 
-	 * @param secure not used in v1.5 or lower
+	 * @param secure not used in v1.6 or lower
 	 */
 	public ODClient(String endpoint, int port, String accessKey, String secretKey, boolean secure)  {
 		
