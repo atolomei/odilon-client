@@ -41,7 +41,6 @@ import java.util.TreeMap;
 
 /**
  * 
- * 
  * @author atolomei@novamens.com (Alejandro Tolomei)
  */
 public abstract class BaseTest {
@@ -62,6 +61,10 @@ public abstract class BaseTest {
 	public String DOWNLOAD_DIR_V2 = DOWNLOAD_DIR + File.separator+"v2";
 	
 	public String DOWNLOAD_DIR_RESTORED = DOWNLOAD_DIR + File.separator+"restored";
+	
+	
+	public final String DOWNLOAD_STAND_BY_DIR  = "d:"+File.separator+ "test-files-standby-download";
+	
 	
 	public String endpoint = "http://localhost";
 	public int port = 9234;
@@ -84,15 +87,19 @@ public abstract class BaseTest {
 	private long LAPSE_BETWEEN_PUT_MILLISECONDS = 0;
 	
 	
+	private String standByEndpoint;
+	private int standByPort;
+	
+	private String standByAccessKey = "odilon";
+	private String standBySecretKey = "odilon";
+	private ODClient standByClient;
+	
+	
+	
 	public BaseTest() {
 		this(null);
 		
 	}
-	
-	public void setClient(OdilonClient client) {
-		this.client = client;
-	}
-
 	
 	public BaseTest(OdilonClient client) {
 		
@@ -107,6 +114,7 @@ public abstract class BaseTest {
 		String lapse = System.getProperty("sleepMilliseconds");
 		if (lapse!=null)
 			LAPSE_BETWEEN_PUT_MILLISECONDS  = Long.valueOf(lapse.trim());
+		
 		
 
 		String max = System.getProperty("max");
@@ -129,10 +137,66 @@ public abstract class BaseTest {
 
 		if (tempPort!=null)
 			port= Integer.valueOf(tempPort.trim());
-
 		
+		setClient(client);
 		
 	}
+
+	
+	public void setClient(OdilonClient client) {
+		this.client = client;
+	}
+
+	
+	public ODClient getStandByClient() {
+		 
+		if (!isStandBy()) {
+			return null;
+		}
+		
+		if (this.standByClient==null) {
+		try {
+				this.standByClient = new ODClient(getStandByEndpoint(), getStandByPort(), standByAccessKey, standBySecretKey);
+				logger.debug(standByClient.toString());
+		        
+			} catch (Exception e) {
+				error(e.getClass().getName() +( e.getMessage()!=null ? (" | " + e.getMessage()) : ""));
+			}
+		}
+		
+		 return standByClient;
+	}
+	
+	
+	public int getStandByPort() {
+		
+		if (getStandByEndpoint()!=null) {
+			return this.standByPort;
+		}
+		return -1;
+	}
+	
+
+	public String getStandByEndpoint() {
+
+		if (standByEndpoint==null) {
+	
+			if (isStandBy()) {
+				try {
+					
+					this.standByEndpoint = getClient().systemInfo().standbyUrl;
+					this.standByPort = Integer.valueOf(getClient().systemInfo().standbyPort);
+					
+				} catch (ODClientException e) {
+					error(e);
+				}
+			}
+		}
+		
+		return standByEndpoint;
+	}
+	
+
 	
 		
 	public void removeTestBucket() {
@@ -226,6 +290,7 @@ public abstract class BaseTest {
 		
 	}
 
+	
 	public OdilonClient getClient() {
 		try {
 			if (client==null) {
@@ -426,10 +491,19 @@ public abstract class BaseTest {
 	
 	
 	protected boolean isStandBy() {
+		
 		if (getClient()!=null) {
+		
 			try {
-				return ((getClient().systemInfo().isStandby!=null) &&
-						getClient().systemInfo().isStandby.equals("true")); 
+			
+				if  ((	getClient().systemInfo().isStandby!=null) &&
+				    	getClient().systemInfo().isStandby.equals("true"));
+				
+				
+				return true;
+				
+				
+				
 			} catch (ODClientException e) {
 				error(e);
 			}

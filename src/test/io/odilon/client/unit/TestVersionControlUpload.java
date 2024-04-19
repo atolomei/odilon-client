@@ -284,7 +284,6 @@ public class TestVersionControlUpload extends BaseTest {
 	}
 
 	/**
-	 * 
 	 * @return
 	 */
 	private boolean restoreObjectVersion() {

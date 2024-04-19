@@ -74,13 +74,11 @@ public class TestObjectPutGet extends BaseTest {
 		
 	    Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
         	
-	    downloadDir = DOWNLOAD_DIR_V0;
-	    sourceDir = SRC_DIR_V0;
-	    
+	    downloadDir = super.DOWNLOAD_DIR_V0;
+	    sourceDir = super.SRC_DIR_V0;
 	    
 	    final File dir = new File(sourceDir);
 	    final File dndir = new File(downloadDir);
-	    
 	    
         if ((!dir.exists()) || (!dir.isDirectory()))  
 			error("Dir not exists or the File is not Dir -> " + sourceDir);
