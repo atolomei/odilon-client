@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import io.odilon.client.error.ODClientException;
+import io.odilon.client.util.FSUtil;
 import io.odilon.model.Bucket;
 import io.odilon.model.MetricsValues;
 import io.odilon.model.ObjectMetadata;
@@ -38,7 +39,7 @@ import io.odilon.net.ODHttpStatus;
  * <p>The implementation of this {@code Interface} is {@link ODClient}</p>
  * 
  * 
- * <b>Examp	le</b>
+ * <b>Example</b>
  *  <p> This example connects to a Odilon server and sends a ping request to check the status of the server.</p>
  * <pre> {
  * String endpoint = "http://localhost";
@@ -79,7 +80,7 @@ public interface OdilonClient {
 	 *  match the regular expression {@link io.odilon.model.SharedConstant#bucket_valid_regex SharedConstant.bucket_valid_regex} (see {@link isValidBucketName})
 	 * </p>
 	 * 
-	 * <p>Note that as of version 1.6 Buckets can not be renamed after creation</p>
+	 * <p>Note that Buckets can not be renamed after creation</p>
 	 * 
 	 *  <b>Example:</b>
 	 * <pre>{@code
@@ -191,7 +192,11 @@ public interface OdilonClient {
 	   * @return 
 	   * 			List of Buckets, sorted alphabetically
 	   * @throws  
-	   * 			{@link ODClientException} if there is a problem  
+	   * 			{@link ODClientException} if there is a problem
+	   * 
+   	   * @see <a  href="https://github.com/atolomei/odilon-client/blob/main/src/test/io/odilon/demo/SampleListBuckets.java">Sample ListObjects program on GitHub</a>	   
+	   *   
+	   *   
 	   */
 	public List<Bucket> listBuckets() throws ODClientException;
 	
@@ -244,7 +249,7 @@ public interface OdilonClient {
 	 * 
 	 * @param bucketName 		can not be null
 	 * 
-	 * @return true if the bucketName is a valid Odilon Bucket name
+	 * @return true if the bucketName is a valid Odilon {@link Bucket} name
 	 * 
 	 * @see {@link io.odilon.model#SharedConstant SharedConstant}
 	 */
@@ -258,7 +263,7 @@ public interface OdilonClient {
 	 *  
 	 * @param bucketName	can not be null
 	 * 
-	 * @return whether the bucket exists in the Server
+	 * @return true if the bucket exists in the Server
 	 * 
 	 */
 	public boolean existsBucket(String bucketName) throws ODClientException;
@@ -427,7 +432,36 @@ public interface OdilonClient {
 
 	
 	/**
-	 * <p>Returns the binary data (File) of this Object</p> 
+	 * <p>Returns the binary data (File) of this Object</p>
+	 * 
+	 *  
+     * <pre>{@code
+	 *  
+	 * OdilonClient odilonClient = new ODClient(url, port, accessKey, secretKey);
+	 * List<Bucket> bucketList = odilonClient.listBuckets();
+	 * bucketList.forEach( bucket ->  {
+	 * 
+	 * 	System.out.println(bucket.creationDate() + ", " + bucket.name());
+	 * 
+	 * 	if ( odilonClient.isEmpty(bucket.getName()) )
+	 * 		System.out.println(bucket.name() + " -> is empty");
+	 * 	else
+	 * 		System.out.println(bucket.name() + " -> has objects");
+	 * );
+	 * }
+	 * }
+	 * </pre>
+	 *  
+	 *  
+	 *  
+	 *  
+	 *  
+	 *  
+	 *  
+	 *  
+	 *  
+	 *  
+	 *  
 	* @param bucketName 	can not be null
 	* @param objectName		can not be null
 	 * 
@@ -573,6 +607,34 @@ public interface OdilonClient {
 	 * @param objectName		can not be null
 	 * @param file				can not be null, file.exists() must be true, file.isDirectory() must be false, Files.isRegularFile(file.toPath()) must be true
 	 * 
+	 * 
+	 * 
+	 * <b>Example:</b>
+	 * <pre>{@code
+	 * String endpoint = "http://localhost";
+	 * int port = 9234;
+	 * String accessKey = "odilon";
+	 * String secretKey = "odilon";
+	 * 						
+	 * // OdilonClient is the interface, ODClient is the implementation
+	 * OdilonClient client = new ODClient(endpoint, port, accessKey, secretKey);
+	 * 
+	 *  File dir = new File("directoryToUpload");
+	 *  
+	 *	String bucketName = "bucket-demo";
+	 *
+	 * // upload all Files from directory
+	 * 
+	 * for (File file:dir.listFiles()) {
+	 * 	if (!file.isDirectory()) {
+	 *  	String objectName = fi.getName()+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*100000))).intValue());
+	 * 		getClient().putObject(bucketName, objectName, fi);
+	 *  }
+	 * }
+	 * }
+	 * </pre>
+	 * 
+	 * @see <a  href="https://github.com/atolomei/odilon-client/blob/main/src/test/io/odilon/demo/SamplePutObject.java">Sample PutObject program in GitHub</a>
 	 * @return {@link ObjectMetadata} of the Object created or updated
 	 * @throws {@link ODClientException}
 	 */
@@ -593,6 +655,9 @@ public interface OdilonClient {
 	 * @param fileName name of the File uploaded
 	 * @return the {@link ObjectMetadata} of the Object
 	 * @throws {@link ODClientException}
+	 * 
+	 * @see <a  href="https://github.com/atolomei/miniomigration/blob/main/src/main/java/io/odilon/migration/MinioMigration.java">Minio to Odilon migration sample program on GitHub</a>
+
 	 */
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, String fileName) throws ODClientException;
 	

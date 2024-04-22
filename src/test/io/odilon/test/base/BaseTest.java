@@ -115,8 +115,6 @@ public abstract class BaseTest {
 		if (lapse!=null)
 			LAPSE_BETWEEN_PUT_MILLISECONDS  = Long.valueOf(lapse.trim());
 		
-		
-
 		String max = System.getProperty("max");
 		if (max!=null)
 			setMax(Integer.valueOf(max.trim()));

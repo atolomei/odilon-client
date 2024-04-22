@@ -128,7 +128,6 @@ public class ODClient implements OdilonClient {
 	private static final String API_METRICS									[] = {"metrics"};
 	private static final String API_SYSTEM_INFO								[] = {"systeminfo"};
 	
-
 	/** 
 	 * 	BUCKET 
 	 */
@@ -136,7 +135,7 @@ public class ODClient implements OdilonClient {
 	private static final String API_BUCKET_GET	 							[] = {"bucket", "get"};
 	private static final String API_BUCKET_EXISTS 							[] = {"bucket", "exists"};
 	private static final String API_BUCKET_CREATE	 						[] = {"bucket", "create"};
-	private static final String API_BUCKET_RENAME	 						[] = {"bucket", "rename"};
+	//private static final String API_BUCKET_RENAME	 						[] = {"bucket", "rename"};
 	private static final String API_BUCKET_DELETE	 						[] = {"bucket", "delete"};
 	private static final String API_BUCKET_ISEMPTY							[] = {"bucket", "isempty"};
 	private static final String API_BUCKET_LIST_OBJECTS						[] = {"bucket", "objects"};
@@ -256,9 +255,9 @@ public class ODClient implements OdilonClient {
 	 * @param accessKey can not be null
 	 * @param secretKey can not be null
 	 * 
-	 * @param secure not used in v1.6 or lower
+	 * @param secure not used in v1.7 or lower
 	 */
-	public ODClient(String endpoint, int port, String accessKey, String secretKey, boolean secure)  {
+	protected ODClient(String endpoint, int port, String accessKey, String secretKey, boolean secure)  {
 		
 			  Check.requireNonNullStringArgument(endpoint,  "endpoint is null or emtpy");
 			  Check.requireNonNullStringArgument(accessKey, "accessKey is null or emtpy");

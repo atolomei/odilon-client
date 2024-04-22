@@ -97,9 +97,9 @@ public class TestFileCache extends BaseTest {
 		}
 		
 		
-		long hit0 = metrics.cacheFileHitCounter;
-		long miss0 = metrics.cacheFileMissCounter;
-		long disk0 = metrics.cacheFileHardDiskUsage;
+		//long hit0 = metrics.cacheFileHitCounter;
+		//long miss0 = metrics.cacheFileMissCounter;
+		//long disk0 = metrics.cacheFileHardDiskUsage;
 				
 		
 		// put files
@@ -144,7 +144,7 @@ public class TestFileCache extends BaseTest {
 		}
 		
 		long hit1 = metrics.cacheFileHitCounter;
-		long miss1 = metrics.cacheFileMissCounter;
+		//long miss1 = metrics.cacheFileMissCounter;
 		long disk1 = metrics.cacheFileHardDiskUsage;
 		
 		

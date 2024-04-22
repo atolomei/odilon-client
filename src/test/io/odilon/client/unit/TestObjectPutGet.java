@@ -217,14 +217,11 @@ public class TestObjectPutGet extends BaseTest {
 			}
         }
 
-        
 		int counter = 0;
 		
 		String bucketName = null;
 		bucketName = this.bucket_1.getName();
 			
-		
-		
 		// put files
 		//
 		for (File fi:dir.listFiles()) {
@@ -237,8 +234,6 @@ public class TestObjectPutGet extends BaseTest {
 				String objectName = FSUtil.getBaseName(fi.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*100000))).intValue());
 				
 				try {
-					
-					
 					
 					getClient().putObject(bucketName, objectName, fi);
 					testFiles.put(bucketName+"-"+objectName, new TestFile(fi, bucketName, objectName));
