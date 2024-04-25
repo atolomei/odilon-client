@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import io.odilon.client.error.ODClientException;
-import io.odilon.client.util.FSUtil;
+
 import io.odilon.model.Bucket;
 import io.odilon.model.MetricsValues;
 import io.odilon.model.ObjectMetadata;
@@ -37,7 +37,6 @@ import io.odilon.net.ODHttpStatus;
 /**
  * <p>{@code OdilonClient} contains the API to interact with an Odilon server.</p>
  * <p>The implementation of this {@code Interface} is {@link ODClient}</p>
- * 
  * 
  * <b>Example</b>
  *  <p> This example connects to a Odilon server and sends a ping request to check the status of the server.</p>
@@ -59,6 +58,8 @@ import io.odilon.net.ODHttpStatus;
  * }</pre>
  * 
  * @author atolomei@novamens.com (Alejandro Tolomei)
+ * @author aferraria@novamens.com (Alejo Ferraria)
+ * 
  */
 public interface OdilonClient {
 

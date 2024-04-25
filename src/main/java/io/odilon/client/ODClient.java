@@ -111,6 +111,7 @@ import okhttp3.Response;
  * <p>For examples on using this library, please visit <a href="http://odilon.io">http://odilon.io</a></p>
  * 
  * @author atolomei@novamens.com (Alejandro Tolomei)
+ * @author aferraria@novamens.com (Alejo Ferraria)
  * 
  */
 public class ODClient implements OdilonClient {
