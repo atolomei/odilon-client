@@ -32,10 +32,8 @@
 	<maven-javadoc-plugin-version>3.6.3</maven-javadoc-plugin-version>
 	<maven-jar-plugin-version>3.3.0</maven-jar-plugin-version>
 	
-
 	<maven.test.skip>true</maven.test.skip>
 	<odilon-model-version>1.6-beta</odilon-model-version>
-	
 	
   </properties>
   

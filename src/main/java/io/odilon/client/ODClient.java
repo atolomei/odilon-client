@@ -64,6 +64,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -269,6 +270,7 @@ public class ODClient implements OdilonClient {
 
 			  this.objectMapper.registerModule(new JavaTimeModule());
 			  this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			  this.objectMapper.registerModule(new Jdk8Module());
 
 			  List<Protocol> protocol = new ArrayList<>();
 		      protocol.add(Protocol.HTTP_1_1);

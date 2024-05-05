@@ -40,17 +40,18 @@ import java.util.Random;
 import java.util.TreeMap;
 
 /**
- * 
  * @author atolomei@novamens.com (Alejandro Tolomei)
  */
 public abstract class BaseTest {
 
 	private static final Logger logger = Logger.getLogger(BaseTest.class.getName());
 
+	public static long THREE_SECONDS = 3000;
+	
+	public final String DOWNLOAD_STAND_BY_DIR  = "d:"+File.separator+ "test-files-standby-download";
 	
 	private String SRC_DIR = "C:"+File.separator+"test-files";
 	private String DOWNLOAD_DIR = "d:"+File.separator+"test-files-download";
-	
 	
 	public String SRC_DIR_V0 = SRC_DIR + File.separator + "v0";
 	public String SRC_DIR_V1 = SRC_DIR + File.separator + "v1";
@@ -61,10 +62,6 @@ public abstract class BaseTest {
 	public String DOWNLOAD_DIR_V2 = DOWNLOAD_DIR + File.separator+"v2";
 	
 	public String DOWNLOAD_DIR_RESTORED = DOWNLOAD_DIR + File.separator+"restored";
-	
-	
-	public final String DOWNLOAD_STAND_BY_DIR  = "d:"+File.separator+ "test-files-standby-download";
-	
 	
 	public String endpoint = "http://localhost";
 	public int port = 9234;
@@ -79,13 +76,9 @@ public abstract class BaseTest {
 	
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
 	
-	
-	static public long THREE_SECONDS = 3000;
-	
 	private Map<String, String> map = new TreeMap<String, String>();
 	
 	private long LAPSE_BETWEEN_PUT_MILLISECONDS = 0;
-	
 	
 	private String standByEndpoint;
 	private int standByPort;
@@ -94,13 +87,18 @@ public abstract class BaseTest {
 	private String standBySecretKey = "odilon";
 	private ODClient standByClient;
 	
-	
-	
+	/**
+	 * <p>Used by stand alone test</p>
+	 */
 	public BaseTest() {
 		this(null);
-		
 	}
 	
+	/**
+	 * <p>Used by RegressionTest</p>
+	 * 
+	 * @param client
+	 */
 	public BaseTest(OdilonClient client) {
 		
 		logger.debug("Start " + this.getClass().getName());
@@ -214,8 +212,10 @@ public abstract class BaseTest {
 				logger.error(e);
 				error(e);
 		}
-		
 	}
+	
+	
+	
 	public Bucket createTestBucket(String bucketName) {
 
 		try {
@@ -230,10 +230,8 @@ public abstract class BaseTest {
 			error(e);
 			return null;
 		}
-		
-		
-			
 	}
+
 	
 	public boolean testPing() {
 		try {
@@ -250,6 +248,7 @@ public abstract class BaseTest {
 		}
 		return true;
 	}
+	
 	
 	public boolean preCondition() {
 		return testPing();
@@ -288,7 +287,6 @@ public abstract class BaseTest {
 		
 	}
 
-	
 	public OdilonClient getClient() {
 		try {
 			if (client==null) {
@@ -322,19 +320,14 @@ public abstract class BaseTest {
 	protected int getMax() {
 		return max;
 	}
-	
-	
 
 	protected void setMax(Integer n) {
 		this.max=n.intValue();
 	}
 
-
 	protected void setMaxLength(Long n) {
 		this.max_length=n.longValue();
 	}
-
-	
 
 	protected long getMaxLength() {return this.max_length;}
 	
@@ -361,7 +354,6 @@ public abstract class BaseTest {
 		
 		return false;
 	}
-
 
 	
 	/**
@@ -398,9 +390,7 @@ public abstract class BaseTest {
 			}
 		}
 		
-		
 		logger.info( "testAddObjects -> Total:  " + String.valueOf(testFiles.size()));
-		
 		
 		testFiles.forEach( (k,v) -> {
 		ObjectMetadata meta = null;
@@ -449,7 +439,10 @@ public abstract class BaseTest {
 	}
 	
 	
-	
+	/**
+	 * 
+	 * 
+	 */
 	protected boolean isVersionControl() {
 		if (getClient()!=null) {
 			try {
@@ -459,11 +452,13 @@ public abstract class BaseTest {
 			}
 		}
 		return false;
-		
-		
 	}
 
 	
+	/**
+	 * 
+	 * 
+	 */
 	protected boolean isRAIDSix() {
 		if (getClient()!=null) {
 			try {
@@ -475,7 +470,11 @@ public abstract class BaseTest {
 		return false;
 	}
 
-	
+
+	/**
+	 * 
+	 * 
+	 */
 	protected boolean isRAIDZero() {
 		if (getClient()!=null) {
 			try {
@@ -488,6 +487,10 @@ public abstract class BaseTest {
 	}
 	
 	
+	/**
+	 * 
+	 * 
+	 */
 	protected boolean isStandBy() {
 		
 		if (getClient()!=null) {
@@ -496,11 +499,7 @@ public abstract class BaseTest {
 			
 				if  ((	getClient().systemInfo().isStandby!=null) &&
 				    	getClient().systemInfo().isStandby.equals("true"));
-				
-				
 				return true;
-				
-				
 				
 			} catch (ODClientException e) {
 				error(e);
@@ -512,6 +511,7 @@ public abstract class BaseTest {
 	
 	/**
 	 * 
+	 * 
 	 */
 	protected void sleep() {
 		
@@ -522,15 +522,6 @@ public abstract class BaseTest {
 			}
 		}
 	}	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 }
