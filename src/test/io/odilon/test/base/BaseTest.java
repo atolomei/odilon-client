@@ -498,8 +498,9 @@ public abstract class BaseTest {
 			try {
 			
 				if  ((	getClient().systemInfo().isStandby!=null) &&
-				    	getClient().systemInfo().isStandby.equals("true"));
-				return true;
+				    	getClient().systemInfo().isStandby.equals("true"))
+					
+					return true;
 				
 			} catch (ODClientException e) {
 				error(e);

@@ -106,7 +106,13 @@ public class TestMasterStandBy extends BaseTest {
         
 
         try {
-			String p=getStandByClient().ping();
+			
+        	
+        	if (getStandByClient()==null) {
+        		error("Standby client is null");
+        	}
+        	
+        	String p=getStandByClient().ping();
 			if (p==null || !p.equals("ok"))
 				error("ping  -> " + p!=null?p:"null");
 			else {
@@ -160,7 +166,7 @@ public class TestMasterStandBy extends BaseTest {
 		FileUtils.deleteQuietly(v2dir);
        	try {
 			FileUtils.forceMkdir(v2dir);
-		} catch (IOException e) {
+		} catch (IOException e) { 
 			error(e);
 		}
 		
