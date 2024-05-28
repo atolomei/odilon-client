@@ -56,13 +56,14 @@ public class TestMasterStandBy extends BaseTest {
 
 	private String bucketTest = "dev-mstb-test";
 
-	boolean isMasterVersionControl = false;
-	boolean isStbyVersionControl = false;
+	private boolean isMasterVersionControl = false;
+	private boolean isStbyVersionControl = false;
 	
 
 	
 	public TestMasterStandBy() {
 	}
+	
 	
 	@Override
 	public void executeTest() {

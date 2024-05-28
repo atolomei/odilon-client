@@ -99,8 +99,7 @@ public interface OdilonClient {
 	 * 
 	 * @param 	bucketName Bucket name
 	 *  
-	 * @throws  ODClientException
-	 * 			if the bucket already exists (error code {@link io.odilon.net.ErrorCode#OBJECT_ALREADY_EXIST})
+	 * Throws  ODClientException if the bucket already exists (error code {@link io.odilon.net.ErrorCode#OBJECT_ALREADY_EXIST})
 	 * 
 	 */
 	public void createBucket(String bucketName) throws ODClientException;
@@ -192,10 +191,8 @@ public interface OdilonClient {
 	   *
 	   * @return 
 	   * 			List of Buckets, sorted alphabetically
-	   * @throws  
-	   * 			{@link ODClientException} if there is a problem
 	   * 
-   	   * @see <a  href="https://github.com/atolomei/odilon-client/blob/main/src/test/io/odilon/demo/SampleListBuckets.java">Sample ListObjects program on GitHub</a>	   
+   	   * see also <a  href="https://github.com/atolomei/odilon-client/blob/main/src/test/io/odilon/demo/SampleListBuckets.java">Sample ListObjects program on GitHub</a>	   
 	   *   
 	   *   
 	   */
@@ -252,7 +249,6 @@ public interface OdilonClient {
 	 * 
 	 * @return true if the bucketName is a valid Odilon {@link Bucket} name
 	 * 
-	 * @see {@link io.odilon.model#SharedConstant SharedConstant}
 	 */
 	public boolean isValidBucketName(String bucketName);
 	
@@ -276,8 +272,8 @@ public interface OdilonClient {
 	 * 
 	 * @return 		true if the bucket has no Objects
 	 * 
-	 * @throws		{@link ODClientException} if bucketName is not an existing Bucket<br/>
-	 * 				http error code {@link ODHttpStatus.NOT_FOUND} and Odilon error code {@link ErrorCode.BUCKET_NOT_EXISTS}) <br/>  
+	 * Throws		{@link ODClientException} if bucketName is not an existing Bucket<br/>
+	 * 				the http error code {@link ODHttpStatus#NOT_FOUND} and Odilon's error code {@link ErrorCode#BUCKET_NOT_EXISTS}) <br/>  
 	 */
 	public boolean isEmpty(String bucketName) throws ODClientException;
 
@@ -303,8 +299,8 @@ public interface OdilonClient {
 	   * 
 	 * @param bucketName Bucket name
 	 * @return Bucket
-	 * @throws {@link ODClientException} <br/> 
-	 * BucketName is not an existing Bucket -> {@link ODHttpStatus.NOT_FOUND} with error code {@link ErrorCode.BUCKET_NOT_EXISTS} <br/>  
+	 * Throws {@link ODClientException} <br/> 
+	 * BucketName is not an existing Bucket -> {@link ODHttpStatus#NOT_FOUND} with error code {@link ErrorCode#BUCKET_NOT_EXISTS} <br/>  
 	 */
 	public Bucket getBucket(String bucketName) throws ODClientException;
 	
@@ -329,7 +325,7 @@ public interface OdilonClient {
 	 * 
 	 * @param bucketName Bucket name
 	 * 
-	 * @throws	 {@link ODHttpStatus#NOT_FOUND} if Bucket does not exist, with error code {@link ErrorCode#BUCKET_NOT_EXISTS} <br/>
+	 * Throws	 {@link ODHttpStatus#NOT_FOUND} if Bucket does not exist, with error code {@link ErrorCode#BUCKET_NOT_EXISTS} <br/>
 	 * 			 {@link ODHttpStatus#CONFLICT} if Bucket does not exist, with error code {@link ErrorCode#BUCKET_NOT_EMPTY}
 	 */
 	public void deleteBucket(String bucketName) throws ODClientException;
@@ -360,9 +356,10 @@ public interface OdilonClient {
 	* }
 	* </pre>
 	* @param bucketName Bucket name
-	* @throws {@link ODClientException} <br/>
-	* Bucket does not exist -> {@link ODHttpStatus.NOT_FOUND} with error code {@link ErrorCode.BUCKET_NOT_EXISTS} <br/>
-	* Server does not have Version Control enabled -> {@link ODHttpStatus.METHOD_NOT_ALLOWED} with error code {@link ErrorCode.API_NOT_ENABLED} Version Control not enabled
+	* 
+	* Throws {@link ODClientException} <br/>
+	* Bucket does not exist -> {@link ODHttpStatus#NOT_FOUND} with error code {@link ErrorCode#BUCKET_NOT_EXISTS} <br/>
+	* Server does not have Version Control enabled -> {@link ODHttpStatus#METHOD_NOT_ALLOWED} with error code {@link ErrorCode#API_NOT_ENABLED} Version Control not enabled
 	*/
 	public void deleteAllBucketVersions(String bucketName) throws ODClientException;
 	
@@ -385,8 +382,7 @@ public interface OdilonClient {
 	 * @param bucketName 	can not be null
 	 * @param objectName	can not be null
 	 * @return true if the Object exist
-	 * @throws {@link ODClientException}
-	 * @throws IOException
+	 * Throws {@link ODClientException}, IOException
 	 */
 	public boolean existsObject(String bucketName, String objectName) throws ODClientException, IOException;
 	
@@ -422,7 +418,7 @@ public interface OdilonClient {
 	* @param bucketName 	can not be null
 	* @param objectName		can not be null
 	* @return 				{@link ObjectMetadata} from server
-	* @throws 				{@link ODClientException} 
+	* Throws 				{@link ODClientException} 
 	* 						if object does not exist 
 	*/
 	public ObjectMetadata getObjectMetadata(String bucketName, String objectName) throws ODClientException;
@@ -453,20 +449,9 @@ public interface OdilonClient {
 	 * }
 	 * </pre>
 	 *  
-	 *  
-	 *  
-	 *  
-	 *  
-	 *  
-	 *  
-	 *  
-	 *  
-	 *  
-	 *  
-	* @param bucketName 	can not be null
-	* @param objectName		can not be null
+  	 * @param bucketName 	can not be null
+     * @param objectName		can not be null
 	 * 
-	 * @throws {@link ODClientException}
 	 */
 	public InputStream getObject(String bucketName, String objectName) throws ODClientException;
 
@@ -482,10 +467,9 @@ public interface OdilonClient {
 	 * @param objectName		can not be null
 	 * @param 					filePath path and file name where to save the data downloaded (example: "c:\temp\myfile.pdf")
 	 * 
-	 * @throws		 			if object does not exist -> {@link ObjectNotFoundException} {@link ODHttpStatus#NOT_FOUND}, {@link ErrorCode#OBJECT_NOT_FOUND}
+	 * Throws		 			if object does not exist -> {@link ODHttpStatus#NOT_FOUND}, {@link ErrorCode#OBJECT_NOT_FOUND}
 	 * 
-	 * 
-	 * @throws IOException		
+	 * Throws IOException		
 	 */
 	public void getObject(String bucketName, String objectName, String filePath) throws ODClientException, IOException;
 	
@@ -525,7 +509,6 @@ public interface OdilonClient {
 	 * 
 	 * @return temporary url to download the file without authentication
 	 * 
-	 * @throws {@link ODClientException}
 	 */
 	public String getPresignedObjectUrl(String bucketName, String objectName, Optional<Integer> expiresInSeconds) throws ODClientException;
 
@@ -541,7 +524,6 @@ public interface OdilonClient {
 	 * 
 	 * @return 					temporary url to download the file without authentication
 	 * 
-	 * @throws {@link ODClientException}
 	 */
 	public String getPresignedObjectUrl(String bucketName, String objectName) throws ODClientException;
 	
@@ -592,7 +574,6 @@ public interface OdilonClient {
 	 * 
 	 * @return {@link ObjectMetadata} of the Object created or updated
 	 * 
-	 * @throws {@link ODClientException}
 	 * 
 	 */
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, String fileName, String contentType) throws ODClientException;
@@ -637,7 +618,7 @@ public interface OdilonClient {
 	 * 
 	 * @see <a  href="https://github.com/atolomei/odilon-client/blob/main/src/test/io/odilon/demo/SamplePutObject.java">Sample PutObject program in GitHub</a>
 	 * @return {@link ObjectMetadata} of the Object created or updated
-	 * @throws {@link ODClientException}
+	 * 
 	 */
 	public ObjectMetadata putObject(String bucketName, String objectName, File file) throws ODClientException;
 	
@@ -655,9 +636,10 @@ public interface OdilonClient {
 	 * @param stream InputStream with the binary data to upload
 	 * @param fileName name of the File uploaded
 	 * @return the {@link ObjectMetadata} of the Object
-	 * @throws {@link ODClientException}
+
+	 * Throws {@link ODClientException}
 	 * 
-	 * @see <a  href="https://github.com/atolomei/miniomigration/blob/main/src/main/java/io/odilon/migration/MinioMigration.java">Minio to Odilon migration sample program on GitHub</a>
+	 * See <a  href="https://github.com/atolomei/miniomigration/blob/main/src/main/java/io/odilon/migration/MinioMigration.java">Minio to Odilon migration sample program on GitHub</a>
 
 	 */
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, String fileName) throws ODClientException;
@@ -676,7 +658,7 @@ public interface OdilonClient {
 	 * @param size
 	 * @param contentType
 	 * @return
-	 * @throws {@link ODClientException}
+	 * 
 	 */
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType) throws ODClientException;
 
@@ -692,7 +674,7 @@ public interface OdilonClient {
 	 * @param fileName
 	 * @param size
 	 * @return
-	 * @throws {@link ODClientException}
+	 * 
 	 */
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size) throws ODClientException;
 	
@@ -710,7 +692,7 @@ public interface OdilonClient {
 	 * @param bucketName 		can not be null
 	 * @param objectName		can not be null
 
-	 * @throws {@link ODClientException}
+	 * 
 	 */
 	public void deleteObject(String bucketName, String objectName) throws ODClientException;
 	
@@ -724,8 +706,8 @@ public interface OdilonClient {
 	 * @param bucketName 		can not be null
 	 * @param objectName		can not be null
 	 * @return {@code true} if the Object has more versions than the head version (ie. the head version must be greater than 0)
-	 * @throws {@link ODClientException}
-	 * @throws IOException
+	 * Throws {@link ODClientException}
+	 * Throws IOException
 	 */
 	public boolean hasVersions(String bucketName, String objectName) throws ODClientException, IOException;
 	
@@ -735,7 +717,7 @@ public interface OdilonClient {
 	 * @param bucketName 		can not be null
 	 * @param objectName		can not be null
 	 * @return
-	 * @throws {@link ODClientException}
+	 * 
 	 */
 	public ObjectMetadata getObjectMetadataPreviousVersion(String bucketName, String objectName) throws ODClientException;
 	
@@ -747,12 +729,13 @@ public interface OdilonClient {
 	 * 
 	 * @param bucketName 		can not be null
 	 * @param objectName		can not be null
-	 * @throws {@link ODClientException} <br/>
+	 * 
+	 * Throws {@link ODClientException} <br/>
 	 * <ul>
-	 * <li>The server does not have Version Control enabled -> {@link OdilonServerAPIException} ODHttpStatus.METHOD_NOT_ALLOWED, ErrorCode.API_NOT_ENABLED <br/><br/></li>
-	 * <li>The Object does not have a previous version (i.e. current version is version 0) -> {@link ObjectNotFoundException} ODHttpStatus.NOT_FOUND, ErrorCode.OBJECT_NOT_FOUND <br/><br/></li>
-	 * <li>All the object's previous version has been deleted via {@link deleteAllBucketVersions} or {@link deleteObjectAllVersions} -> {@link ObjectNotFoundException} ODHttpStatus.NOT_FOUND, ErrorCode.OBJECT_NOT_FOUND <br/><br/></li> 
-	 * <li>Other, unexpected causes -> ODHttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_ERROR<br/><br/></li>
+	 * <li>The server does not have Version Control enabled -> ODHttpStatus#METHOD_NOT_ALLOWED, ErrorCode#API_NOT_ENABLED <br/><br/></li>
+	 * <li>The Object does not have a previous version (i.e. current version is version 0) -> ODHttpStatus#NOT_FOUND, ErrorCode#OBJECT_NOT_FOUND <br/><br/></li>
+	 * <li>All the object's previous version has been deleted via {@link deleteAllBucketVersions} or {@link deleteObjectAllVersions} ->  ODHttpStatus#NOT_FOUND, ErrorCode#OBJECT_NOT_FOUND <br/><br/></li> 
+	 * <li>Other, unexpected causes -> ODHttpStatus#INTERNAL_SERVER_ERROR, ErrorCode#INTERNAL_ERROR<br/><br/></li>
 	 * </ul>
 	 * 
 	 */
@@ -764,7 +747,7 @@ public interface OdilonClient {
 	 * @param bucketName 		can not be null
 	 * @param objectName		can not be null
 	 * @return list of {@link ObjectMetadata} sorted by version number, from 0 to (head version - 1)
-	 * @throws {@link ODClientException}
+	 * Throws {@link ODClientException}
 	 */
 	public List<ObjectMetadata> getObjectMetadataPreviousVersionAll(String bucketName, String objectName) throws ODClientException;	
 	
@@ -774,7 +757,7 @@ public interface OdilonClient {
 	 * @param bucketName 		can not be null
 	 * @param objectName		can not be null
 	 * @return ObjectMetadata of the object's previous version
-	 * @throws {@link ODClientException}
+	 * 
 	 */
 	public InputStream getObjectPreviousVersion(String bucketName, String objectName) throws ODClientException;
 
@@ -785,7 +768,7 @@ public interface OdilonClient {
 	 * @param objectName		can not be null
 	 * @param version
 	 * @return
-	 * @throws {@link ODClientException}
+	 * 
 	 */
 	public InputStream getObjectVersion(String bucketName, String objectName, int version) throws ODClientException;
 	
@@ -796,7 +779,7 @@ public interface OdilonClient {
 	 * 
 	 * @param bucketName 		can not be null
 	 * @param objectName		can not be null
-	 * @throws {@link ODClientException}
+	 * 
 	 */
 	public void deleteObjectAllVersions(String bucketName, String objectName) throws ODClientException;
 	 
@@ -852,7 +835,7 @@ public interface OdilonClient {
 	 * @param bucketName 		can not be null
 	 * @param prefix
 	 * @return
-	 * @throws {@link ODClientException}
+	 * 
 	 */
 	public ResultSet<Item<ObjectMetadata>> listObjects(String bucketName, String prefix) throws ODClientException;	
 	
@@ -863,7 +846,7 @@ public interface OdilonClient {
 	 * 
 	 * @param bucketName 		can not be null
 	 * @return
-	 * @throws {@link ODClientException}
+	 * 
 	 */
 	public ResultSet<Item<ObjectMetadata>> listObjects(String bucketName) throws ODClientException;
 	
@@ -873,8 +856,7 @@ public interface OdilonClient {
 	 *<p> see {@link #listObjects}</p>
 	 * 
 	 * @param bucket		can not be null
-	 * @return
-	 * @throws {@link ODClientException}
+	 * @return				ResulSet of Items
 	 */
 	public ResultSet<Item<ObjectMetadata>> listObjects(Bucket bucket) throws ODClientException;
 	
