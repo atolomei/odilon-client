@@ -39,7 +39,7 @@
 	<java-version>11</java-version>  
 	<junit-version>5.10.1</junit-version>
 	
-	<metrics.version>4.2.25</metrics.version> 								<!--  2024/3  -->
+	<metrics.version>4.2.25</metrics.version> 								<!--  2024/3  		-->
 	<okhttp.version>4.12.0</okhttp.version> 								<!--  5/2023 3.13.1 -->
 	
     <maven.compiler.source>11</maven.compiler.source>
@@ -147,6 +147,14 @@
 		    <version>${junit-version}</version>
 		    <scope>test</scope>
 		</dependency>
+		
+				
+		<dependency>
+		    <groupId>net.nicoulaj.maven.plugins</groupId>
+		    <artifactId>checksum-maven-plugin</artifactId>
+		    <version>1.11</version>
+		</dependency>
+		
 
 	 </dependencies>
 	 
@@ -230,6 +238,37 @@
 				</executions>
 				
 	        </plugin>
+	        
+	        
+	        <plugin>
+    				<groupId>net.nicoulaj.maven.plugins</groupId>
+			        <artifactId>checksum-maven-plugin</artifactId>
+			        <version>1.11</version>
+			        <executions>
+			          <execution>
+			            <goals>
+			              <goal>artifacts</goal>
+			            </goals>
+			          </execution>
+			        </executions>
+			        <configuration>
+			          <csvSummary>true</csvSummary>
+			          <csvSummaryFile>artifacts-checksums.csv</csvSummaryFile>
+			          <xmlSummary>true</xmlSummary>
+			          <xmlSummaryFile>artifacts-checksums.xml</xmlSummaryFile>
+			        </configuration>
+		      </plugin>
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
 	      </plugins>
 	    </pluginManagement>
 	  </build>
