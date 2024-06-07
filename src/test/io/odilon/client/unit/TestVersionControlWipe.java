@@ -52,7 +52,7 @@ public class TestVersionControlWipe extends BaseTest {
 	
 	private Bucket bucket;
 	
-	private OffsetDateTime showStatus = OffsetDateTime.now();
+	
 	
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
 	

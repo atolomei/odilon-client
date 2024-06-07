@@ -404,6 +404,9 @@ public class TestVersionControlUpload extends BaseTest {
 	 */
 	private boolean putObjectNewVersion() {
 		
+		logger.debug( "starting putObjectNewVersion");
+		
+		
 	 	counterNewVersion.set(0);
 	 	
 		testFiles.forEach((k,v) -> 
@@ -425,7 +428,6 @@ public class TestVersionControlUpload extends BaseTest {
 			}
 			
 			
-			// int index = Math.abs(name.hashCode()) % secondVersion.size();
 			
 			int index = random.nextInt(secondVersion.size());
 					

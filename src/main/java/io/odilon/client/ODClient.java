@@ -346,6 +346,9 @@ public class ODClient implements OdilonClient {
 	}
 
 
+	/**
+	 * 
+	 */
 	@Override
 	public boolean isValidObjectName(String objectName) {
 		Check.requireNonNullStringArgument(objectName, "objectName can not be null or emtpy");
@@ -363,7 +366,7 @@ public class ODClient implements OdilonClient {
 	 * 
 	 */
 	@Override
-	public ObjectMetadata putObjectStream(String bucketName,String objectName,InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType) throws ODClientException {
+	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType) throws ODClientException {
 		
 		if (!objectName.matches(SharedConstant.object_valid_regex)) 
 			throw new IllegalArgumentException(	"objectName must be >0 and <="+String.valueOf(SharedConstant.MAX_OBJECT_CHARS) + ", and must match the java regex ->  " + SharedConstant.object_valid_regex + " | o:" +	objectName);

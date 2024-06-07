@@ -62,7 +62,7 @@ public class TestBucketCRUD extends BaseTest {
 			error(e.getClass().getName() + " | " + e.getMessage());
 		}
 		
-		  if (!makeBuckets())
+		if (!makeBuckets())
 	        	error("makeBuckets");
 		  
 		if (!listBuckets())
@@ -241,7 +241,7 @@ public class TestBucketCRUD extends BaseTest {
 	        List<Bucket> list = getClient().listBuckets();
 	        Assert.assertNotNull(list);
 	        for (Bucket bucket: list) {
-	        	logger.debug(bucket.getName());
+	        	logger.debug(bucket.toString());
 	        }
 	        getMap().put("listBuckets", "ok");
 	        return true;
