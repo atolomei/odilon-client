@@ -16,6 +16,7 @@
  */
 package io.odilon.client.unit;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
@@ -65,6 +66,12 @@ public class TestBucketCRUD extends BaseTest {
 		if (!makeBuckets())
 	        	error("makeBuckets");
 		  
+		if (!listBuckets())
+        	error("listBuckets");
+		
+		if (!renameBuckets())
+        	error("renameBuckets");
+		
 		if (!listBuckets())
         	error("listBuckets");
 	
@@ -183,7 +190,51 @@ public class TestBucketCRUD extends BaseTest {
 	}
 	
 
- 
+	public boolean renameBuckets() {
+		
+		
+		try {
+	        
+			List<Bucket> list = getClient().listBuckets();
+	        Assert.assertNotNull(list);
+	        
+	        for (Bucket bucket: list) {
+	        	
+	        	String o_name = bucket.getName();
+	        	String n_name = bucket.getName()+"-"+randomString(5);
+	        	
+	        	getClient().renameBucket(o_name, n_name);
+	        	
+	        	if (getClient().existsBucket(o_name))
+	        		error("rename failed -> " + o_name);
+	        	
+	        	if (!getClient().existsBucket(n_name))
+	        		error("rename failed -> " + o_name);
+	        	
+	        	
+	        	Bucket bu=getClient().getBucket(n_name);
+	        	
+	        	if (bu==null)
+	        		error("rename failed -> " + o_name);
+	        	
+	        	if (!bu.getName().equals(n_name))
+	        		error("rename failed -> " + o_name);
+	        	
+	        	logger.debug("Rename ok: " + o_name + " -> " + n_name);
+	        }
+	        
+	        getMap().put("renameBuckets", "ok");
+	        return true;
+	        
+        }  catch (Exception e) {
+    		error(e);
+    	}
+        return false;
+        
+		
+		
+		
+	}
 
 	/**
 	 * 

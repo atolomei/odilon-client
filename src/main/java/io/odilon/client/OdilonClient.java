@@ -81,8 +81,6 @@ public interface OdilonClient {
 	 *  match the regular expression {@link io.odilon.model.SharedConstant#bucket_valid_regex SharedConstant.bucket_valid_regex} (see {@link isValidBucketName})
 	 * </p>
 	 * 
-	 * <p>Note that Buckets can not be renamed after creation</p>
-	 * 
 	 * <b>Example:</b>
 	 * 
 	 * <pre>{@code
@@ -105,7 +103,43 @@ public interface OdilonClient {
 	 */
 	public void createBucket(String bucketName) throws ODClientException;
 
+
 	
+	
+	/**
+	 *  <p>Renames a {@link Bucket}.</p> 
+	 * 	<p>The new bucket name must not be used by another bucket</p>
+	 * 
+	 * <b>Example:</b>
+	 * 
+	 * <pre>{@code
+	 * 	try {
+	 *  	 String bucketName = "bucket-demo";
+	 *   	
+	 *     // check if the bucket exists, if not create it
+	 *   	if (client.existsBucket(bucketName))
+	 *      	 System.out.println("bucket already exists ->" + bucketName );
+	 *   	else 
+	 *      	 client.createBucket(bucketName);
+	 *      
+	 *      // rename bucket to "bucket-demo-renamed"
+	 *      
+	 *      client.renameBucket(bucketName, "bucket-demo-renamed");
+	 *      
+	 * 		} catch (ODClientException e) {
+	* 			System.out.println( "HTTP status -> " + String.valueOf(e.getHttpStatus())+ " | ErrorMsg -> " + e.getMessage() + " Odilon Error Code -> " + String.valueOf(e.getErrorCode()) );
+	 * 		}
+	 * }</pre>
+	 * 
+	 * @param 	bucketName existing Bucket name
+	 * @param 	newBucketName new Bucket name
+	 * 
+	 * Throws  ODClientException if the bucket does not exist (ErrorCode.BUCKET_NOT_EXISTS)
+	 *                           if newBucketName is already used by another bucket (ErrorCode.OBJECT_ALREADY_EXIST)
+	 */
+	void renameBucket(String bucketName, String newBucketName) throws ODClientException;
+
+
 
 	
 	
@@ -947,6 +981,14 @@ public interface OdilonClient {
 	 * @return Charsert "UTF-8" is the default value.
 	 */
 	public String getCharset();
+
+
+
+
+
+
+
+
 
 	
 }
