@@ -78,8 +78,11 @@ public abstract class BaseTest {
 	
 	private Map<String, String> map = new TreeMap<String, String>();
 	
-	private long LAPSE_BETWEEN_PUT_MILLISECONDS = 0;
+	private long LAPSE_BETWEEN_OP_MILLISECONDS = 0;
 	
+	
+
+
 	private String standByEndpoint;
 	private int standByPort;
 	
@@ -110,8 +113,9 @@ public abstract class BaseTest {
 		String tempPort = System.getProperty("port");
 	
 		String lapse = System.getProperty("sleepMilliseconds");
+		
 		if (lapse!=null)
-			LAPSE_BETWEEN_PUT_MILLISECONDS  = Long.valueOf(lapse.trim());
+			LAPSE_BETWEEN_OP_MILLISECONDS  = Long.valueOf(lapse.trim());
 		
 		String max = System.getProperty("max");
 		if (max!=null)
@@ -287,6 +291,15 @@ public abstract class BaseTest {
 		
 	}
 
+	
+	public long getSleepDurationMills() {
+		return LAPSE_BETWEEN_OP_MILLISECONDS;
+	}
+
+	public void setSleepDurationMills(long lAPSE_BETWEEN_OP_MILLISECONDS) {
+		LAPSE_BETWEEN_OP_MILLISECONDS = lAPSE_BETWEEN_OP_MILLISECONDS;
+	}
+	
 	public OdilonClient getClient() {
 		try {
 			if (client==null) {
@@ -516,9 +529,9 @@ public abstract class BaseTest {
 	 */
 	protected void sleep() {
 		
-		if (LAPSE_BETWEEN_PUT_MILLISECONDS>0) {
+		if (LAPSE_BETWEEN_OP_MILLISECONDS>0) {
 			try {
-				Thread.sleep(LAPSE_BETWEEN_PUT_MILLISECONDS);
+				Thread.sleep(LAPSE_BETWEEN_OP_MILLISECONDS);
 			} catch (InterruptedException e) {
 			}
 		}

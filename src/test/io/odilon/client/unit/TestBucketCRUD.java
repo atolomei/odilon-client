@@ -40,6 +40,8 @@ public class TestBucketCRUD extends BaseTest {
 	private static final Logger logger = Logger.getLogger(TestBucketCRUD.class.getName());
 
 	private String buckets[] = {"bucket1", "bucket2", "bucket3", "bucket4", "bucket5"};
+	
+	
 	private String bucketEmpty;
 
 	
@@ -51,6 +53,8 @@ public class TestBucketCRUD extends BaseTest {
 	@Override
 	public void executeTest() {
 	 
+		setSleepDurationMills(2000);
+		
 		try {
 			String p=ping();
 			if (p==null || !p.equals("ok"))
@@ -73,7 +77,7 @@ public class TestBucketCRUD extends BaseTest {
         	error("renameBuckets");
 		
 		if (!listBuckets())
-        	error("listBuckets");
+       	error("listBuckets");
 	
 	     if (!testCreateRemoveCreateBucketEmtpy())
 	        error("testCreateRemoveCreateBucketEmtpy");
@@ -199,7 +203,6 @@ public class TestBucketCRUD extends BaseTest {
 	        Assert.assertNotNull(list);
 	        
 	        for (Bucket bucket: list) {
-	        	
 	        	String o_name = bucket.getName();
 	        	String n_name = bucket.getName()+"-"+randomString(5);
 	        	
@@ -221,6 +224,9 @@ public class TestBucketCRUD extends BaseTest {
 	        		error("rename failed -> " + o_name);
 	        	
 	        	logger.debug("Rename ok: " + o_name + " -> " + n_name);
+	        	
+	        	sleep();
+	        	
 	        }
 	        
 	        getMap().put("renameBuckets", "ok");
@@ -240,6 +246,7 @@ public class TestBucketCRUD extends BaseTest {
 	 * 
 	 */
 	public boolean makeBuckets() {
+		
 		
 			/**------------------
 			 * remove buckets if exist
@@ -269,6 +276,9 @@ public class TestBucketCRUD extends BaseTest {
 					if (!getClient().existsBucket(s)) {
 						getClient().createBucket(s);
 						n++;
+						
+						sleep();
+						
 						org.junit.Assert.assertTrue(getClient().existsBucket(s));
 					}
 				}
@@ -292,7 +302,7 @@ public class TestBucketCRUD extends BaseTest {
 	        List<Bucket> list = getClient().listBuckets();
 	        Assert.assertNotNull(list);
 	        for (Bucket bucket: list) {
-	        	logger.debug(bucket.toString());
+	        	logger.debug(bucket.getName());
 	        }
 	        getMap().put("listBuckets", "ok");
 	        return true;
