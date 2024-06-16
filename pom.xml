@@ -73,11 +73,11 @@
 	<scm>
 	  <connection>scm:git:git://github.com/atolomei/odilon-client.git</connection>
 	  <developerConnection>scm:git:ssh://github.com:atolomei/odilon-client.git</developerConnection>
-	  <url>https://github.com/atolomei/odilon-client/tree/v1.6</url>
+	  <url>https://github.com/atolomei/odilon-client/tree/v1.7</url>
 	</scm>
     
     
-    <repositories>
+    <!-- repositories>
 		<repository>
 			<id>my-local-repo</id>
 			<url>file://${basedir}/nonstandardlib/</url>
@@ -87,7 +87,7 @@
 			<id>novamens-releases</id>		
 			<url>https://maven.novamens.com/nexus/content/repositories/releases/</url>
 		</repository>
-	</repositories>
+	</repositories -->
     
 
   <dependencies>

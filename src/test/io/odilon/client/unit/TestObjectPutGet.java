@@ -169,8 +169,8 @@ public class TestObjectPutGet extends BaseTest {
 						if (!src_sha.equals(new_sha)) {
 							StringBuilder str  = new StringBuilder();
 							str.append("Error sha256 are not equal -> " + meta.bucketName+" / "+meta.objectName);
-							str.append(" | src -> " + String.valueOf(t_file.getSrcFile(0).length()) + "bytes");
-							str.append(" | dest -> " + String.valueOf(new File(destFileName).length()) + "bytes");
+							str.append(" | src -> " + String.valueOf(t_file.getSrcFile(0).length()/1000.0) + " kbytes");
+							str.append(" | dest -> " + String.valueOf(new File(destFileName).length()/1000.0) + " kbytes");
 							error(str.toString());
 						}
 							
