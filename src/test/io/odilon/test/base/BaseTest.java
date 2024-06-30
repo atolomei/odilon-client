@@ -27,7 +27,7 @@ import io.odilon.log.Logger;
 import io.odilon.model.Bucket;
 import io.odilon.model.ObjectMetadata;
 import io.odilon.model.RedundancyLevel;
-import io.odilon.util.ODFileUtils;
+import io.odilon.util.OdilonFileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -431,7 +431,7 @@ public abstract class BaseTest {
 			
 			try {
 				String src_sha = t_file. getSrcFileSha256(0);
-				String new_sha = ODFileUtils.calculateSHA256String(new File(destFileName));
+				String new_sha = OdilonFileUtils.calculateSHA256String(new File(destFileName));
 				
 				if (!src_sha.equals(new_sha)) {
 					error("Error sha256 are not equal -> " + meta.bucketName+"-"+meta.objectName);

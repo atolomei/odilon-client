@@ -42,7 +42,7 @@ import io.odilon.model.Bucket;
 import io.odilon.model.ObjectMetadata;
 import io.odilon.test.base.BaseTest;
 import io.odilon.test.base.TestFile;
-import io.odilon.util.ODFileUtils;
+import io.odilon.util.OdilonFileUtils;
 
 public class TestVersionControlWipe extends BaseTest {
 			
@@ -210,7 +210,7 @@ public class TestVersionControlWipe extends BaseTest {
 			
 			try {
 				String src_sha = t_file. getSrcFileSha256(0);
-				String new_sha = ODFileUtils.calculateSHA256String(new File(destFileName));
+				String new_sha = OdilonFileUtils.calculateSHA256String(new File(destFileName));
 				
 				if (!src_sha.equals(new_sha)) {
 					error("Error sha256 are not equal -> " + meta.bucketName+"-"+meta.objectName);

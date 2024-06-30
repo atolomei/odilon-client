@@ -94,7 +94,7 @@ import io.odilon.model.list.ResultSet;
 import io.odilon.net.ErrorCode;
 import io.odilon.net.ODHttpStatus;
 import io.odilon.util.Check;
-import io.odilon.util.ODFileUtils;
+import io.odilon.util.OdilonFileUtils;
 import io.odilon.util.RandomIDGenerator;
 import okhttp3.Cache;
 import okhttp3.HttpUrl;
@@ -1470,7 +1470,7 @@ public class ODClient implements OdilonClient {
 
 		  if (body != null) {
 			  //sha256 = Digest.sha256Hash(body, length);
-			  sha256 = ODFileUtils.calculateSHA256String(body);
+			  sha256 = OdilonFileUtils.calculateSHA256String(body);
 		  }else {
 			  
 			  

@@ -43,7 +43,7 @@ import io.odilon.model.ObjectMetadata;
 import io.odilon.test.base.BaseTest;
 import io.odilon.test.base.NumberFormatter;
 import io.odilon.test.base.TestFile;
-import io.odilon.util.ODFileUtils;
+import io.odilon.util.OdilonFileUtils;
 
 public class TestVersionControlUpload extends BaseTest {
 				
@@ -341,7 +341,7 @@ public class TestVersionControlUpload extends BaseTest {
 						try {
 							
 							String src_sha  =  v.getSrcFileSha256(0);
-							String dest_sha =  ODFileUtils.calculateSHA256String(new File(restoredDir, meta.fileName));
+							String dest_sha =  OdilonFileUtils.calculateSHA256String(new File(restoredDir, meta.fileName));
 							
 							if (!dest_sha.equals(src_sha)) {
 								error("Error sha256 are not equal -> " + 
@@ -551,8 +551,8 @@ public class TestVersionControlUpload extends BaseTest {
 								String src_sha0 = test.getSrcFileSha256(0);
 								String src_sha1 = test.getSrcFileSha256(1);
 								
-								String dest_sha0 = ODFileUtils.calculateSHA256String(new File(previousVersionDestFileName));
-								String dest_sha1 = ODFileUtils.calculateSHA256String(new File(currentVersionDestFileName));
+								String dest_sha0 = OdilonFileUtils.calculateSHA256String(new File(previousVersionDestFileName));
+								String dest_sha1 = OdilonFileUtils.calculateSHA256String(new File(currentVersionDestFileName));
 								
 								if (!dest_sha0.equals(src_sha0)) {
 									error("Error sha256 v0 are not equal -> " + 
@@ -709,7 +709,7 @@ public class TestVersionControlUpload extends BaseTest {
 			try {
 				
 					String src_sha = v. getSrcFileSha256(1);
-					String new_sha = ODFileUtils.calculateSHA256String(new File(destFileName));
+					String new_sha = OdilonFileUtils.calculateSHA256String(new File(destFileName));
 					
 					if (!src_sha.equals(new_sha)) {
 						logger.error("sha256 are not equal -> " + meta.bucketName+"-"+meta.objectName);

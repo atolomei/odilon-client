@@ -25,7 +25,7 @@ import java.util.Map;
 
 import io.odilon.log.Logger;
 import io.odilon.model.ObjectMetadata;
-import io.odilon.util.ODFileUtils;
+import io.odilon.util.OdilonFileUtils;
 
 
 /**
@@ -90,7 +90,7 @@ public class TestFile {
 				
 		if (!sha256.containsKey(iVersion)) {
 			try {
-				String str = ODFileUtils.calculateSHA256String( files.get(iVersion));
+				String str = OdilonFileUtils.calculateSHA256String( files.get(iVersion));
 				sha256.put(iVersion, str);
 			} catch (NoSuchAlgorithmException | IOException e) {
 				logger.error(e);
