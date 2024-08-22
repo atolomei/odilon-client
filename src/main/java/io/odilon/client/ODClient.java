@@ -325,8 +325,6 @@ public class ODClient implements OdilonClient {
 			    this.secretKey = secretKey;
 		  }
 
-	
-	
 	/**
 	 * 
 	 */
@@ -369,11 +367,7 @@ public class ODClient implements OdilonClient {
 		
 		if (!objectName.matches(SharedConstant.object_valid_regex)) 
 			throw new IllegalArgumentException(	"objectName must be >0 and <="+String.valueOf(SharedConstant.MAX_OBJECT_CHARS) + ", and must match the java regex ->  " + SharedConstant.object_valid_regex + " | o:" +	objectName);
-
-		//ObjectMetadata meta = null;
-		
-		//-----------
-									
+								
 		String plainCredentials = accessKey + ":" + secretKey;
 		
 		String cType = null;
