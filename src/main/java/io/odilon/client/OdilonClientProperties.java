@@ -25,6 +25,7 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 import io.odilon.log.Logger;
+import io.odilon.model.SharedConstant;
 
 /**
  * <p>JVM properties</p>
@@ -50,7 +51,7 @@ public enum OdilonClientProperties {
 	            setOdilonClientJavaVersion(classLoader);
 	            setDevelopmentVersion();
 	          } catch (IOException e) {
-	            logger.error(e);
+	            logger.error(e, SharedConstant.NOT_THROWN);
 	            version.set("unknown");
 	          }
 	          result = version.get();

@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.util.Locale;
 
 import io.odilon.log.Logger;
+import io.odilon.model.SharedConstant;
 import okhttp3.Headers;
 
 /**
@@ -78,7 +79,7 @@ public class HeaderParser {
         }
       } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
     	  logger.error( "setter: " + setter + " | " + "annotation: " + value + " | " + "value: " + headers.get(value));
-    	  logger.error(e);
+    	  logger.error(e, SharedConstant.NOT_THROWN);
       }
     }
   }
