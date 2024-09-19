@@ -16,7 +16,6 @@
  */
 package io.odilon.client;
 
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -1750,7 +1749,6 @@ public class ODClient implements OdilonClient {
 	  }
 
     
-	
 	 /**
 	  * Uses okhttp3 
 	  
@@ -1887,7 +1885,6 @@ public class ODClient implements OdilonClient {
 	    return true;
 	}
 }
-
 
 /**
  * @param bucketName
