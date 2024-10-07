@@ -75,20 +75,6 @@
 	  <url>https://github.com/atolomei/odilon-client/tree/v1.7</url>
 	</scm>
     
-    
-    <!-- repositories>
-		<repository>
-			<id>my-local-repo</id>
-			<url>file://${basedir}/nonstandardlib/</url>
-		</repository>
-
-		<repository>
-			<id>novamens-releases</id>		
-			<url>https://maven.novamens.com/nexus/content/repositories/releases/</url>
-		</repository>
-	</repositories -->
-    
-
   <dependencies>
     
     	<!-- Odilon =====================================================================================  -->
