@@ -43,12 +43,10 @@ public class TestObjectPutGet extends BaseTest {
 	private String sourceDir;
 	private String downloadDir;
 	
-	
 	private Bucket bucket_1 = null;
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
 	
 	private OffsetDateTime showStatus = OffsetDateTime.now();
-
 	
 	public TestObjectPutGet() {
 	}

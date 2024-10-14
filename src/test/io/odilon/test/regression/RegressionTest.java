@@ -53,6 +53,8 @@ public class RegressionTest extends BaseTest {
 		
 		List<String> list = new ArrayList<String>();
 		
+		setSSL(false);
+		
 		TestBucketCRUD bucket_t = new  TestBucketCRUD();
 		bucket_t.setClient(getClient());
 		bucket_t.executeTest();

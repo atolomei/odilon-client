@@ -255,7 +255,7 @@ public class ODClient implements OdilonClient {
 	 * 
 	 * @param secure connection not used in v1.7 or earlier 
 	 */
-	protected ODClient(String endpoint, int port, String accessKey, String secretKey, boolean secure)  {
+	public ODClient(String endpoint, int port, String accessKey, String secretKey, boolean secure)  {
 		
 			  Check.requireNonNullStringArgument(endpoint,  "endpoint is null or emtpy");
 			  Check.requireNonNullStringArgument(accessKey, "accessKey is null or emtpy");

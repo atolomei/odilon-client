@@ -80,16 +80,16 @@ public abstract class BaseTest {
 	private Map<String, String> map = new TreeMap<String, String>();
 	
 	private long LAPSE_BETWEEN_OP_MILLISECONDS = 0;
-	
-	
-
 
 	private String standByEndpoint;
 	private int standByPort;
 	
 	private String standByAccessKey = "odilon";
 	private String standBySecretKey = "odilon";
+	private boolean standBySSL = false;
+	
 	private ODClient standByClient;
+	
 	
 	
 	
@@ -168,7 +168,7 @@ public abstract class BaseTest {
 		
 		if (this.standByClient==null) {
 		try {
-				this.standByClient = new ODClient(getStandByEndpoint(), getStandByPort(), standByAccessKey, standBySecretKey);
+				this.standByClient = new ODClient(getStandByEndpoint(), getStandByPort(), standByAccessKey, standBySecretKey, standBySSL);
 				logger.debug(standByClient.toString());
 		        
 			} catch (Exception e) {
@@ -312,10 +312,20 @@ public abstract class BaseTest {
 		LAPSE_BETWEEN_OP_MILLISECONDS = lAPSE_BETWEEN_OP_MILLISECONDS;
 	}
 	
+	
+	public boolean isSSL = false;
+	public void setSSL( boolean b) {
+		this.isSSL=b;
+	}
+	public boolean isSSL() {
+		return this.isSSL;
+	}
+	
 	public OdilonClient getClient() {
 		try {
 			if (client==null) {
-					this.client = new ODClient(endpoint, port, accessKey, secretKey);
+					boolean secure = isSSL();
+					this.client = new ODClient(endpoint, port, accessKey, secretKey, secure);
 			        logger.debug(this.client.toString());
 			}
 	        
