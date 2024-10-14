@@ -424,7 +424,7 @@ public class ODClient implements OdilonClient {
 		if (customTags.isPresent()) {
 
 			StringBuilder str = new StringBuilder();
-			customTags.get().forEach( s -> str.append(str.length()>0?("#"+s): s));
+			customTags.get().forEach( s -> str.append(str.length()>0?("||"+s): s));
 			urlBuilder.addEncodedQueryParameter("customTags", str.toString());
 				
 			// String jsonArray = objectMapper.writeValueAsString(customTags.get());

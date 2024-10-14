@@ -536,10 +536,15 @@ public interface OdilonClient {
 	 * in this case, if the server has Version Control enabled it will make a new version and the previous version of the object will not be deleted.
 	 *  If the server does not have Version Control enabled, the former version will be discarded.
 	 * </p>
-	 * <p>The Odilon client closes the {@link InputStream} after sending the data to the server. 
+	 * 
+	 * <p>Objects can optionally be uploaded with one or more user defined tags (String), for example to store a local id with the file uploaded</p> 
+	 * 
+	 * <p>Odilon client closes the {@link InputStream} after sending the data to the server. 
 	 *  However, if an {@link Exception} other than {@link ODClientException} is thrown by this method, the
 	 * {@link InputStream} may not have been closed.</p> 
 	 * <p>Therefore callers must always attempt to close the {@link InputStream}</p>
+	 * 
+	 * 
 	 * 
 	 * <b>Example:</b>
 	 * <pre>{@code
