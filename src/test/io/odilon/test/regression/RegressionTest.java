@@ -21,6 +21,7 @@ package io.odilon.test.regression;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.odilon.client.error.ODClientException;
 import io.odilon.client.unit.TestBucketCRUD;
 import io.odilon.client.unit.TestDeleteObject;
 import io.odilon.client.unit.TestFileCache;
@@ -124,7 +125,13 @@ public class RegressionTest extends BaseTest {
 			checker.executeTest();
 			list.add(checker.getClass().getSimpleName());
 		}
-		
+
+		try {
+			getClient().close();
+		} catch (ODClientException e) {
+			error(e.getClass().getName() + " | " + e.getMessage());
+		}
+
 		list.forEach( i -> logger.info(i + " ok"));
 		
 		logger.debug(this.getClass().getSimpleName() + " -> done.");

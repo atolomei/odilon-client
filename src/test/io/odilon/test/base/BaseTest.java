@@ -91,6 +91,17 @@ public abstract class BaseTest {
 	private String standBySecretKey = "odilon";
 	private ODClient standByClient;
 	
+	
+	
+	public void close() {
+		if (this.client!=null) {
+			try {
+				this.client.close();
+			} catch (ODClientException e) {
+				error(e.getClass().getName() +( e.getMessage()!=null ? (" | " + e.getMessage()) : ""));
+			}
+		}
+	}
 	/**
 	 * <p>Used by stand alone test</p>
 	 */

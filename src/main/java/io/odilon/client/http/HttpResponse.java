@@ -30,8 +30,8 @@ import okhttp3.ResponseBody;
  */
 public class HttpResponse {
 	
-  ResponseHeader header;
-  Response response;
+  private ResponseHeader header;
+  private Response response;
 
   public HttpResponse(ResponseHeader header, Response response) {
     this.header = header;

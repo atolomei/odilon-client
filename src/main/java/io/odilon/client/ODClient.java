@@ -97,6 +97,7 @@ import io.odilon.util.OdilonFileUtils;
 import io.odilon.util.RandomIDGenerator;
 import okhttp3.Cache;
 import okhttp3.HttpUrl;
+//import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
@@ -165,12 +166,10 @@ public class ODClient implements OdilonClient {
 	private static final String API_OBJECT_GET_HAS_VERSIONS					[] = {"object", "hasversions"};
 	private static final String API_OBJECT_GET_METADATA_PREVIOUS_VERSION	[] = {"object", "getmetadatapreviousversion"};
 	
-												
 	private static final String API_OBJECT_GET_METADATA_VERSION_ALL			[] = {"object", "getmetadatapreviousversionall"};
 	private static final String API_OBJECT_URL_PRESIGNES_PREFIX				[] = {"presigned", "object"};
 	
 	private static final String API_OBJECT_UPLOAD 							[] = {"object", "upload"};
-	
 	private static final String API_OBJECT_RESTORE_PREVIOUS_VERSION 		[] = {"object", "restorepreviousversion"};
 
 	/** ---------------------------------------------------- */
@@ -221,6 +220,10 @@ public class ODClient implements OdilonClient {
 	 private String charset = Charset.defaultCharset().name();
 	 
 	 private RandomIDGenerator rand = new RandomIDGenerator();
+	
+	 private Scheme scheme  = Scheme.HTTP;
+	 
+	 
 	 
 	/***
 	 * 
@@ -242,7 +245,7 @@ public class ODClient implements OdilonClient {
 					this(endpoint, port, accessKey, secretKey, false);
 	}
 
-
+	
 	/**
 	 * 
 	 * @param endpoint 	can not be null
@@ -281,8 +284,10 @@ public class ODClient implements OdilonClient {
 		        .cache(cache)
 		        .build();
 		      
-		      this.urlStr = endpoint;
 		      
+		      
+		      
+		      this.urlStr = endpoint;
 		      HttpUrl url = HttpUrl.parse(this.urlStr);
 			  
 			  if (url != null) {
@@ -290,15 +295,29 @@ public class ODClient implements OdilonClient {
 					  if (!"/".equals(url.encodedPath())) {
 				        	  throw new IllegalArgumentException("no path allowed in endpoint -> " + endpoint);
 				      }
-
+					  
+					  // TODO AT REMOVE
+					  // secure = true;
+					  
 			          HttpUrl.Builder urlBuilder = url.newBuilder();
-			          Scheme scheme = (secure) ? Scheme.HTTPS : Scheme.HTTP;
+			          this.scheme = (secure) ? Scheme.HTTPS : Scheme.HTTP;
 			          urlBuilder.scheme(scheme.toString());
+			          
 			          if (port > 0)
 			            urlBuilder.port(port);
+			          
 			          this.baseUrl = urlBuilder.build();
 			          this.accessKey = accessKey;
 			          this.secretKey = secretKey;
+			          
+			          if (secure) {
+					      try {
+					    	  ignoreCertCheck();
+					      } catch (KeyManagementException | NoSuchAlgorithmException e) {
+					    	  throw new IllegalStateException(e);			
+					      }
+			          }
+			          
 			          return;
 			    }
 
@@ -341,6 +360,9 @@ public class ODClient implements OdilonClient {
 	}
 
 
+
+	
+
 	/**
 	 * 
 	 * 
@@ -358,11 +380,21 @@ public class ODClient implements OdilonClient {
 		return true;
 	}
 	
+	
+	
+	/**
+	 * 
+	 */
+	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType) throws ODClientException {
+			return putObjectStream(bucketName, objectName, stream, fileName, size, contentType, Optional.empty()); 
+	}
+	
+	
 	/**
 	 * 
 	 */
 	@Override
-	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType) throws ODClientException {
+	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType, Optional<List<String>> customTags) throws ODClientException {
 		
 		if (!objectName.matches(SharedConstant.object_valid_regex)) 
 			throw new IllegalArgumentException(	"objectName must be >0 and <="+String.valueOf(SharedConstant.MAX_OBJECT_CHARS) + ", and must match the java regex ->  " + SharedConstant.object_valid_regex + " | o:" +	objectName);
@@ -389,6 +421,18 @@ public class ODClient implements OdilonClient {
 		urlBuilder.addEncodedQueryParameter("fileName", fileName.orElse(objectName));
 		urlBuilder.addEncodedQueryParameter("Content-Type", cType);
 
+		if (customTags.isPresent()) {
+
+			StringBuilder str = new StringBuilder();
+			customTags.get().forEach( s -> str.append(str.length()>0?("#"+s): s));
+			urlBuilder.addEncodedQueryParameter("customTags", str.toString());
+				
+			// String jsonArray = objectMapper.writeValueAsString(customTags.get());
+			// urlBuilder.addEncodedQueryParameter("customTags", jsonArray);
+				
+			
+		}
+		
 		
 		HttpMultipart request = new HttpMultipart(urlBuilder.toString(), plainCredentials, this.getCharset());
 		
@@ -396,7 +440,6 @@ public class ODClient implements OdilonClient {
 			 request.setChunk(getChunkSize());
 		
 		try (InputStream is = (stream instanceof BufferedInputStream) ? stream : (new BufferedInputStream(stream))) {
-
 			return request.exchange(new HttpFileEntity(is, objectName, size.orElse(Long.valueOf(-1).longValue())), new TypeReference<ObjectMetadata>() {});
 			
 		} catch (IOException e) {
@@ -438,8 +481,19 @@ public class ODClient implements OdilonClient {
 	 *}
 	 *</pre>
 	 */
+	
 	@Override													
 	public ObjectMetadata putObject(String bucketName, String objectName, File file) throws ODClientException {
+			return putObject(bucketName, objectName, Optional.empty(), file);
+	}
+	
+	/**
+	 * 
+	 * 
+	 */
+	@Override													
+	public ObjectMetadata putObject(String bucketName, String objectName, Optional<List<String>> customTags, File file) throws ODClientException {
+		
 		Check.requireNonNullStringArgument(bucketName, "bucketName is null");
 		Check.requireNonNullStringArgument(objectName, "objectName can not be null | b:"+ bucketName);
 		Check.requireNonNullArgument(file, "file is null");
@@ -447,7 +501,7 @@ public class ODClient implements OdilonClient {
 		Check.requireTrue(!file.isDirectory(), "file can not be a Directory");
 		
 		try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
-			return putObjectStream(bucketName, objectName, inputStream, file.getName(), getContentType(file.getName()));
+			return	putObjectStream(bucketName, objectName, inputStream, Optional.ofNullable(file.getName()),  Optional.empty(), Optional.ofNullable(getContentType(file.getName())), customTags);
 		} catch (FileNotFoundException e) {
 			throw new ODClientException(e);
 		} catch (IOException e) {
@@ -470,7 +524,7 @@ public class ODClient implements OdilonClient {
 	/**
 	 * <p>
 	 * {@link Item} is a wrapper for Lists and other {@link Iterable} structures of T where some elements may not be a T but an error.<br/>
-	 * {@code T} must be Serializable
+	 * {@code T} must be {@link Serializable}
 	 * </p>
 	 * Example list all bucket's objects:
 	 * <pre> {@code 
@@ -640,13 +694,14 @@ public class ODClient implements OdilonClient {
 	   */
 	  @Override
 	  public boolean isEmpty(String bucketName) throws ODClientException {
-		Check.requireNonNullStringArgument(bucketName, "bucketName is null or empty");
-		HttpResponse httpResponse = executeGetReq(API_BUCKET_ISEMPTY, Optional.of(bucketName));
-		try {	
-				return httpResponse.body().string().equals("true");
-		} catch (IOException e) {
-				throw new ODClientException(ODHttpStatus.OK.value(), ErrorCode.INTERNAL_ERROR.getCode(), e.getClass().getSimpleName() + " - " + e.getMessage());
-		}
+		
+		  Check.requireNonNullStringArgument(bucketName, "bucketName is null or empty");
+		  HttpResponse httpResponse = executeGetReq(API_BUCKET_ISEMPTY, Optional.of(bucketName));
+		  try {	
+					return httpResponse.body().string().equals("true");
+		  } catch (IOException e) {
+					throw new ODClientException(ODHttpStatus.OK.value(), ErrorCode.INTERNAL_ERROR.getCode(), e.getClass().getSimpleName() + " - " + e.getMessage());
+		  }
 	}
 	 
 	  
@@ -656,7 +711,6 @@ public class ODClient implements OdilonClient {
 	@Override		 
 	public boolean existsBucket(String bucketName) throws ODClientException {
 		Check.requireNonNullStringArgument(bucketName, "bucketName is null");
-
 		HttpResponse httpResponse = executeGetReq(API_BUCKET_EXISTS,  Optional.of(bucketName));
 		try {
 			return httpResponse.body().string().equals("true");
@@ -860,9 +914,14 @@ public class ODClient implements OdilonClient {
 		 return systemInfo().isVersionControl(); 
 	 }
 
+	@Override
+	public boolean isHTTPS() {
+		return this.scheme==Scheme.HTTPS;
+	}
+
+		
 	 @Override
 	 public MetricsValues metrics() throws ODClientException {
-		//HttpResponse httpResponse = executeReq(API_METRICS, Method.GET);
 		HttpResponse httpResponse = executeGetReq(API_METRICS);
 		String str = null;
 	  	try {
@@ -1152,6 +1211,30 @@ public class ODClient implements OdilonClient {
 	      .build();
 	  }
 
+	  
+		 @Override
+		 public void close() throws ODClientException {
+			 
+			 if (this.httpClient!=null) {
+				 
+				 if (this.httpClient.cache()!=null)
+					try {
+						this.httpClient.cache().close();
+						
+					} catch (Exception e) {
+						throw new ODClientException(e);
+					}
+				 
+				 this.httpClient.connectionPool().evictAll();
+			
+				 this.httpClient.dispatcher().executorService().shutdown();
+				 
+			 }
+			 
+		 }
+
+		 
+		 
 	  @Override
 	  public boolean isValidBucketName(String name) {
 		  	
@@ -1885,6 +1968,7 @@ public class ODClient implements OdilonClient {
 	    return true;
 	}
 }
+
 
 /**
  * @param bucketName

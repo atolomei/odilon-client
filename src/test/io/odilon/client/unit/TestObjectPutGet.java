@@ -9,7 +9,9 @@ import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -106,7 +108,12 @@ public class TestObjectPutGet extends BaseTest {
 
 					try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
 						
-						getClient().putObjectStream(bucketName, objectName, inputStream, Optional.of(file.getName()), Optional.empty());
+						
+						List<String> customTags = new ArrayList<String>();
+						customTags.add(String.valueOf(counter));
+						
+						// getClient().putObjectStream(bucketName, objectName, inputStream, Optional.of(file.getName()), Optional.empty());
+						getClient().putObjectStream(bucketName, objectName, inputStream, Optional.of(file.getName()), Optional.empty(), Optional.empty(), Optional.ofNullable(customTags));
 						
 						testFiles.put(bucketName+"-"+objectName, new TestFile(file, bucketName, objectName));
 						logger.info( String.valueOf(testFiles.size() + " testAddObjectsStream -> " + file.getName()));

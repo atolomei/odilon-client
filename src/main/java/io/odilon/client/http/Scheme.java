@@ -23,9 +23,9 @@ package io.odilon.client.http;
  *  
  */
 public enum Scheme {
-  HTTP("http"), HTTPS("https");
+  HTTP("http"), 
+  HTTPS("https");
   private final String value;
-
 
   private Scheme(String value) {
     this.value = value;

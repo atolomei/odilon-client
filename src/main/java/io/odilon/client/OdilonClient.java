@@ -64,6 +64,20 @@ import io.odilon.net.ODHttpStatus;
 public interface OdilonClient {
 
 	/* =======================================
+	 * SHUTDOWN
+	 ==========================================*/
+	
+	/**
+	 * <p>Shutdown Isn't Necessary because
+	 * the threads and connections that are held will be released automatically if they remain idle</p> 
+	 * 
+	 * */
+	public void close() throws ODClientException;
+	public boolean isHTTPS();
+	
+	
+	
+	/* =======================================
 	 * BUCKET
 	 ==========================================*/
 
@@ -428,7 +442,7 @@ public interface OdilonClient {
 	 * </pre>
 	 *  
   	 * @param bucketName 	can not be null
-     * @param objectName		can not be null
+     * @param objectName	can not be null
 	 * 
 	 */
 	public InputStream getObject(String bucketName, String objectName) throws ODClientException;
@@ -546,7 +560,6 @@ public interface OdilonClient {
 	 * @param bucketName 		can not be null
 	 * @param objectName		can not be null
 	 * @param stream			can not be null
-	 *  
 	 * @param fileName
 	 * @param contentType
 	 * 
@@ -602,7 +615,21 @@ public interface OdilonClient {
 	
 	
 	
-	
+	/**
+	 * 
+	 * <p>Uploads a File or any other binary stream to the server. It will create a new object or update an existing one.</p> 
+	 * <p>This method does the same as {@link #putObject} <br/>
+	 * but with a local {@link File} instead of an {@link InputStream}</p>
+	 * 
+	 * @param bucketName
+	 * @param objectName
+	 * @param customTags Optional List of user defined tags
+	 * @param file
+	 * @return
+	 * @throws ODClientException
+	 */
+	public ObjectMetadata putObject(String bucketName, String objectName, Optional<List<String>> customTags, File file) throws ODClientException;
+
 	
 	
 	/**
@@ -656,6 +683,24 @@ public interface OdilonClient {
 	 */
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size) throws ODClientException;
 	
+	
+	
+	/**
+	 * 
+	 * <p>Uploads a File or any other binary stream to the server. It will create a new object or update an existing one.</p>
+	 * <p>This method calls {@link #putObject}</p>
+	 * 
+	 * @param bucketName
+	 * @param objectName
+	 * @param stream
+	 * @param fileName
+	 * @param size
+	 * @param contentType
+	 * @param customTags
+	 * @return
+	 * @throws ODClientException
+	 */
+	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType, Optional<List<String>> customTags) throws ODClientException;
 	
 	/* -----------------------
 	 * OBJECT delete   	     	  
@@ -981,6 +1026,13 @@ public interface OdilonClient {
 	 * @return Charsert "UTF-8" is the default value.
 	 */
 	public String getCharset();
+	/**
+	 * 
+	 */
+	
+
+
+
 
 
 

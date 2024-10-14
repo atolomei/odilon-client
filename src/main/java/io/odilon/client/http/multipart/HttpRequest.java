@@ -38,15 +38,26 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.Socket;
 import java.net.URL;
-
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Base64;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509ExtendedTrustManager;
 
 /**
  * 
- * @author atolomei@novamens.com (Alejandro Tolomei)
+ * @author aferraria@novamens.com (Alejo Ferraria)
  * 
  */
 @JsonInclude(Include.NON_NULL)
@@ -174,26 +185,22 @@ public class HttpRequest {
 
 
     public PrintWriter getWriter( String charset) throws IOException  {
-        if (writer==null) {
+        if (this.writer==null) {
             OutputStream outputStream = getConnection().getOutputStream();
-            //writer = new PrintWriter(new OutputStreamWriter(outputStream, "UTF-8"), true);
-            writer = new PrintWriter(new OutputStreamWriter(outputStream, charset ), true);
+            this.writer = new PrintWriter(new OutputStreamWriter(outputStream, charset ), true);
         }
-        return writer;
+        return this.writer;
     }
 
     public BufferedReader getReader() throws IOException {
-        if (reader==null) {
-                reader = new BufferedReader(new InputStreamReader(getConnection().getInputStream()));
-        }
-        return reader;
+        if (this.reader==null)
+        	this.reader = new BufferedReader(new InputStreamReader(getConnection().getInputStream()));
+        return this.reader;
     }
 
     public BufferedReader getErrorReader() throws IOException {
         BufferedReader reader = null;
-        if (reader==null) {
-              reader = new BufferedReader(new InputStreamReader(getConnection().getErrorStream()));
-        }
+        reader = new BufferedReader(new InputStreamReader(getConnection().getErrorStream()));
         return reader;
     }
 
@@ -221,11 +228,11 @@ public class HttpRequest {
     }
 
     public String getCredentials() {
-        return credentials;
+        return this.credentials;
     }
 
     public String getApiToken() {
-        return apiToken;
+        return this.apiToken;
     }
 
     public void setApiToken(String apiToken) {
@@ -289,9 +296,64 @@ public class HttpRequest {
         return false;
     }
     
+    	
+    
+    
+    private static final TrustManager DUMMY_TRUST_MANAGER = new X509ExtendedTrustManager() {
+  	   @Override
+  	   public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+  	       return new java.security.cert.X509Certificate[0];
+  	   }
+
+  	   @Override
+  	   public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+  	   }
+
+	@Override
+	public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+	}
+
+	@Override
+	public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket)
+			throws CertificateException {
+	}
+
+	@Override
+	public void checkServerTrusted(X509Certificate[] chain, String authType, Socket socket)
+			throws CertificateException {
+	}
+
+	@Override
+	public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine)
+			throws CertificateException {
+	}
+
+	@Override
+	public void checkServerTrusted(X509Certificate[] chain, String authType, SSLEngine engine)
+			throws CertificateException {
+	}
+  	};
+  	
     
     protected HttpURLConnection openConnection() throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) getUrl().openConnection();
+    	
+        
+/**
+    	try {
+    	
+    		SSLContext sslContext = SSLContext.getInstance("SSL"); // OR TLS
+			sslContext.init(null, new TrustManager[]{DUMMY_TRUST_MANAGER}, new SecureRandom());
+			
+		} catch (KeyManagementException | NoSuchAlgorithmException e) {
+			throw new IOException(e);
+		}
+   **/ 	
+    	
+    	
+    	HttpURLConnection conn = (HttpURLConnection) getUrl().openConnection();
+    	
+    	Authenticator a;
+    	
         conn.setUseCaches(false);
         conn.setDoInput(true);
         conn.setDoOutput(getDoOutput());
