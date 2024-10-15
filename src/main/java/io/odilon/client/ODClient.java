@@ -223,6 +223,8 @@ public class ODClient implements OdilonClient {
 	
 	 private Scheme scheme  = Scheme.HTTP;
 	 
+	 private final boolean isSSL;
+	 private final boolean acceptAllCertificates;
 	 
 	 
 	/***
@@ -246,6 +248,10 @@ public class ODClient implements OdilonClient {
 	}
 
 	
+	public ODClient(String endpoint, int port, String accessKey, String secretKey, boolean secure)  {
+		this(endpoint, port, accessKey, secretKey, secure, false);
+	}
+	
 	/**
 	 * 
 	 * @param endpoint 	can not be null
@@ -255,7 +261,9 @@ public class ODClient implements OdilonClient {
 	 * 
 	 * @param secure connection not used in v1.7 or earlier 
 	 */
-	public ODClient(String endpoint, int port, String accessKey, String secretKey, boolean secure)  {
+	public ODClient(String endpoint, int port, String accessKey, String secretKey, boolean issecure, boolean acceptAllCertificates)  {
+		
+		
 		
 			  Check.requireNonNullStringArgument(endpoint,  "endpoint is null or emtpy");
 			  Check.requireNonNullStringArgument(accessKey, "accessKey is null or emtpy");
@@ -264,6 +272,10 @@ public class ODClient implements OdilonClient {
 			  if (port < 0 || port > 65535) 
 			      throw new IllegalArgumentException("port must be in range of 1 to 65535 -> " + String.valueOf(port));
 
+			  
+			  this.acceptAllCertificates=acceptAllCertificates;
+			  this.isSSL=issecure;
+			  
 			  this.objectMapper.registerModule(new JavaTimeModule());
 			  this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			  this.objectMapper.registerModule(new Jdk8Module());
@@ -284,9 +296,6 @@ public class ODClient implements OdilonClient {
 		        .cache(cache)
 		        .build();
 		      
-		      
-		      
-		      
 		      this.urlStr = endpoint;
 		      HttpUrl url = HttpUrl.parse(this.urlStr);
 			  
@@ -300,7 +309,7 @@ public class ODClient implements OdilonClient {
 					  // secure = true;
 					  
 			          HttpUrl.Builder urlBuilder = url.newBuilder();
-			          this.scheme = (secure) ? Scheme.HTTPS : Scheme.HTTP;
+			          this.scheme = (issecure) ? Scheme.HTTPS : Scheme.HTTP;
 			          urlBuilder.scheme(scheme.toString());
 			          
 			          if (port > 0)
@@ -310,7 +319,7 @@ public class ODClient implements OdilonClient {
 			          this.accessKey = accessKey;
 			          this.secretKey = secretKey;
 			          
-			          if (secure) {
+			          if (issecure) {
 					      try {
 					    	  ignoreCertCheck();
 					      } catch (KeyManagementException | NoSuchAlgorithmException e) {
@@ -325,7 +334,7 @@ public class ODClient implements OdilonClient {
 			    if (!this.isValidEndpoint(endpoint))
 			      throw new IllegalArgumentException("invalid host -> " +  endpoint);
 			    
-			    Scheme scheme = (secure) ? Scheme.HTTPS : Scheme.HTTP;
+			    Scheme scheme = (issecure) ? Scheme.HTTPS : Scheme.HTTP;
 
 			    if (port == 0) {
 			      this.baseUrl = new HttpUrl.Builder()
@@ -429,12 +438,10 @@ public class ODClient implements OdilonClient {
 				
 			// String jsonArray = objectMapper.writeValueAsString(customTags.get());
 			// urlBuilder.addEncodedQueryParameter("customTags", jsonArray);
-				
-			
 		}
 		
 		
-		HttpMultipart request = new HttpMultipart(urlBuilder.toString(), plainCredentials, this.getCharset());
+		HttpMultipart request = new HttpMultipart(urlBuilder.toString(), plainCredentials, this.getCharset(), isSSL());
 		
 		if (getChunkSize()>0) 
 			 request.setChunk(getChunkSize());
@@ -449,6 +456,11 @@ public class ODClient implements OdilonClient {
 	}
 
 	
+	private boolean isSSL() {
+		return this.isSSL;
+	}
+
+
 	/**
 	 * <p>Uploads the {@link File} file to the server</p>
 	 * 
@@ -513,7 +525,6 @@ public class ODClient implements OdilonClient {
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, String fileName, String contentType) throws ODClientException {
 		return putObjectStream(bucketName, objectName, stream, Optional.ofNullable(fileName), Optional.empty(), Optional.ofNullable(contentType));
 	}											
-
 	
 	@Override
 	public ResultSet<Item<ObjectMetadata>> listObjects(Bucket bucket) throws ODClientException {
@@ -1405,7 +1416,6 @@ public class ODClient implements OdilonClient {
  			}
  		}
 
- 
 	
 	/**
 	   * Gets object's data of given offset and length as {@link InputStream} in the given bucket. The InputStream must be

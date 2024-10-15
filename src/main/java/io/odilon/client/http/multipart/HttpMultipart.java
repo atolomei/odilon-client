@@ -32,11 +32,12 @@ public class HttpMultipart extends HttpRequest {
     private final String boundary = "===" + System.currentTimeMillis() + "===";
     private final String charset;
     
-    public HttpMultipart(String url, String credentials, String charset) {
-    		this(url, credentials, charset, null);
+    
+    public HttpMultipart(String url, String credentials, String charset, boolean ssl) {
+    		this(url, credentials, charset, ssl, null);
     }
-    public HttpMultipart(String url, String credentials, String charset, ProgressListener listener) {
-        super(url, credentials, listener);
+    public HttpMultipart(String url, String credentials, String charset, boolean ssl, ProgressListener listener) {
+        super(url, credentials, ssl, listener);
         this.charset=charset;
     }
 

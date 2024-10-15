@@ -50,16 +50,42 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * 
  * @author aferraria@novamens.com (Alejo Ferraria)
  * 
+ * 
+ * 
+ * 
  */
+
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
+import java.net.URLConnection;
+ 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.security.cert.X509Certificate;
+
+
+
+
+
+
 @JsonInclude(Include.NON_NULL)
 public class HttpRequest {
 		
@@ -88,15 +114,27 @@ public class HttpRequest {
 	private PrintWriter writer;
 	private BufferedReader reader;
 	private ProgressListener listener;
-	protected String LINE_FEED = "\r\n";
+	
 
-    public HttpRequest(String url, String credentials) {
-        setUrl(url);
+	private final boolean isSSL;
+	
+	protected String LINE_FEED = "\r\n";
+	
+	
+    public HttpRequest(String url, String credentials, boolean isSSL) {
+    	this.isSSL=isSSL;
+    	setUrl(url);
         setCredentials(credentials);
     }
 
-    public HttpRequest(String url, String credentials, ProgressListener listener) {
-        setUrl(url);
+  	public boolean isSSL() {
+  		return isSSL;
+  	}
+
+  	
+    public HttpRequest(String url, String credentials, boolean isSSL, ProgressListener listener) {
+    	this.isSSL=isSSL;
+    	setUrl(url);
         setCredentials(credentials);
         setListener(listener);
     }
@@ -299,61 +337,45 @@ public class HttpRequest {
     	
     
     
-    private static final TrustManager DUMMY_TRUST_MANAGER = new X509ExtendedTrustManager() {
-  	   @Override
-  	   public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-  	       return new java.security.cert.X509Certificate[0];
-  	   }
-
-  	   @Override
-  	   public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-  	   }
-
-	@Override
-	public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-	}
-
-	@Override
-	public void checkClientTrusted(X509Certificate[] chain, String authType, Socket socket)
-			throws CertificateException {
-	}
-
-	@Override
-	public void checkServerTrusted(X509Certificate[] chain, String authType, Socket socket)
-			throws CertificateException {
-	}
-
-	@Override
-	public void checkClientTrusted(X509Certificate[] chain, String authType, SSLEngine engine)
-			throws CertificateException {
-	}
-
-	@Override
-	public void checkServerTrusted(X509Certificate[] chain, String authType, SSLEngine engine)
-			throws CertificateException {
-	}
-  	};
+     
   	
-    
     protected HttpURLConnection openConnection() throws IOException {
     	
-        
-/**
-    	try {
-    	
-    		SSLContext sslContext = SSLContext.getInstance("SSL"); // OR TLS
-			sslContext.init(null, new TrustManager[]{DUMMY_TRUST_MANAGER}, new SecureRandom());
-			
-		} catch (KeyManagementException | NoSuchAlgorithmException e) {
-			throw new IOException(e);
-		}
-   **/ 	
-    	
+
+    	if (isSSL()) {
+	        try {
+		        	TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
+			                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+			                    return null;
+			                }
+			                public void checkClientTrusted(X509Certificate[] certs, String authType) {
+			                }
+			                public void checkServerTrusted(X509Certificate[] certs, String authType) {
+			                }
+		            	}
+		        	};
+		
+		        // Install the all-trusting trust manager
+		        SSLContext sc = SSLContext.getInstance("SSL");
+		        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+		        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+		
+		        // Create all-trusting host name verifier
+		        HostnameVerifier allHostsValid = new HostnameVerifier() {
+		            public boolean verify(String hostname, SSLSession session) {
+		                return true;
+		            }
+		        };
+		        
+		        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+		        
+	        } catch (Exception e) {
+	        		throw new IOException(e);
+	        }
+    	}
     	
     	HttpURLConnection conn = (HttpURLConnection) getUrl().openConnection();
-    	
-    	Authenticator a;
-    	
+
         conn.setUseCaches(false);
         conn.setDoInput(true);
         conn.setDoOutput(getDoOutput());
@@ -372,7 +394,15 @@ public class HttpRequest {
             conn.setRequestProperty("Authorization", "Bearer " + getApiToken());
         else
             conn.setRequestProperty("Authorization", "Basic " + base64Credentials);
+        
+
+        //if (conn instanceof HttpsURLConnection) {
+        //	((HttpsURLConnection)conn).setHostnameVerifier(WhitelistHostnameVerifier.INSTANCE);
+        //}
+		
         return conn;
+        
+       
     }
 
     protected void close() {

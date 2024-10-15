@@ -90,6 +90,9 @@ public abstract class BaseTest {
 	
 	private ODClient standByClient;
 	
+
+	public boolean isSSL = false;
+	public boolean isAcceptAllCertificates = false;
 	
 	
 	
@@ -123,8 +126,8 @@ public abstract class BaseTest {
 		String tempDir = System.getProperty("tempDir");
 		String downloadDir = System.getProperty("downloadDir");
 				
-		String tempEndpoint = System.getProperty("endpoint");
-		String tempPort = System.getProperty("port");
+		//String tempEndpoint = System.getProperty("endpoint");
+		//String tempPort = System.getProperty("port");
 	
 		String lapse = System.getProperty("sleepMilliseconds");
 		
@@ -314,20 +317,27 @@ public abstract class BaseTest {
 		LAPSE_BETWEEN_OP_MILLISECONDS = lAPSE_BETWEEN_OP_MILLISECONDS;
 	}
 	
-	
-	public boolean isSSL = false;
 	public void setSSL( boolean b) {
 		this.isSSL=b;
 	}
+	
 	public boolean isSSL() {
 		return this.isSSL;
 	}
+
+	public boolean isAcceptAllCertificates() {
+		return this.isAcceptAllCertificates;
+	}
+	
+	public void setAcceptAllCertificates(boolean b) {
+		this.isAcceptAllCertificates=b;
+	}
+	
 	
 	public OdilonClient getClient() {
 		try {
 			if (client==null) {
-					boolean secure = isSSL();
-					this.client = new ODClient(endpoint, port, accessKey, secretKey, secure);
+					this.client = new ODClient(endpoint, port, accessKey, secretKey, isSSL(), isAcceptAllCertificates());
 			        logger.debug(this.client.toString());
 			}
 	        
