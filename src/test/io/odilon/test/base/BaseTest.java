@@ -116,6 +116,8 @@ public abstract class BaseTest {
 	 */
 	public BaseTest(OdilonClient client) {
 		
+		setSSL(true);
+		
 		logger.debug("Start " + this.getClass().getName());
 		
 		String tempDir = System.getProperty("tempDir");
@@ -144,11 +146,11 @@ public abstract class BaseTest {
 		if (downloadDir!=null)
 			DOWNLOAD_DIR=downloadDir.trim();
 
-		if (tempEndpoint!=null)
-			endpoint=tempEndpoint.trim();
+		//if (tempEndpoint!=null)
+		//	endpoint=tempEndpoint.trim();
 
-		if (tempPort!=null)
-			port= Integer.valueOf(tempPort.trim());
+		//if (tempPort!=null)
+		//	port= Integer.valueOf(tempPort.trim());
 		
 		setClient(client);
 		
@@ -255,8 +257,8 @@ public abstract class BaseTest {
 			if (p==null || !p.equals("ok"))
 				error("ping  -> " + p!=null?p:"null");
 			else {
-				logger.debug("ping " +  endpoint + " :" + String.valueOf(port) + " -> ok");
-				map.put("ping  " +  endpoint + " :" + String.valueOf(port) , "ok");
+				logger.debug("ping " +  getClient().getUrl() + " -> ok");
+				map.put("ping  " +  getClient().getUrl() , "ok");
 			}
 		} catch (Exception e)
 		{

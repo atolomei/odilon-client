@@ -14,6 +14,7 @@ public class TestMonitor extends BaseTest {
 	
 	
 	public TestMonitor() {
+		
 	}
 	
 	
@@ -32,6 +33,8 @@ public class TestMonitor extends BaseTest {
 	public boolean testSystemInfo() {
 		
 		try {
+			
+			
 			
 			SystemInfo info = getClient().systemInfo();
 			Map<String, String> map = info.getColloquial();
