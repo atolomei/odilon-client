@@ -122,7 +122,7 @@ public abstract class BaseTest {
 	 */
 	public BaseTest(OdilonClient client) {
 		
-		setSSL(true);
+		// setSSL(true);
 		
 		logger.debug("Start " + this.getClass().getName());
 		
