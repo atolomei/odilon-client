@@ -1035,13 +1035,10 @@ public interface OdilonClient {
 	 * 
 	 */
 	
-
-
-
-
-
-
-
+	public boolean isAcceptAllCertificates();
+	
+	public boolean isSSL();
+	
 
 
 

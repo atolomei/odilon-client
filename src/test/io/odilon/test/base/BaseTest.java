@@ -63,7 +63,10 @@ public abstract class BaseTest {
 	
 	public String DOWNLOAD_DIR_RESTORED = DOWNLOAD_DIR + File.separator+"restored";
 	
-	public String endpoint = "http://localhost";
+	
+	public String endpoint = "localhost";
+	
+	
 	public int port = 9234;
 
 	private String accessKey = "odilon";
@@ -92,7 +95,7 @@ public abstract class BaseTest {
 	
 
 	public boolean isSSL = false;
-	public boolean isAcceptAllCertificates = false;
+	public boolean isAcceptAllCertificates = true;
 	
 	
 	
@@ -173,6 +176,7 @@ public abstract class BaseTest {
 		
 		if (this.standByClient==null) {
 		try {
+			
 				this.standByClient = new ODClient(getStandByEndpoint(), getStandByPort(), standByAccessKey, standBySecretKey, standBySSL);
 				logger.debug(standByClient.toString());
 		        
@@ -337,7 +341,7 @@ public abstract class BaseTest {
 	public OdilonClient getClient() {
 		try {
 			if (client==null) {
-					this.client = new ODClient(endpoint, port, accessKey, secretKey, isSSL(), isAcceptAllCertificates());
+					this.client = new ODClient((isSSL()?"https":"http") + "://" + endpoint, port, accessKey, secretKey, isSSL(), isAcceptAllCertificates());
 			        logger.debug(this.client.toString());
 			}
 	        

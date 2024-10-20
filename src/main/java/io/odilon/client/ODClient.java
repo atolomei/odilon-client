@@ -261,7 +261,7 @@ public class ODClient implements OdilonClient {
 	 * 
 	 * @param secure connection not used in v1.7 or earlier 
 	 */
-	public ODClient(String endpoint, int port, String accessKey, String secretKey, boolean issecure, boolean acceptAllCertificates)  {
+	public ODClient(String endpoint, int port, String accessKey, String secretKey, boolean isSecure, boolean acceptAllCertificates)  {
 		
 		
 		
@@ -274,7 +274,7 @@ public class ODClient implements OdilonClient {
 
 			  
 			  this.acceptAllCertificates=acceptAllCertificates;
-			  this.isSSL=issecure;
+			  this.isSSL=isSecure;
 			  
 			  this.objectMapper.registerModule(new JavaTimeModule());
 			  this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -299,17 +299,17 @@ public class ODClient implements OdilonClient {
 		      this.urlStr = endpoint;
 		      HttpUrl url = HttpUrl.parse(this.urlStr);
 			  
+		      
+		      this.scheme = (isSSL()) ? Scheme.HTTPS : Scheme.HTTP;
+		      
 			  if (url != null) {
 
 					  if (!"/".equals(url.encodedPath())) {
 				        	  throw new IllegalArgumentException("no path allowed in endpoint -> " + endpoint);
 				      }
 					  
-					  // TODO AT REMOVE
-					  // secure = true;
-					  
 			          HttpUrl.Builder urlBuilder = url.newBuilder();
-			          this.scheme = (issecure) ? Scheme.HTTPS : Scheme.HTTP;
+
 			          urlBuilder.scheme(scheme.toString());
 			          
 			          if (port > 0)
@@ -319,14 +319,15 @@ public class ODClient implements OdilonClient {
 			          this.accessKey = accessKey;
 			          this.secretKey = secretKey;
 			          
-			          if (issecure) {
+			          if ( isSSL() && isAcceptAllCertificates()) {
 					      try {
+					  
 					    	  ignoreCertCheck();
+					    	  
 					      } catch (KeyManagementException | NoSuchAlgorithmException e) {
 					    	  throw new IllegalStateException(e);			
 					      }
 			          }
-			          
 			          return;
 			    }
 
@@ -334,7 +335,7 @@ public class ODClient implements OdilonClient {
 			    if (!this.isValidEndpoint(endpoint))
 			      throw new IllegalArgumentException("invalid host -> " +  endpoint);
 			    
-			    Scheme scheme = (issecure) ? Scheme.HTTPS : Scheme.HTTP;
+			    
 
 			    if (port == 0) {
 			      this.baseUrl = new HttpUrl.Builder()
@@ -441,7 +442,7 @@ public class ODClient implements OdilonClient {
 		}
 		
 		
-		HttpMultipart request = new HttpMultipart(urlBuilder.toString(), plainCredentials, this.getCharset(), isSSL());
+		HttpMultipart request = new HttpMultipart(urlBuilder.toString(), plainCredentials, this.getCharset(), isSSL(), isAcceptAllCertificates());
 		
 		if (getChunkSize()>0) 
 			 request.setChunk(getChunkSize());
@@ -456,10 +457,14 @@ public class ODClient implements OdilonClient {
 	}
 
 	
-	private boolean isSSL() {
-		return this.isSSL;
+	@Override
+	public boolean isAcceptAllCertificates() {
+		return this.acceptAllCertificates;
 	}
 
+	public boolean isSSL() {
+		return this.isSSL;
+	}
 
 	/**
 	 * <p>Uploads the {@link File} file to the server</p>
@@ -816,7 +821,6 @@ public class ODClient implements OdilonClient {
 		response.body().close();
 	}
 
-	
 	/**
 	 * 
 	 */

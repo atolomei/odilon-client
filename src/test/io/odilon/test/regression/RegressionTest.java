@@ -48,12 +48,11 @@ public class RegressionTest extends BaseTest {
 			
 	private static final Logger logger = Logger.getLogger(RegressionTest.class.getName());
 	
+	
 	@Override
 	public void executeTest() {
 		
 		List<String> list = new ArrayList<String>();
-		
-		 
 		
 		TestBucketCRUD bucket_t = new  TestBucketCRUD();
 		bucket_t.setClient(getClient());

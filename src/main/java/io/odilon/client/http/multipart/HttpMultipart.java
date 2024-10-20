@@ -33,11 +33,11 @@ public class HttpMultipart extends HttpRequest {
     private final String charset;
     
     
-    public HttpMultipart(String url, String credentials, String charset, boolean ssl) {
-    		this(url, credentials, charset, ssl, null);
+    public HttpMultipart(String url, String credentials, String charset, boolean ssl, boolean acceptAllCertificates) {
+    		this(url, credentials, charset, ssl, acceptAllCertificates, null);
     }
-    public HttpMultipart(String url, String credentials, String charset, boolean ssl, ProgressListener listener) {
-        super(url, credentials, ssl, listener);
+    public HttpMultipart(String url, String credentials, String charset, boolean ssl, boolean  acceptAllCertificates, ProgressListener listener) {
+        super(url, credentials, ssl, acceptAllCertificates, listener);
         this.charset=charset;
     }
 

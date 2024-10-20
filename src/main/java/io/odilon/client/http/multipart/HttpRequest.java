@@ -117,23 +117,22 @@ public class HttpRequest {
 	
 
 	private final boolean isSSL;
+	private final boolean isAcceptAllCertificates;
 	
 	protected String LINE_FEED = "\r\n";
 	
 	
-    public HttpRequest(String url, String credentials, boolean isSSL) {
+    public HttpRequest(String url, String credentials, boolean isSSL, boolean isAcceptAllCertificates) {
     	this.isSSL=isSSL;
+    	this.isAcceptAllCertificates=isAcceptAllCertificates;
     	setUrl(url);
         setCredentials(credentials);
     }
 
-  	public boolean isSSL() {
-  		return isSSL;
-  	}
-
   	
-    public HttpRequest(String url, String credentials, boolean isSSL, ProgressListener listener) {
+    public HttpRequest(String url, String credentials, boolean isSSL, boolean isAcceptAllCertificates, ProgressListener listener) {
     	this.isSSL=isSSL;
+    	this.isAcceptAllCertificates=isAcceptAllCertificates;
     	setUrl(url);
         setCredentials(credentials);
         setListener(listener);
@@ -155,6 +154,14 @@ public class HttpRequest {
 		this.chunk = chunk;
 	}
 
+	public boolean isSSL() {
+  		return isSSL;
+  	}
+
+  	public boolean isAcceptAllCertificates() {
+		return isAcceptAllCertificates;
+	}
+  	
 	/**
 	 * 
 	 * @param <T>
@@ -342,7 +349,7 @@ public class HttpRequest {
     protected HttpURLConnection openConnection() throws IOException {
     	
 
-    	if (isSSL()) {
+    	if (isSSL() && isAcceptAllCertificates()) {
 	        try {
 		        	TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
 			                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
@@ -405,7 +412,9 @@ public class HttpRequest {
        
     }
 
-    protected void close() {
+    
+
+	protected void close() {
         conn = null;
     }
 }
