@@ -24,9 +24,41 @@
 	      <distribution>repo</distribution>
 	    </license>
   	</licenses>
+
   
-<!-- mvn install source:jar javadoc:jar net.nicoulaj.maven.plugins:checksum-maven-plugin:1.11:artifacts -->  
-  
+<!-- This command ->
+
+STEP 1
+
+mvn install source:jar javadoc:jar net.nicoulaj.maven.plugins:checksum-maven-plugin:1.11:artifacts
+
+will generate:
+
+jar
+md5
+sha1
+
+javadoc
+md5
+sha1
+
+jar sources
+md5
+sha1
+
+
+STEP 2
+
+CertUtil -hashfile .\odilon-client-1.8.pom SHA1   
+CertUtil -hashfile .\odilon-client-1.8.pom MD5  
+
+STEP 3
+
+Open Kelopatra -> to digitally sign files 
+
+-->
+
+
   <properties>
 
 	<checksum-maven-plugin-version>1.11</checksum-maven-plugin-version>
@@ -73,7 +105,7 @@
 	<scm>
 	  <connection>scm:git:git://github.com/atolomei/odilon-client.git</connection>
 	  <developerConnection>scm:git:ssh://github.com:atolomei/odilon-client.git</developerConnection>
-	  <url>https://github.com/atolomei/odilon-client/tree/v1.7</url>
+	  <url>https://github.com/atolomei/odilon-client/tree/v1.8</url>
 	</scm>
     
   <dependencies>
