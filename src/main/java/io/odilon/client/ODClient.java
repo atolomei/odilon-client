@@ -258,8 +258,8 @@ public class ODClient implements OdilonClient {
 	 * @param port		can not be null (normally default port is 9234)
 	 * @param accessKey can not be null
 	 * @param secretKey can not be null
-	 * 
-	 * @param secure connection not used in v1.7 or earlier 
+	 * @param isSecure  whether to use SSL
+	 * @param acceptAllCertificates for self signed certificates  
 	 */
 	public ODClient(String endpoint, int port, String accessKey, String secretKey, boolean isSecure, boolean acceptAllCertificates)  {
 		
@@ -540,7 +540,7 @@ public class ODClient implements OdilonClient {
 	/**
 	 * <p>
 	 * {@link Item} is a wrapper for Lists and other {@link Iterable} structures of T where some elements may not be a T but an error.<br/>
-	 * {@code T} must be {@link Serializable}
+	 * {@code T} must be Serializable
 	 * </p>
 	 * Example list all bucket's objects:
 	 * <pre> {@code 

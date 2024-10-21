@@ -56,6 +56,11 @@ STEP 3
 
 Open Kelopatra -> to digitally sign files 
 
+
+FOR JAVADOC HTML
+
+mvn javadoc:javadoc
+
 -->
 
 
