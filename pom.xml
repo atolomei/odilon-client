@@ -6,7 +6,7 @@
 
   <groupId>io.odilon</groupId>
   <artifactId>odilon-client</artifactId>
-  <version>1.8</version>
+  <version>1.9</version>
   <packaging>jar</packaging>
   <name>Odilon Client</name>
   <description>	
@@ -86,7 +86,7 @@ mvn javadoc:javadoc
 	
 	
 	<maven.test.skip>true</maven.test.skip>
-	<odilon-model-version>1.8</odilon-model-version>
+	<odilon-model-version>1.9</odilon-model-version>
 	
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	
@@ -112,6 +112,22 @@ mvn javadoc:javadoc
 	  <developerConnection>scm:git:ssh://github.com:atolomei/odilon-client.git</developerConnection>
 	  <url>https://github.com/atolomei/odilon-client/tree/v1.8</url>
 	</scm>
+    
+    
+    
+	<repositories>
+		<repository>
+			<id>my-local-repo</id>
+			<url>file://${basedir}/nonstandardlib/</url>
+		</repository>
+
+		<repository>
+			<id>novamens-releases</id>		
+			<url>https://maven.novamens.com/nexus/content/repositories/releases/</url>
+		</repository>
+	</repositories>
+
+    
     
   <dependencies>
     
