@@ -1,6 +1,6 @@
 package io.odilon.test.regression;
 
-import javax.annotation.PostConstruct;
+//import javax.annotation.PostConstruct;
 
 import io.odilon.client.ODClient;
 import io.odilon.client.OdilonClient;
@@ -36,7 +36,7 @@ public abstract class Executor implements Runnable {
 		this.testBucket=bucket;
 	}
 	
-	@PostConstruct
+	//@PostConstruct
 	public abstract void init();
 	
 	
