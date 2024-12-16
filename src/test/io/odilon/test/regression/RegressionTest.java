@@ -121,6 +121,12 @@ public class RegressionTest extends BaseTest {
 			standby_t.executeTest();
 			list.add(standby_t.getClass().getSimpleName());
 			
+			
+			try {
+                Thread.sleep(THREE_SECONDS);
+            } catch (InterruptedException e) {
+            }
+			
 			ReplicationChecker checker = new ReplicationChecker();
 			checker.setClient(getClient());
 			checker.executeTest();

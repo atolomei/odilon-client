@@ -44,6 +44,7 @@ public class ReplicationChecker extends BaseTest {
 			for (Bucket bucket: getClient().listBuckets()) {
 					if (!getStandByClient().existsBucket(bucket.getName())) {
 						bucketsLocalNotRemote.add(bucket.getName());
+						logger.error("Local not remote -> " + bucket.getName());
 					}
 			}
 		} catch (ODClientException e) {
@@ -56,6 +57,7 @@ public class ReplicationChecker extends BaseTest {
 				for (Bucket bucket: getStandByClient().listBuckets()) {
 					if (!getClient().existsBucket(bucket.getName())) {
 						bucketsRemoteNotLocal.add(bucket.getName());
+						logger.error("Remote not local -> " + bucket.getName());
 				}
 			}
 			
@@ -69,17 +71,18 @@ public class ReplicationChecker extends BaseTest {
 			getMap().put("checkBuckets", "ok");
 		}
 		else {
-			logger.error("checkBuckets error");
+			logger.error("checkBuckets error: ");
 			
-			logger.error("bucketsLocalNotRemote: ");
-			bucketsLocalNotRemote.forEach(n -> logger.error(n));
-			
-			logger.error("bucketsRemoteNotLocal: ");
-			bucketsRemoteNotLocal.forEach(n -> logger.error(n));
-			
-			error("checkBuckets error");
+			if (bucketsLocalNotRemote.size()>0) {
+    			logger.error("bucketsLocalNotRemote: ");
+    			bucketsLocalNotRemote.forEach(n -> logger.error(n));
+			}
+
+			if (bucketsRemoteNotLocal.size()>0) { 
+    			logger.error("bucketsRemoteNotLocal: ");
+    			bucketsRemoteNotLocal.forEach(n -> logger.error(n));
+			}
 		}
-		
 	}
 	
 

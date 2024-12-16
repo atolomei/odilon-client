@@ -85,15 +85,18 @@ public class TestFile {
 	
 		Integer iVersion = Integer.valueOf(version);
 
-		if (!files.containsKey(iVersion))
-			throw new IllegalArgumentException("invalid version");
+		if (!files.containsKey(iVersion)) {
+		    logger.error("invalid version -> " + String.valueOf(version));
+		    throw new IllegalArgumentException("invalid version -> " + String.valueOf(version));
+		}
 				
 		if (!sha256.containsKey(iVersion)) {
 			try {
 				String str = OdilonFileUtils.calculateSHA256String( files.get(iVersion));
 				sha256.put(iVersion, str);
 			} catch (NoSuchAlgorithmException | IOException e) {
-				logger.error(e);
+			    logger.error(e.getClass().getName() + " | version -> " + String.valueOf(version));
+			    logger.error(e);
 			}
 			
 		}

@@ -212,23 +212,16 @@ public class TestDeleteObject extends BaseTest {
 						logger.info( "testDeleteObjects -> " + String.valueOf(getCounter()));
 						showStatus = OffsetDateTime.now();
 					}
-					
-					
 				}
 			} catch (ODClientException | IOException e) {
 				logger.error(e);	
 				error(e);
 			}
-			
 		}
-		
 		logger.debug("testDeleteObjects", "ok");
 		getMap().put("testDeleteObjects", "ok");
 		
 		return true;
-		
-		
-		
 	}
 	
 	/**
@@ -324,7 +317,7 @@ public class TestDeleteObject extends BaseTest {
 
 	});
 	
-	logger.debug("testAddObjects", "ok");
+	logger.debug("testAddObjects ok");
 	getMap().put("testAddObjects", "ok");
 	return true;
 	}
