@@ -6,7 +6,7 @@
 
   <groupId>io.odilon</groupId>
   <artifactId>odilon-client</artifactId>
-  <version>1.9</version>
+  <version>1.10</version>
   <packaging>jar</packaging>
   <name>Odilon Client</name>
   <description>	
@@ -86,7 +86,7 @@ mvn javadoc:javadoc
 	
 	
 	<maven.test.skip>true</maven.test.skip>
-	<odilon-model-version>1.9</odilon-model-version>
+	<odilon-model-version>1.10</odilon-model-version>
 	
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	
