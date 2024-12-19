@@ -110,7 +110,6 @@ public class TestObjectPutGet extends BaseTest {
 						List<String> customTags = new ArrayList<String>();
 						customTags.add(String.valueOf(counter));
 						
-						// getClient().putObjectStream(bucketName, objectName, inputStream, Optional.of(file.getName()), Optional.empty());
 						getClient().putObjectStream(bucketName, objectName, inputStream, Optional.of(file.getName()), Optional.empty(), Optional.empty(), Optional.ofNullable(customTags));
 						
 						testFiles.put(bucketName+"-"+objectName, new TestFile(file, bucketName, objectName));

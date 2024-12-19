@@ -27,16 +27,14 @@ public class TestPresignedUrl extends BaseTest {
 	private String bucketName = null;
 	
 	public TestPresignedUrl() {
-
 	}
-	
-	
 	
 	@Override
 	public void executeTest() {
 
 		try {
-			if (getClient().listBuckets().isEmpty()) {
+
+		    if (getClient().listBuckets().isEmpty()) {
 				createBucket();
 				addFiles();
 			}
@@ -44,6 +42,7 @@ public class TestPresignedUrl extends BaseTest {
 			org.junit.Assert.assertFalse("must have at least 1 bucket", getClient().listBuckets().isEmpty());
 			
 			this.bucket_1 = getClient().listBuckets().get(0);
+			
 			org.junit.Assert.assertFalse("bucket must not be empty", getClient().isEmpty(this.bucket_1.getName()));
 			
 			 ResultSet<Item<ObjectMetadata>> rs = getClient().listObjects(this.bucket_1.getName());
@@ -66,34 +65,26 @@ public class TestPresignedUrl extends BaseTest {
 				 
 			getMap().put("presigned test -> " + String.valueOf(total), "ok");
 			showResults();
-			 
-			 
+			
 		} catch (ODClientException e) {
 			error(e);
 		}
 	}
 
-
-	
 	
 	private void createBucket() {
 		
 		bucketName = randomString(10);
 		
 		try {
-		
 			getClient().createBucket(bucketName);
-			
 		} catch (ODClientException e) {
 			error(e);
 		}
-		
 	}
 	
 	
 	/**
-	 * 
-	 * 
 	 * @return
 	 */
 	private boolean addFiles() {
