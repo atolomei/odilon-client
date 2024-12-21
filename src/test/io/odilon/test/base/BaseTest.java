@@ -74,7 +74,7 @@ public abstract class BaseTest {
 	private OdilonClient client;
 	private Bucket testBucket;
 
-	private int max = 10;
+	private int max = 20;
 	
 	private long max_length =120 * 100 * 10000; // 120 MB
 	
