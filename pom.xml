@@ -110,7 +110,7 @@ mvn javadoc:javadoc
 	<scm>
 	  <connection>scm:git:git://github.com/atolomei/odilon-client.git</connection>
 	  <developerConnection>scm:git:ssh://github.com:atolomei/odilon-client.git</developerConnection>
-	  <url>https://github.com/atolomei/odilon-client/tree/v1.8</url>
+	  <url>https://github.com/atolomei/odilon-client/tree/v1.10</url>
 	</scm>
     
     
