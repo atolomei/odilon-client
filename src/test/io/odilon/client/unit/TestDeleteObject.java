@@ -48,10 +48,11 @@ public class TestDeleteObject extends BaseTest {
 	
 	static final int BUFFER_SIZE = 4096;
 	
-	static final int MAX = 10;
+	//static final int MAX = 20;
 	static final long MAX_LENGTH = 100 * 10000; // 1 MB
 	
 	private int index = 0;
+	private int sub_index = 0;
 	
 	private Bucket bucket_1 = null;
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
@@ -93,13 +94,6 @@ public class TestDeleteObject extends BaseTest {
 			
 			sleep();
 			
-			/** display status every 4 seconds or so */
-			if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-				logger.info( "testFiles -> " + String.valueOf(testFiles.size()));
-				showStatus = OffsetDateTime.now();
-			}
-
-			
 			getClient().deleteObject(this.bucket_1.getName(), randomString(12));
 			error("should have thrown exception - delete object non existent");
 			return false;
@@ -124,7 +118,8 @@ public class TestDeleteObject extends BaseTest {
 		
 		try {
 			
-			
+		    sub_index = 0;
+		    
 			getClient().listBuckets().forEach( bucket ->  {
 				
 				try {
@@ -142,9 +137,10 @@ public class TestDeleteObject extends BaseTest {
 				
 						/** display status every 4 seconds or so */
 						if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-							logger.info( "testDeleteAllObjects -> " + String.valueOf(getCounter()));
+							logger.info( "testDeleteAllObjects -> " + String.valueOf(sub_index) );
 							showStatus = OffsetDateTime.now();
 						}
+						sub_index++;
 					}
 
 				} catch (ODClientException e) {
@@ -152,6 +148,7 @@ public class TestDeleteObject extends BaseTest {
 				}
 			});
 
+            logger.info( "testDeleteAllObjects -> " + String.valueOf(sub_index));
 			logger.debug("testDeleteAllObjects", "ok");
 			getMap().put("testDeleteAllObjects", "ok");
 
@@ -193,14 +190,16 @@ public class TestDeleteObject extends BaseTest {
 	
 	public boolean testDeleteObjects() {
 	
+	   sub_index = 0;
+	   
 		for( TestFile tf: testFiles.values()) {
 			
 			try {
 				
 				if (getClient().existsObject(tf.bucketName, tf.objectName)) {
 					
-					getClient().deleteObject(tf.bucketName, tf.objectName);
-					
+				    getClient().deleteObject(tf.bucketName, tf.objectName);
+
 					if (getClient().existsObject(tf.bucketName, tf.objectName)) {
 						error("should not exist ->" + tf.bucketName + " | " + tf.objectName);
 					}
@@ -209,7 +208,7 @@ public class TestDeleteObject extends BaseTest {
 
 					/** display status every 4 seconds or so */
 					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-						logger.info( "testDeleteObjects -> " + String.valueOf(getCounter()));
+						logger.info( "testDeleteObjects -> " + String.valueOf(sub_index) + " / " + String.valueOf(testFiles.size()));
 						showStatus = OffsetDateTime.now();
 					}
 				}
@@ -217,7 +216,10 @@ public class TestDeleteObject extends BaseTest {
 				logger.error(e);	
 				error(e);
 			}
+			sub_index++;
 		}
+
+        logger.info( "testDeleteObjects -> " + String.valueOf(sub_index) + " / " + String.valueOf(testFiles.size()));
 		logger.debug("testDeleteObjects", "ok");
 		getMap().put("testDeleteObjects", "ok");
 		
@@ -240,10 +242,9 @@ public class TestDeleteObject extends BaseTest {
 		String bucketName = null;
 		
 		
-		
 		bucketName = this.bucket_1.getName();
 		
-		
+
 		for (File fi:dir.listFiles()) {
 			
 			if (counter == getMax())
@@ -261,7 +262,7 @@ public class TestDeleteObject extends BaseTest {
 
 					/** display status every 4 seconds or so */
 					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-						logger.info( "testAddObjects -> " + String.valueOf(getCounter()));
+						logger.info( "testAddObjects add -> " + String.valueOf(counter));
 						showStatus = OffsetDateTime.now();
 					}
 					
@@ -275,12 +276,19 @@ public class TestDeleteObject extends BaseTest {
 		
 		logger.info( "testAddObjects -> Total:  " + String.valueOf(testFiles.size()));
 		
+		index = testFiles.size();
+		
+		sub_index = 0;
 		
 		testFiles.forEach( (k,v) -> {
 		ObjectMetadata meta = null;
+
 		
 		try {
-				 meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
+
+		    meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
+		    sub_index++;
+		    
 				
 		} catch (ODClientException e) {
 				error(e);
@@ -295,27 +303,30 @@ public class TestDeleteObject extends BaseTest {
 				error(e);
 		}
 		
-		TestFile t_file=testFiles.get(meta.bucketName+"-"+meta.objectName);
-		
-		if (t_file!=null) {
-			
-			try {
-				String src_sha = t_file. getSrcFileSha256(0);
+		try {
+				String src_sha = v. getSrcFileSha256(0);
 				String new_sha = OdilonFileUtils.calculateSHA256String(new File(destFileName));
 				
 				if (!src_sha.equals(new_sha)) {
-					error("Error sha256 are not equal -> " + meta.bucketName+"-"+meta.objectName);
+					error("Error sha256 are not equal ->  b: " + meta.bucketName+" - o:"+meta.objectName + " f:" + meta.fileName);
 				}
+				
+				
+				/** display status every 4 seconds or so */
+                if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
+                    logger.info( "testAddObjects check -> " + String.valueOf(sub_index) + " / " + String.valueOf(testFiles.size()));
+                    showStatus = OffsetDateTime.now();
+                }
+				
+				
 					
 			} catch (NoSuchAlgorithmException | IOException e) {
 				error(e);
 			}
-		}
-		else {
-				error("Test file does not exist -> " + meta.bucketName+"-"+meta.objectName);
-		}
+		
 
-	});
+		
+		});
 	
 	logger.debug("testAddObjects ok");
 	getMap().put("testAddObjects", "ok");
@@ -325,9 +336,9 @@ public class TestDeleteObject extends BaseTest {
 	
 
 
-protected int getCounter() {
-	return index++;
-}
+//protected int getCounter() {
+//	return index;
+//}
 
 
 }

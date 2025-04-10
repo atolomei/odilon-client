@@ -47,6 +47,8 @@ public class TestObjectPutGet extends BaseTest {
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
 	
 	private OffsetDateTime showStatus = OffsetDateTime.now();
+	private int sub_index = 0;
+	
 	
 	public TestObjectPutGet() {
 	}
@@ -119,7 +121,7 @@ public class TestObjectPutGet extends BaseTest {
 						sleep();
 						
 						if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-							logger.info( "testAddObjectsStream -> " + String.valueOf(testFiles.size()));
+							logger.info( "testAddObjectsStream add -> " + String.valueOf(testFiles.size()));
 							showStatus = OffsetDateTime.now();
 						}
 						
@@ -134,16 +136,23 @@ public class TestObjectPutGet extends BaseTest {
 				}
 			}
 			
-			logger.info( "testAddObjectsStream total -> " + String.valueOf(testFiles.size()));
+			logger.info( "testAddObjectsStream add total -> " + String.valueOf(testFiles.size()));
 		
 			
-		
+			sub_index = 0;
+			
 			
 			testFiles.forEach((k,v) -> {
 					
+			    
 				ObjectMetadata meta = null;
+				
+				
+				
 				try {
 					 meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
+					 sub_index++;
+					 
 				} catch (ODClientException e) {
 						error(e);
 				}
@@ -161,20 +170,18 @@ public class TestObjectPutGet extends BaseTest {
 					error(e);
 				}
 				
-				TestFile t_file=testFiles.get(meta.bucketName+"-"+meta.objectName);
-				
-				if (t_file!=null) {
-					
+
+									
 					try {
 					
-						String src_sha = t_file.getSrcFileSha256(0);
+						String src_sha = v.getSrcFileSha256(0);
 						String new_sha = OdilonFileUtils.calculateSHA256String(new File(destFileName));
 						
 						if (!src_sha.equals(new_sha)) {
 							StringBuilder str  = new StringBuilder();
-							str.append("Error sha256 are not equal -> " + meta.bucketName+" / "+meta.objectName);
-							str.append(" | src -> " + String.valueOf(t_file.getSrcFile(0).length()/1000.0) + " kbytes");
-							str.append(" | dest -> " + String.valueOf(new File(destFileName).length()/1000.0) + " kbytes");
+							str.append("testAddObjectsStream Error sha256 are not equal -> " + meta.bucketName+" / "+meta.objectName);
+							str.append(" | src -> " + v.getSrcFile(0).getAbsolutePath()           + "  " + String.valueOf(v.getSrcFile(0).length()/1000.0) + " kbytes");
+							str.append(" | dest -> "+ (new File(destFileName)).getAbsolutePath()  + "  " + String.valueOf(new File(destFileName).length()/1000.0) + " kbytes");
 							error(str.toString());
 						}
 							
@@ -182,11 +189,15 @@ public class TestObjectPutGet extends BaseTest {
 						logger.error(e);
 						error(e);
 					}
-				}
-				else {
-					error("Test file does not exist -> " + meta.bucketName+"-"+meta.objectName);
-				}
+					
+                    if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
+                        logger.info( "testAddObjectsStream check -> " + String.valueOf(sub_index));
+                        showStatus = OffsetDateTime.now();
+                    }
 			});
+			
+
+			logger.info( "testAddObjectsStream -> ok " + String.valueOf(testFiles.size()));
 			
 			getMap().put("testAddObjectsStream " + version + " | " + String.valueOf(testFiles.size()), "ok");
 				
@@ -241,14 +252,14 @@ public class TestObjectPutGet extends BaseTest {
 					
 					getClient().putObject(bucketName, objectName, fi);
 					testFiles.put(bucketName+"-"+objectName, new TestFile(fi, bucketName, objectName));
-					logger.info( String.valueOf(testFiles.size() + " testAddObjects -> " + fi.getName()));
+					logger.info( String.valueOf(testFiles.size() + " testAddObjects add -> " + fi.getName()));
 					
 					counter++; 
 					sleep();
 					
 					/** display status every n seconds */
 					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-						logger.info( " testAddObjects -> " + String.valueOf(testFiles.size()));
+						logger.info( " testAddObjects add -> " + String.valueOf(testFiles.size()));
 						showStatus = OffsetDateTime.now();
 					}
 					
@@ -258,17 +269,19 @@ public class TestObjectPutGet extends BaseTest {
 			}
 		}
 		
-		logger.info( " uploaded total -> " + String.valueOf(testFiles.size()));
+		logger.info( " testAddObjects add total -> " + String.valueOf(testFiles.size()));
 		
 		
 		// -----------
 		
+		sub_index=0;
 		testFiles.forEach( (k,v) -> {
 		
 			ObjectMetadata meta = null;
 				
 				try {
 						 meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
+						 sub_index++;
 						
 				} catch (ODClientException e) {
 						error(e);
@@ -285,31 +298,35 @@ public class TestObjectPutGet extends BaseTest {
 				} catch (ODClientException | IOException e) {
 						error(e);
 				}
-				
-
-				TestFile t_file = testFiles.get(meta.bucketName+"-"+meta.objectName);
-				
-				if (t_file!=null) {
-					
 					try {
-						String src_sha = t_file.getSrcFileSha256(0);
+						String src_sha = v.getSrcFileSha256(0);
 						String new_sha = OdilonFileUtils.calculateSHA256String(new File(destFileName));
 						
 						if (!src_sha.equals(new_sha)) {
-							error("Error sha256 are not equal -> " + meta.bucketName+"-"+meta.objectName);
+                            StringBuilder str  = new StringBuilder();
+                            str.append("Error sha256 are not equal -> " + meta.bucketName+" / "+meta.objectName);
+                            str.append(" | src -> " + v.getSrcFile(0).getAbsolutePath()           + "  " + String.valueOf(v.getSrcFile(0).length()/1000.0) + " kbytes");
+                            str.append(" | dest -> "+ (new File(destFileName)).getAbsolutePath()  + "  " + String.valueOf(new File(destFileName).length()/1000.0) + " kbytes");
+                            error(str.toString());
 						}
+						
+						
+						  /** display status every n seconds */
+	                    if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
+	                        logger.info( " testAddObjects check -> " + String.valueOf(sub_index));
+	                        showStatus = OffsetDateTime.now();
+	                    }
+						
 						
 							
 					} catch (NoSuchAlgorithmException | IOException e) {
 						error(e);
 					}
-				}
-				else {
-						error("Test file does not exist -> " + meta.bucketName+"-"+meta.objectName);
-				}
 		});
 	
-		getMap().put("testAddObjects" + " | " + String.valueOf(testFiles.size()), "ok");
+	    logger.info("testAddObjects ok " + "  " + String.valueOf(testFiles.size()));
+	    
+		getMap().put("testAddObjects check" + " | " + String.valueOf(testFiles.size()), "ok");
 		return true;
 	
 	}	
