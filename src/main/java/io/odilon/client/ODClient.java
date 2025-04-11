@@ -263,8 +263,6 @@ public class ODClient implements OdilonClient {
 	 */
 	public ODClient(String endpoint, int port, String accessKey, String secretKey, boolean isSecure, boolean acceptAllCertificates)  {
 		
-		
-		
 			  Check.requireNonNullStringArgument(endpoint,  "endpoint is null or emtpy");
 			  Check.requireNonNullStringArgument(accessKey, "accessKey is null or emtpy");
 			  Check.requireNonNullStringArgument(secretKey, "secretKey is null or emtpy");
@@ -334,8 +332,6 @@ public class ODClient implements OdilonClient {
 			    /** endpoint may be a valid hostname, IPv4 or IPv6 address */
 			    if (!this.isValidEndpoint(endpoint))
 			      throw new IllegalArgumentException("invalid host -> " +  endpoint);
-			    
-			    
 
 			    if (port == 0) {
 			      this.baseUrl = new HttpUrl.Builder()
@@ -427,8 +423,32 @@ public class ODClient implements OdilonClient {
 		
 		urlBuilder.addEncodedPathSegment(bucketName);
 		urlBuilder.addEncodedPathSegment(objectName);
-		
-		urlBuilder.addEncodedQueryParameter("fileName", fileName.orElse(objectName));
+
+		if (fileName.isPresent()) {
+		    /**
+		    String normalizedName = fileName.get().replace("{", "-").
+		                                           replace("}", "-").
+		                                           replace("/", "-").
+		                                           replace("<", "-").
+		                                           replace(">", "-").
+	                                               replace("*", "-").
+                                                   replace("?", "-").
+                                                   replace("´", "-").
+                                                   replace("^", "-").
+                                                   replace("`", "-").
+		                                           replace("\\", "-");
+		                                           **/
+		    
+		    String regex = "[\\{\\}/<>\\*\\?´\\^`\\\\]+";
+		    String normalizedName = fileName.get().replaceAll(regex, "-");
+		    
+		    
+		    urlBuilder.addEncodedQueryParameter("fileName", normalizedName);    
+		}
+		else {
+		    urlBuilder.addEncodedQueryParameter("fileName", objectName);
+		}
+		    
 		urlBuilder.addEncodedQueryParameter("Content-Type", cType);
 
 		if (customTags.isPresent()) {
