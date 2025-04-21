@@ -53,8 +53,8 @@ public abstract class BaseTest {
 	private String SRC_DIR = "d:"+File.separator+"test-files";
 	private String DOWNLOAD_DIR = "d:"+File.separator+"test-files-download";
 	
-	//public String SRC_DIR_V0 = SRC_DIR + File.separator + "v0";
-	public String SRC_DIR_V0 = "d:"+File.separator+"test-files"+File.separator+"errorcases";
+	public String SRC_DIR_V0 = SRC_DIR + File.separator + "v0";
+	//public String SRC_DIR_V0 = "d:"+File.separator+"test-files"+File.separator+"errorcases";
 	   
 	public String SRC_DIR_V1 = SRC_DIR + File.separator + "v1";
 	public String SRC_DIR_V2 = SRC_DIR + File.separator + "v2";
@@ -78,7 +78,7 @@ public abstract class BaseTest {
 	private OdilonClient client;
 	private Bucket testBucket;
 
-	private int max = 20;
+	private int max = 1000;
 	
 	private long max_length = 500 * 100 * 10000; // 500 MB
 	
