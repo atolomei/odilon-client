@@ -28,7 +28,7 @@
 	</licenses>
 
 
-	<!-- This command ->
+<!-- This command ->
 
 STEP 1
 
@@ -275,9 +275,7 @@ mvn javadoc:javadoc
 							</goals>
 						</execution>
 					</executions>
-
 				</plugin>
-
 
 				<plugin>
 					<groupId>net.nicoulaj.maven.plugins</groupId>

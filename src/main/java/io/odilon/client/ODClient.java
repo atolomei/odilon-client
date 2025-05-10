@@ -812,9 +812,15 @@ public class ODClient implements OdilonClient {
         byte data[] = "".getBytes();
         int len = data.length;
 
-        HttpResponse response = executePost(API_BUCKET_CREATE, Optional.of(bucketName), Optional.empty(), null, null, data, len,
-                false);
-        response.body().close();
+        HttpResponse response = null;
+        try {
+            response = executePost(API_BUCKET_CREATE, Optional.of(bucketName), Optional.empty(), null, null, data, len, false);
+         }
+        finally {
+            if (response!=null)
+                response.body().close();    
+        }
+
     }
 
     /**
@@ -1105,7 +1111,7 @@ public class ODClient implements OdilonClient {
      * <b>Example:</b><br>
      * 
      * <pre>{@code ObjectMetadata meta = odilonClient.getObjectMetadata("my-bucketname", "my-objectname");
-     *   			System.out.println(meta.toString()));}</pre>
+     *              System.out.println(meta.toString()));}</pre>
      *
      * @param bucketName Bucket name
      * @param objectName Object name in the bucket
@@ -1135,7 +1141,7 @@ public class ODClient implements OdilonClient {
      * <b>Example:</b><br>
      * 
      * <pre>{@code ObjectMetadata meta = odilonClient.getObjectMetadata("my-bucketname", "my-objectname");
-     *   			System.out.println(meta.toString()));}</pre>
+     *              System.out.println(meta.toString()));}</pre>
      *
      * @param bucketName Bucket name.
      * @param objectName Object name in the bucket.
@@ -1637,12 +1643,8 @@ public class ODClient implements OdilonClient {
 
         String sha256 = null;
 
-        if (body != null) {
-            // sha256 = Digest.sha256Hash(body, length);
+        if (body != null)
             sha256 = OdilonFileUtils.calculateSHA256String(body);
-        } else {
-
-        }
 
         if (this.accessKey != null && this.secretKey != null) {
             String encoding = Base64.getEncoder().encodeToString((accessKey + ":" + secretKey).getBytes());

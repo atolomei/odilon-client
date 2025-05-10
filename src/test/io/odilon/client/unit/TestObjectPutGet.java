@@ -99,7 +99,7 @@ public class TestObjectPutGet extends BaseTest {
 		
 		for (File file : dir.listFiles()) {
 				
-				if (counter >= getMax())
+				if (counter >=  (int) Math.round( Double.valueOf(Double.valueOf(getMax()).doubleValue()/2.0).doubleValue()))
 					break;
 				
 				if (isElegible(file)) {
@@ -241,7 +241,7 @@ public class TestObjectPutGet extends BaseTest {
 		//
 		for (File fi:dir.listFiles()) {
 			
-			if (counter >= getMax())
+		    if (counter >=  (int) Math.round( Double.valueOf(Double.valueOf(getMax()).doubleValue()/2.0).doubleValue()))
 				break;
 			
 			if (isElegible(fi)) {

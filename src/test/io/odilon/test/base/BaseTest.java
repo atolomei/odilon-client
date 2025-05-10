@@ -71,14 +71,14 @@ public abstract class BaseTest {
 	
 
 	
-	public int port = 9211;
+	public int port = 9234;
 
 	private String accessKey = "odilon";
 	private String secretKey = "odilon";
 	private OdilonClient client;
 	private Bucket testBucket;
 
-	private int max = 1000;
+	private int max = 6;
 	
 	private long max_length = 500 * 100 * 10000; // 500 MB
 	
