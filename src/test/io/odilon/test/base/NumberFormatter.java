@@ -21,7 +21,6 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-
 /**
  * 
  * @author atolomei@novamens.com (Alejandro Tolomei)
@@ -132,7 +131,6 @@ public class NumberFormatter {
 		}
 		return  float_nf.format(number);
 	}
-	
 	
 	/**
 	 * 
