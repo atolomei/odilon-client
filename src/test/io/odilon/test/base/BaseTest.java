@@ -71,7 +71,7 @@ public abstract class BaseTest {
 	
 
 	
-	public int port = 9234;
+	public int port = 9211;
 
 	private String accessKey = "odilon";
 	private String secretKey = "odilon";
