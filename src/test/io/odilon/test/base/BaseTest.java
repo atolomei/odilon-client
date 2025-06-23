@@ -30,12 +30,15 @@ import io.odilon.model.RedundancyLevel;
 import io.odilon.util.OdilonFileUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Random;
 import java.util.TreeMap;
 
@@ -54,7 +57,6 @@ public abstract class BaseTest {
 	private String DOWNLOAD_DIR = "d:"+File.separator+"test-files-download";
 	
 	public String SRC_DIR_V0 = SRC_DIR + File.separator + "v0";
-	//public String SRC_DIR_V0 = "d:"+File.separator+"test-files"+File.separator+"errorcases";
 	   
 	public String SRC_DIR_V1 = SRC_DIR + File.separator + "v1";
 	public String SRC_DIR_V2 = SRC_DIR + File.separator + "v2";
@@ -65,29 +67,23 @@ public abstract class BaseTest {
 	
 	public String DOWNLOAD_DIR_RESTORED = DOWNLOAD_DIR + File.separator+"restored";
 	
-	
-	public String endpoint = "kbee-demo.novamens.com";
-	public int port = 80;
-	        
-	
-	
-
-	
-	//public int port = 9211;
-
-	private String accessKey = "odilon";
-	private String secretKey = "odil0nKbee-2";
 	private OdilonClient client;
 	private Bucket testBucket;
 
-	private int max = 20;
+    public String endpoint = "kbee-demo.novamens.com";
+    public int port = 80;
+    private String accessKey = "odilon";
+    private String secretKey = "odil0nKbee-2";
+	private String presignedUrl = "files.novamens.com";
+	private int  presignedPort = 80;
+	private boolean  presignedSSL = false;
+	
+	private int max = 40;
 	
 	private long max_length = 500 * 100 * 10000; // 500 MB
-	
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
-	
 	private Map<String, String> map = new TreeMap<String, String>();
-	
+
 	private long LAPSE_BETWEEN_OP_MILLISECONDS = 0;
 
 	private String standByEndpoint;
@@ -104,7 +100,12 @@ public abstract class BaseTest {
 	public boolean isAcceptAllCertificates = true;
 	
 	
+	private Properties properties = new Properties();
 	
+
+	/**
+	 * 
+	 */
 	public void close() {
 		if (this.client!=null) {
 			try {
@@ -132,21 +133,33 @@ public abstract class BaseTest {
 		
 		logger.debug("Start " + this.getClass().getName());
 		
+		
+		readConfigFiles();
+		
+
+         setMax((properties.get("max")!=null) ? Integer.valueOf(properties.get("max").toString().trim()) : 10);
+
+		
+	    this.endpoint  =  (properties.get("odilon.server.endpoint")!=null)  ? properties.get("odilon.server.endpoint").toString().trim() : "localhost"; 
+	    this.port      =  (properties.get("odilon.server.port")!=null)      ? Integer.valueOf(( properties.get("odilon.server.port").toString().trim())) : 80;
+	    this.isSSL     =  (properties.get("odilon.server.isSSL")!=null)      ? Boolean.valueOf(( properties.get("odilon.server.isSSL").toString().trim())) : false;
+
+	    
+	    this.accessKey =  (properties.get("odilon.server.accessKey")!=null)  ? properties.get("odilon.server.accessKey").toString().trim() : "odilon";
+	    this.secretKey =  (properties.get("odilon.server.secretKey")!=null)  ? properties.get("odilon.server.secretKey").toString().trim() : "odilon";
+	    
+	    this.presignedUrl =  (properties.get("odilon.server.presignedUrl")!=null)  ? properties.get("odilon.server.presignedUrl").toString().trim() : this.endpoint; 
+	    this.presignedPort = (properties.get("odilon.server.presignedPort")!=null)      ? Integer.valueOf(( properties.get("odilon.server.presignedPort").toString().trim())) : this.port;
+	    
+	    this.presignedSSL = (properties.get("odilon.server.presignedSSL")!=null)      ? Boolean.valueOf(( properties.get("odilon.server.presignedSSL").toString().trim())) : this.isSSL;
+
 		String tempDir = System.getProperty("tempDir");
 		String downloadDir = System.getProperty("downloadDir");
-				
-		//String tempEndpoint = System.getProperty("endpoint");
-		//String tempPort = System.getProperty("port");
-	
 		String lapse = System.getProperty("sleepMilliseconds");
 		
 		if (lapse!=null)
 			LAPSE_BETWEEN_OP_MILLISECONDS  = Long.valueOf(lapse.trim());
 		
-		String max = System.getProperty("max");
-		if (max!=null)
-			setMax(Integer.valueOf(max.trim()));
-
 		String maxLength = System.getProperty("maxLength");				
 		if (maxLength!=null)
 			max_length = Long.valueOf(maxLength.trim());
@@ -163,6 +176,7 @@ public abstract class BaseTest {
 
 		//if (tempPort!=null)
 		//	port= Integer.valueOf(tempPort.trim());
+
 		
 		setClient(client);
 		
@@ -344,11 +358,14 @@ public abstract class BaseTest {
 	}
 	
 	
+	
 	public OdilonClient getClient() {
 		try {
 			if (client==null) {
 					this.client = new ODClient((isSSL()?"https":"http") + "://" + endpoint, port, accessKey, secretKey, isSSL(), isAcceptAllCertificates());
-					this.client.setPresignedUrl("files.novamens.com", 80, false);
+					
+					if (this.presignedUrl!=null)
+					    this.client.setPresignedUrl(this.presignedUrl, this.presignedPort, this.presignedSSL);
 			        logger.debug(this.client.toString());
 			}
 	        
@@ -570,7 +587,7 @@ public abstract class BaseTest {
 	
 	/**
 	 * 
-	 * 
+    
 	 */
 	protected void sleep() {
 		
@@ -581,7 +598,26 @@ public abstract class BaseTest {
 			}
 		}
 	}	
-	
+
+	   private void readConfigFiles() {
+	        
+	       String configPath  = "."+File.separator+"config" + File.separator+"application.properties";
+	        
+	       File file = new File(configPath);
+	       
+	        if (!file.exists()) {
+	         
+	            logger.error("config file does not exist -> " + configPath);
+	            return;
+	        }
+	        
+	        try (InputStream input = new FileInputStream(configPath)) {
+	            properties.load(input);
+	        } catch (IOException ex) {
+	            throw new RuntimeException("Error ->  " + configPath);
+	        }
+	    }
+
 	
 }
  
