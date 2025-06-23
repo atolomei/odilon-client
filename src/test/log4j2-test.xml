@@ -78,7 +78,7 @@
 		<!-- =============================================================================================================== -->
 		<!-- Root Logger -->
 
-		<Asyncroot level="error">
+		<Asyncroot level="debug">
 			<AppenderRef ref="Console" />
 			<appender-ref ref="odilon"/>
 		</Asyncroot>

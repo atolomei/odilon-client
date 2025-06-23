@@ -34,6 +34,7 @@ public class TestPresignedUrl extends BaseTest {
 
 		try {
 
+		    
 		    if (getClient().listBuckets().isEmpty()) {
 				createBucket();
 				addFiles();
@@ -41,9 +42,20 @@ public class TestPresignedUrl extends BaseTest {
 			
 			org.junit.Assert.assertFalse("must have at least 1 bucket", getClient().listBuckets().isEmpty());
 			
-			this.bucket_1 = getClient().listBuckets().get(0);
+			this.bucket_1 = null;
 			
-			org.junit.Assert.assertFalse("bucket must not be empty", getClient().isEmpty(this.bucket_1.getName()));
+			for (Bucket bu:getClient().listBuckets()) {
+			    
+			    logger.debug(bu.toString());
+			    
+			    if (!getClient().isEmpty(bu.getName())) {
+			        this.bucket_1 = bu;
+			        break;
+			    }
+			}
+			
+			
+			org.junit.Assert.assertFalse("bucket must not be empty", this.bucket_1==null || (getClient().isEmpty(this.bucket_1.getName())));
 			
 			 ResultSet<Item<ObjectMetadata>> rs = getClient().listObjects(this.bucket_1.getName());
 			 int counter = 0;

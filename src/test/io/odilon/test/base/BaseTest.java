@@ -66,15 +66,17 @@ public abstract class BaseTest {
 	public String DOWNLOAD_DIR_RESTORED = DOWNLOAD_DIR + File.separator+"restored";
 	
 	
-	public String endpoint = "localhost";
+	public String endpoint = "kbee-demo.novamens.com";
+	public int port = 80;
+	        
 	
 	
 
 	
-	public int port = 9211;
+	//public int port = 9211;
 
 	private String accessKey = "odilon";
-	private String secretKey = "odilon";
+	private String secretKey = "odil0nKbee-2";
 	private OdilonClient client;
 	private Bucket testBucket;
 
