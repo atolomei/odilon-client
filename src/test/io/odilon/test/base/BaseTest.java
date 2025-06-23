@@ -348,6 +348,7 @@ public abstract class BaseTest {
 		try {
 			if (client==null) {
 					this.client = new ODClient((isSSL()?"https":"http") + "://" + endpoint, port, accessKey, secretKey, isSSL(), isAcceptAllCertificates());
+					this.client.setPresignedUrl("files.novamens.com", 80, false);
 			        logger.debug(this.client.toString());
 			}
 	        

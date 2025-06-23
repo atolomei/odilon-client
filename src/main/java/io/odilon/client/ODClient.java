@@ -238,6 +238,10 @@ public class ODClient implements OdilonClient {
     private final boolean isSSL;
     private final boolean acceptAllCertificates;
 
+    private String presignedEndPoint;
+    private String presignedPortStr;
+    private boolean presignedSSL;
+
     /***
      * 
      * <p>
@@ -350,6 +354,24 @@ public class ODClient implements OdilonClient {
         }
         this.accessKey = accessKey;
         this.secretKey = secretKey;
+
+        this.presignedEndPoint = baseUrl.host();
+        this.presignedPortStr = ((baseUrl.port() != 80 && baseUrl.port() != 443) ? (":" + String.valueOf(baseUrl.port())) : "");
+        this.presignedSSL = isSSL();
+    }
+
+    public void setPresignedUrl(String presignedEndPoint) {
+        setPresignedUrl(presignedEndPoint, 80, false);
+    }
+
+    public void setPresignedUrl(String presignedEndPoint, boolean presignedSSL) {
+        setPresignedUrl(presignedEndPoint, presignedSSL ? 443 : 80, presignedSSL);
+    }
+
+    public void setPresignedUrl(String presignedEndPoint, int port, boolean presignedSSL) {
+        this.presignedEndPoint = presignedEndPoint;
+        this.presignedPortStr = ((port != 80 && port != 443) ? (":" + String.valueOf(port)) : "");
+        this.presignedSSL = presignedSSL;
     }
 
     /**
@@ -815,10 +837,9 @@ public class ODClient implements OdilonClient {
         HttpResponse response = null;
         try {
             response = executePost(API_BUCKET_CREATE, Optional.of(bucketName), Optional.empty(), null, null, data, len, false);
-         }
-        finally {
-            if (response!=null)
-                response.body().close();    
+        } finally {
+            if (response != null)
+                response.body().close();
         }
 
     }
@@ -1584,9 +1605,13 @@ public class ODClient implements OdilonClient {
             throw new ODClientException(e);
         }
 
-        String sPort = ((baseUrl.port() != 80 && baseUrl.port() != 443) ? (":" + String.valueOf(baseUrl.port())) : "");
         StringBuilder url = new StringBuilder();
-        url.append(baseUrl.scheme() + "://" + baseUrl.host() + sPort);
+        url.append((this.presignedSSL ? "https" : "http") + "://" + this.presignedEndPoint + this.presignedPortStr);
+
+        // String sPort = ((baseUrl.port() != 80 && baseUrl.port() != 443) ? (":" +
+        // String.valueOf(baseUrl.port())) : "");
+        // url.append(baseUrl.scheme() + "://" + baseUrl.host() + sPort);
+
         for (String leg : API_OBJECT_URL_PRESIGNES_PREFIX)
             url.append("/" + leg);
         String urlEncoded = null;

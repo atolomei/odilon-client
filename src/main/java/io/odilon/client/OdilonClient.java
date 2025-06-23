@@ -466,6 +466,24 @@ public interface OdilonClient {
 	public void getObject(String bucketName, String objectName, String filePath) throws ODClientException, IOException;
 	
 
+	/**
+     * <p>Returns a temporary URL to access or download the binary data of an Object without authentication</p>
+     * <p>A presigned URL is a way to grant temporary access to an Object, for example in an HTML webpage.
+     *  It remains valid for a limited period of time which is specified when the URL is generated.
+     * </p>
+     * <p>Sometimes it may be useful for the presigned url to have a different prefix than the 
+     * endopoint used to interact with the server. For example:
+     * 
+     * The server may be accessible at  <br/>
+     * http://localhost:9234<br/>
+     * and the presigned url generated for a html web page be
+     * <br/>
+     * http://files.odilon.io<br/>
+     * </p>
+     */
+     public void setPresignedUrl(String  presignedEndPoint);
+     public void setPresignedUrl(String  presignedEndPoint, boolean  presignedSSL);
+	 public void setPresignedUrl(String  presignedEndPoint, int port, boolean  presignedSSL);
 	
 	/**
 	 * <p>Returns a temporary URL to access or download the binary data of an Object without authentication</p>
