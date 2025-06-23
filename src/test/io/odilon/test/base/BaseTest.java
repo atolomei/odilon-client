@@ -70,12 +70,12 @@ public abstract class BaseTest {
 	private OdilonClient client;
 	private Bucket testBucket;
 
-    public String endpoint = "kbee-demo.novamens.com";
-    public int port = 80;
+    public String endpoint = "localhost";
+    public int port = 9234;
     private String accessKey = "odilon";
-    private String secretKey = "odil0nKbee-2";
-	private String presignedUrl = "files.novamens.com";
-	private int  presignedPort = 80;
+    private String secretKey = "odilon";
+	private String presignedUrl = endpoint;
+	private int  presignedPort = 9234;
 	private boolean  presignedSSL = false;
 	
 	private int max = 40;
