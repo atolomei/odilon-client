@@ -364,8 +364,11 @@ public abstract class BaseTest {
 			if (client==null) {
 					this.client = new ODClient((isSSL()?"https":"http") + "://" + endpoint, port, accessKey, secretKey, isSSL(), isAcceptAllCertificates());
 					
-					if (this.presignedUrl!=null)
-					    this.client.setPresignedUrl(this.presignedUrl, this.presignedPort, this.presignedSSL);
+					
+					//if (this.presignedUrl!=null)
+					//    this.client.setPresignedUrl(this.presignedUrl, this.presignedPort, this.presignedSSL);
+					
+					
 			        logger.debug(this.client.toString());
 			}
 	        

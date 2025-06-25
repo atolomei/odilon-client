@@ -63,6 +63,9 @@ import io.odilon.net.ODHttpStatus;
  */
 public interface OdilonClient {
 
+    
+    final public String VERSION = "1.14.1";
+    
 	/* =======================================
 	 * SHUTDOWN
 	 ==========================================*/
@@ -73,10 +76,11 @@ public interface OdilonClient {
 	 * 
 	 * */
 	public void close() throws ODClientException;
+	
+	
 	public boolean isHTTPS();
-	
-	
-	
+    public boolean isSSL();
+    
 	/* =======================================
 	 * BUCKET
 	 ==========================================*/
@@ -153,11 +157,6 @@ public interface OdilonClient {
 	 */
 	void renameBucket(String bucketName, String newBucketName) throws ODClientException;
 
-
-
-	
-	
-	
 
 	
 	
@@ -467,19 +466,31 @@ public interface OdilonClient {
 	
 
 	/**
-     * <p>Returns a temporary URL to access or download the binary data of an Object without authentication</p>
+     * <p>Sets a specific url for presigned urls.</p>
      * <p>A presigned URL is a way to grant temporary access to an Object, for example in an HTML webpage.
      *  It remains valid for a limited period of time which is specified when the URL is generated.
      * </p>
-     * <p>Sometimes it may be useful for the presigned url to have a different prefix than the 
-     * endopoint used to interact with the server. For example:
-     * 
-     * The server may be accessible at  <br/>
+     * <p>Sometimes it may be useful for the presigned url to have a different prefix than the endpoint used to interact with the server. 
+     * <br/>For example:
+     * The server may be accessible by an application server at  <br/>
      * http://localhost:9234<br/>
-     * and the presigned url generated for a html web page be
+     * and the presigned url generated to be distributed in a html web page be reachable at:
      * <br/>
      * http://files.odilon.io<br/>
      * </p>
+     
+      <pre>
+     *{@code
+     *
+     *  ODilonClient client = new ODClient(("http://localhost", 9234, "odilon", "odilon");
+        
+        // The firewall blocks port 9234 and the webserver is configured to allow access to
+        //  the odilon server at http://files.myportal.com
+        
+        client.setPresignedUrl("files.myportal.com", 80, false);
+     * }
+     * </pre>
+     * 
      */
      public void setPresignedUrl(String  presignedEndPoint);
      public void setPresignedUrl(String  presignedEndPoint, boolean  presignedSSL);
@@ -1038,14 +1049,12 @@ public interface OdilonClient {
 
 
 	/**
-	 * 
 	 * @param c 
 	 */
 	public void setCharset(String c);
 	
 	
 	/**
-	 * 
 	 * @return Charsert "UTF-8" is the default value.
 	 */
 	public String getCharset();
@@ -1055,68 +1064,15 @@ public interface OdilonClient {
 	
 	public boolean isAcceptAllCertificates();
 	
-	public boolean isSSL();
-	
+	/**
+	 * @return The version of the client SDK
+	 */
+	public String getVersion();	
 
-
-
-
-
-	
+	public String toJSON();	
 }
 
-/*
- * <p>Renames existing {@link Bucket}.</p> 
- *  
- * <p>The bucket must exist, if it does exists the method will throw a {@link ODClientException}.<br/>
- *  newBucketName length must be lower or equal to {@link io.odilon.model.SharedConstant#MAX_BUCKET_CHARS} and <br/> 
- *  match the regular expression {@link io.odilon.model.SharedConstant#bucket_valid_regex SharedConstant.bucket_valid_regex} (see {@link isValidBucketName})
- *  
- *  If an existing bucket has the name newBucketName the method will thrown an exception
- * </p>
- * 
- *  <b>Example:</b>
- * <pre>{@code
- * 	
- * String bucketName = "bucket-demo-1";
- * 
- * try {
- *   	//	check if the bucket exists, if not create it
- *   	if (client.existsBucket(bucketName))
- *      	 System.out.println("bucket already exists ->" + bucketName );
- *   	else 
- *      	 client.createBucket(bucketName);
- * 		} catch (ODClientException e) {
-* 			System.out.println( "HTTP status -> " + String.valueOf(e.getHttpStatus())+ " | ErrorMsg -> " + e.getMessage() + " Odilon Error Code -> " + String.valueOf(e.getErrorCode()) );
- * 		}
- * 
- * String newBucketName = "bucket-demo-2";
- * 
- * try {
- *   		//	check if the bucket exists, if not create it
- *   		if (client.existsBucket(newBucketName))
- *      		 System.out.println("bucket already exists ->" + newBucketName );
- *   		else {
- *      	 	client.renameBucketName(bucketName, newBucketName);
- *      		System.out.println("bucket name changed from -> " bucketName  +"  to -> " + newBucketName);
- *      	}
- * 		} catch (ODClientException e) {
-* 			System.out.println( "HTTP status -> " + String.valueOf(e.getHttpStatus())+ " | ErrorMsg -> " + e.getMessage() + " Odilon Error Code -> " + String.valueOf(e.getErrorCode()) );
- * 		}
- * 
- * 
- * }</pre>
- * 
- * @param 	bucketName Bucket name
- * @param 	newBucketName new name for Bucket
- * 
- * @throws  ODClientException
- * 			if newBucketName is the name of an existing Bucket -> (error code {@link io.odilon.net.ErrorCode#OBJECT_ALREADY_EXIST})
- * 
- * 	@throws  ODClientException
- * 			 if bucketName is not an existing Bucket -> {@link ODHttpStatus.NOT_FOUND} with error code {@link ErrorCode.BUCKET_NOT_EXISTS} <br/>
- * 
 
-public void renameBucket(String bucketName, String newBucketName) throws ODClientException;
- */
+
+
 

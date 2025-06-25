@@ -340,6 +340,9 @@ public class ODClient implements OdilonClient {
                     throw new IllegalStateException(e);
                 }
             }
+            this.presignedEndPoint = baseUrl.host();
+            this.presignedPortStr = ((baseUrl.port() != 80 && baseUrl.port() != 443) ? (":" + String.valueOf(baseUrl.port())) : "");
+            this.presignedSSL = isSSL();
             return;
         }
 
@@ -1016,7 +1019,7 @@ public class ODClient implements OdilonClient {
 
     @Override
     public boolean isHTTPS() {
-        return this.scheme == Scheme.HTTPS;
+        return isSSL(); // this.scheme == Scheme.HTTPS;
     }
 
     @Override
@@ -1186,7 +1189,6 @@ public class ODClient implements OdilonClient {
                 return null;
 
         } catch (IOException e1) {
-            logger.error(e1);
             throw new InternalCriticalException(e1);
         }
 
@@ -1445,11 +1447,25 @@ public class ODClient implements OdilonClient {
         this.traceStream = null;
     }
 
+    
+    @Override
     public String toJSON() {
         StringBuilder str = new StringBuilder();
+        
+        
         str.append("\"url\":\"" + baseUrl.toString() + "\"");
+        str.append("\"https\":" + (isSSL() ? "true" : "false"));
+
+        
+        str.append(", \"presignedUrl\":\"" + getPresignedUrl() + "\"");
+        
+
+        str.append(", \"version\":\"" + getVersion() + "\"");
+        
         str.append(", \"accessKey\":\"" + accessKey + "\"");
         str.append(", \"secretKey\":\"" + secretKey + "\"");
+        
+        
         return str.toString();
     }
 
@@ -1491,6 +1507,11 @@ public class ODClient implements OdilonClient {
         return urlStr;
     }
 
+    @Override
+    public String getVersion() {
+        return VERSION;
+    }
+    
     protected ObjectMapper getObjectMapper() {
         return this.objectMapper;
     }
@@ -1606,11 +1627,9 @@ public class ODClient implements OdilonClient {
         }
 
         StringBuilder url = new StringBuilder();
-        url.append((this.presignedSSL ? "https" : "http") + "://" + this.presignedEndPoint + this.presignedPortStr);
+        
 
-        // String sPort = ((baseUrl.port() != 80 && baseUrl.port() != 443) ? (":" +
-        // String.valueOf(baseUrl.port())) : "");
-        // url.append(baseUrl.scheme() + "://" + baseUrl.host() + sPort);
+        url.append( this.getPresignedUrl());
 
         for (String leg : API_OBJECT_URL_PRESIGNES_PREFIX)
             url.append("/" + leg);
@@ -1624,6 +1643,12 @@ public class ODClient implements OdilonClient {
         return url.toString() + "?token=" + urlEncoded;
     }
 
+    
+    
+    private String getPresignedUrl() {
+        return (this.presignedSSL ? "https" : "http") + "://" + this.presignedEndPoint + this.presignedPortStr;
+    }
+    
     /**
      * @param relativePath
      * @param method
