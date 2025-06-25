@@ -64,7 +64,7 @@ import io.odilon.net.ODHttpStatus;
 public interface OdilonClient {
 
     
-    final public String VERSION = "1.14.1";
+    final public String VERSION = "1.15";
     
 	/* =======================================
 	 * SHUTDOWN
