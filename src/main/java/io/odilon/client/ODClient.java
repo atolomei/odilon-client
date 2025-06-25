@@ -97,7 +97,6 @@ import io.odilon.util.OdilonFileUtils;
 import io.odilon.util.RandomIDGenerator;
 import okhttp3.Cache;
 import okhttp3.HttpUrl;
-//import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Protocol;
@@ -207,9 +206,9 @@ public class ODClient implements OdilonClient {
      * private static final String UPLOAD_ID = "uploadId"; the current client
      * instance's base URL.
      */
-    private HttpUrl baseUrl;
+    private HttpUrl serverBaseUrl;
 
-    private final String urlStr;
+    private final String serverSchemaAndHostStr;
 
     /** access key to sign all requests with */
     private String accessKey;
@@ -238,7 +237,7 @@ public class ODClient implements OdilonClient {
     private final boolean isSSL;
     private final boolean acceptAllCertificates;
 
-    private String presignedEndPoint;
+    private String presignedSchemeAndHost;
     private String presignedPortStr;
     private boolean presignedSSL;
 
@@ -258,32 +257,32 @@ public class ODClient implements OdilonClient {
      * <li>secretKey. "odilon"</li>
      * </ul>
      * 
-     * @param endpoint  can not be null
-     * @param port      can not be null (normally default port is 9234)
-     * @param accessKey can not be null (default is "odilon")
-     * @param secretKey can not be null (default is "odilon")
+     * @param schemeAndHost can not be null
+     * @param port          can not be null (normally default port is 9234)
+     * @param accessKey     can not be null (default is "odilon")
+     * @param secretKey     can not be null (default is "odilon")
      * 
      */
-    public ODClient(String endpoint, int port, String accessKey, String secretKey) {
-        this(endpoint, port, accessKey, secretKey, false);
+    public ODClient(String schemeAndHost, int port, String accessKey, String secretKey) {
+        this(schemeAndHost, port, accessKey, secretKey, false);
     }
 
-    public ODClient(String endpoint, int port, String accessKey, String secretKey, boolean secure) {
-        this(endpoint, port, accessKey, secretKey, secure, false);
+    public ODClient(String schemeAndHost, int port, String accessKey, String secretKey, boolean secure) {
+        this(schemeAndHost, port, accessKey, secretKey, secure, false);
     }
 
     /**
-     * @param endpoint              can not be null
+     * @param schemeAndHost         can not be null
      * @param port                  can not be null (normally default port is 9234)
      * @param accessKey             can not be null
      * @param secretKey             can not be null
      * @param isSecure              whether to use SSL
      * @param acceptAllCertificates for self signed certificates
      */
-    public ODClient(String endpoint, int port, String accessKey, String secretKey, boolean isSecure,
+    public ODClient(String schemeAndHost, int port, String accessKey, String secretKey, boolean isSecure,
             boolean acceptAllCertificates) {
 
-        Check.requireNonNullStringArgument(endpoint, "endpoint is null or emtpy");
+        Check.requireNonNullStringArgument(schemeAndHost, "schemeAndHost is null or emtpy");
         Check.requireNonNullStringArgument(accessKey, "accessKey is null or emtpy");
         Check.requireNonNullStringArgument(secretKey, "secretKey is null or emtpy");
 
@@ -309,15 +308,15 @@ public class ODClient implements OdilonClient {
                 .writeTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS).protocols(protocol).cache(cache).build();
 
-        this.urlStr = endpoint;
-        HttpUrl url = HttpUrl.parse(this.urlStr);
+        this.serverSchemaAndHostStr = schemeAndHost;
+        HttpUrl url = HttpUrl.parse(this.serverSchemaAndHostStr);
 
         this.scheme = (isSSL()) ? Scheme.HTTPS : Scheme.HTTP;
 
         if (url != null) {
 
             if (!"/".equals(url.encodedPath())) {
-                throw new IllegalArgumentException("no path allowed in endpoint -> " + endpoint);
+                throw new IllegalArgumentException("no path allowed in scheme and host -> " + schemeAndHost);
             }
 
             HttpUrl.Builder urlBuilder = url.newBuilder();
@@ -327,7 +326,7 @@ public class ODClient implements OdilonClient {
             if (port > 0)
                 urlBuilder.port(port);
 
-            this.baseUrl = urlBuilder.build();
+            this.serverBaseUrl = urlBuilder.build();
             this.accessKey = accessKey;
             this.secretKey = secretKey;
 
@@ -340,26 +339,30 @@ public class ODClient implements OdilonClient {
                     throw new IllegalStateException(e);
                 }
             }
-            this.presignedEndPoint = baseUrl.host();
-            this.presignedPortStr = ((baseUrl.port() != 80 && baseUrl.port() != 443) ? (":" + String.valueOf(baseUrl.port())) : "");
+            this.presignedSchemeAndHost = serverBaseUrl.host();
+            this.presignedPortStr = ((serverBaseUrl.port() != 80 && serverBaseUrl.port() != 443)
+                    ? (":" + String.valueOf(serverBaseUrl.port()))
+                    : "");
             this.presignedSSL = isSSL();
             return;
         }
 
         /** endpoint may be a valid hostname, IPv4 or IPv6 address */
-        if (!this.isValidEndpoint(endpoint))
-            throw new IllegalArgumentException("invalid host -> " + endpoint);
+        if (!this.isValidEndpoint(schemeAndHost))
+            throw new IllegalArgumentException("invalid host -> " + schemeAndHost);
 
         if (port == 0) {
-            this.baseUrl = new HttpUrl.Builder().scheme(scheme.toString()).host(endpoint).build();
+            this.serverBaseUrl = new HttpUrl.Builder().scheme(scheme.toString()).host(schemeAndHost).build();
         } else {
-            this.baseUrl = new HttpUrl.Builder().scheme(scheme.toString()).host(endpoint).port(port).build();
+            this.serverBaseUrl = new HttpUrl.Builder().scheme(scheme.toString()).host(schemeAndHost).port(port).build();
         }
         this.accessKey = accessKey;
         this.secretKey = secretKey;
 
-        this.presignedEndPoint = baseUrl.host();
-        this.presignedPortStr = ((baseUrl.port() != 80 && baseUrl.port() != 443) ? (":" + String.valueOf(baseUrl.port())) : "");
+        this.presignedSchemeAndHost = serverBaseUrl.host();
+        this.presignedPortStr = ((serverBaseUrl.port() != 80 && serverBaseUrl.port() != 443)
+                ? (":" + String.valueOf(serverBaseUrl.port()))
+                : "");
         this.presignedSSL = isSSL();
     }
 
@@ -372,7 +375,7 @@ public class ODClient implements OdilonClient {
     }
 
     public void setPresignedUrl(String presignedEndPoint, int port, boolean presignedSSL) {
-        this.presignedEndPoint = presignedEndPoint;
+        this.presignedSchemeAndHost = presignedEndPoint;
         this.presignedPortStr = ((port != 80 && port != 443) ? (":" + String.valueOf(port)) : "");
         this.presignedSSL = presignedSSL;
     }
@@ -442,7 +445,7 @@ public class ODClient implements OdilonClient {
         else
             cType = DEFAULT_CONTENT_TYPE;
 
-        HttpUrl.Builder urlBuilder = this.baseUrl.newBuilder();
+        HttpUrl.Builder urlBuilder = this.serverBaseUrl.newBuilder();
 
         for (String str : API_OBJECT_UPLOAD)
             urlBuilder.addEncodedPathSegment(str);
@@ -490,6 +493,7 @@ public class ODClient implements OdilonClient {
         return this.acceptAllCertificates;
     }
 
+    @Override
     public boolean isSSL() {
         return this.isSSL;
     }
@@ -941,7 +945,7 @@ public class ODClient implements OdilonClient {
 
         if (!isVersionControl())
             throw new ODClientException(ODHttpStatus.OK.value(), ErrorCode.API_NOT_ENABLED.getCode(),
-                    "Server " + this.baseUrl.toString() + " does not support Version Control");
+                    "Server " + this.serverBaseUrl.toString() + " does not support Version Control");
 
         HttpResponse response = executeDelete(API_OBJECT_DELETE_ALL_PREVIOUS_VERSION, Optional.of(bucketName),
                 Optional.of(objectName), null);
@@ -1447,25 +1451,20 @@ public class ODClient implements OdilonClient {
         this.traceStream = null;
     }
 
-    
     @Override
     public String toJSON() {
+
         StringBuilder str = new StringBuilder();
-        
-        
-        str.append("\"url\":\"" + baseUrl.toString() + "\"");
-        str.append("\"https\":" + (isSSL() ? "true" : "false"));
 
-        
+        str.append("\"url\":\"" + serverBaseUrl.toString() + "\"");
+        str.append(", \"https\":" + (isSSL() ? "true" : "false"));
+
         str.append(", \"presignedUrl\":\"" + getPresignedUrl() + "\"");
-        
+        str.append(", \"ClientVersion\":\"" + getVersion() + "\"");
 
-        str.append(", \"version\":\"" + getVersion() + "\"");
-        
         str.append(", \"accessKey\":\"" + accessKey + "\"");
         str.append(", \"secretKey\":\"" + secretKey + "\"");
-        
-        
+
         return str.toString();
     }
 
@@ -1503,15 +1502,20 @@ public class ODClient implements OdilonClient {
     }
 
     @Override
+    @Deprecated
     public String getUrl() {
-        return urlStr;
+        return getSchemaAndHost();
+    }
+
+    public String getSchemaAndHost() {
+        return serverSchemaAndHostStr;
     }
 
     @Override
     public String getVersion() {
         return VERSION;
     }
-    
+
     protected ObjectMapper getObjectMapper() {
         return this.objectMapper;
     }
@@ -1627,9 +1631,8 @@ public class ODClient implements OdilonClient {
         }
 
         StringBuilder url = new StringBuilder();
-        
 
-        url.append( this.getPresignedUrl());
+        url.append(this.getPresignedUrl());
 
         for (String leg : API_OBJECT_URL_PRESIGNES_PREFIX)
             url.append("/" + leg);
@@ -1643,12 +1646,10 @@ public class ODClient implements OdilonClient {
         return url.toString() + "?token=" + urlEncoded;
     }
 
-    
-    
     private String getPresignedUrl() {
-        return (this.presignedSSL ? "https" : "http") + "://" + this.presignedEndPoint + this.presignedPortStr;
+        return (this.presignedSSL ? "https" : "http") + "://" + this.presignedSchemeAndHost + this.presignedPortStr;
     }
-    
+
     /**
      * @param relativePath
      * @param method
@@ -1664,7 +1665,7 @@ public class ODClient implements OdilonClient {
             Multimap<String, String> headerMap, Multimap<String, String> queryParamMap, final String contentType, byte[] body,
             int length, boolean multiPart) throws NoSuchAlgorithmException, IOException {
 
-        HttpUrl.Builder urlBuilder = this.baseUrl.newBuilder();
+        HttpUrl.Builder urlBuilder = this.serverBaseUrl.newBuilder();
 
         if (relativePath != null) {
             for (String str : relativePath)
@@ -1825,17 +1826,6 @@ public class ODClient implements OdilonClient {
         if (headerMap != null && headerMap.get("Content-Type") != null) {
             contentType = String.join(" ", headerMap.get("Content-Type"));
         }
-
-        // if (body != null && !(body instanceof InputStream || body instanceof
-        // RandomAccessFile || body instanceof byte[])) {
-        // if (body != null) {
-        // byte[] bytes = body.toString().getBytes(StandardCharsets.UTF_8);
-        // length = bytes.length;
-        // }
-        // else {
-        // body = "".getBytes();
-        // length = "".length();
-        // }
 
         Request request = null;
 

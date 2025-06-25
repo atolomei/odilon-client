@@ -26,6 +26,10 @@ STEP 2
 CertUtil -hashfile .\odilon-client-1.14.pom SHA1   
 CertUtil -hashfile .\odilon-client-1.14.pom MD5  
 
+editar cada archivo y dejar solo el checksum
+
+
+
 STEP 3
 ======
 

@@ -166,7 +166,7 @@ public interface OdilonClient {
 	   * </p>
 	   * <pre>{@code
 	   *  
-	   * OdilonClient odilonClient = new ODClient(url, port, accessKey, secretKey);
+	   * OdilonClient odilonClient = new ODClient(schemeAndHost, port, accessKey, secretKey);
 	   * List<Bucket> bucketList = odilonClient.listBuckets();
 	   * bucketList.forEach( bucket ->  {
 	   * 
@@ -425,7 +425,7 @@ public interface OdilonClient {
 	 *  
      * <pre>{@code
 	 *  
-	 * OdilonClient odilonClient = new ODClient(url, port, accessKey, secretKey);
+	 * OdilonClient odilonClient = new ODClient(schemaAndHost, port, accessKey, secretKey);
 	 * List<Bucket> bucketList = odilonClient.listBuckets();
 	 * bucketList.forEach( bucket ->  {
 	 * 
@@ -466,7 +466,8 @@ public interface OdilonClient {
 	
 
 	/**
-     * <p>Sets a specific url for presigned urls.</p>
+     * <p>Sets a specific url for presigned urls</p>
+     * 
      * <p>A presigned URL is a way to grant temporary access to an Object, for example in an HTML webpage.
      *  It remains valid for a limited period of time which is specified when the URL is generated.
      * </p>
@@ -1005,9 +1006,23 @@ public interface OdilonClient {
 	
 	/**
 	 * <p>Returns the url of the Odilon server</p>
-	 * @return server url (without the port)
+	 * <p>This method is deprecated since v.1.14.1 <br/>  
+	 * Use instead getSchemaAndHost</p>
+	 * 
+	 *  @return server schema and host (ie url without the port)
 	 */
+	@Deprecated
 	public String getUrl();
+	
+    /**
+     * <p>Returns the url of the Odilon server</p>
+     * <p>This method is deprecated since v.1.14.1 <br/>  
+     * Use instead getSchemaAndHost</p>
+     * 
+     * @return server schema and host (ie url without the port)
+     */
+
+	public String getSchemaAndHost();
 
 	/* =======================================
 	 * CLIENT SETTINGS

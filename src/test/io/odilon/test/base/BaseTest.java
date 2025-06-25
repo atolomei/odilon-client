@@ -70,13 +70,15 @@ public abstract class BaseTest {
 	private OdilonClient client;
 	private Bucket testBucket;
 
-    public String endpoint = "localhost";
+    public String serverHost = "localhost";
     public int port = 9234;
     private String accessKey = "odilon";
     private String secretKey = "odilon";
-	private String presignedUrl = endpoint;
+	
+    
+    private String presignedHost = serverHost;
 	private int  presignedPort = 9234;
-	private boolean  presignedSSL = false;
+	private boolean presignedSSL = false;
 	
 	private int max = 40;
 	
@@ -86,7 +88,7 @@ public abstract class BaseTest {
 
 	private long LAPSE_BETWEEN_OP_MILLISECONDS = 0;
 
-	private String standByEndpoint;
+	private String standByHost;
 	private int standByPort;
 	
 	private String standByAccessKey = "odilon";
@@ -94,27 +96,12 @@ public abstract class BaseTest {
 	private boolean standBySSL = false;
 	
 	private ODClient standByClient;
-	
 
 	public boolean isSSL = false;
 	public boolean isAcceptAllCertificates = true;
 	
-	
 	private Properties properties = new Properties();
 	
-
-	/**
-	 * 
-	 */
-	public void close() {
-		if (this.client!=null) {
-			try {
-				this.client.close();
-			} catch (ODClientException e) {
-				error(e.getClass().getName() +( e.getMessage()!=null ? (" | " + e.getMessage()) : ""));
-			}
-		}
-	}
 	/**
 	 * <p>Used by stand alone test</p>
 	 */
@@ -139,20 +126,19 @@ public abstract class BaseTest {
 
          setMax((properties.get("max")!=null) ? Integer.valueOf(properties.get("max").toString().trim()) : 10);
 
-		
-	    this.endpoint  =  (properties.get("odilon.server.endpoint")!=null)  ? properties.get("odilon.server.endpoint").toString().trim() : "localhost"; 
+		this.serverHost  =  (properties.get("odilon.server.host")!=null)  ? properties.get("odilon.server.host").toString().trim() : "localhost"; 
 	    this.port      =  (properties.get("odilon.server.port")!=null)      ? Integer.valueOf(( properties.get("odilon.server.port").toString().trim())) : 80;
 	    this.isSSL     =  (properties.get("odilon.server.isSSL")!=null)      ? Boolean.valueOf(( properties.get("odilon.server.isSSL").toString().trim())) : false;
 
-	    
 	    this.accessKey =  (properties.get("odilon.server.accessKey")!=null)  ? properties.get("odilon.server.accessKey").toString().trim() : "odilon";
 	    this.secretKey =  (properties.get("odilon.server.secretKey")!=null)  ? properties.get("odilon.server.secretKey").toString().trim() : "odilon";
 	    
-	    this.presignedUrl =  (properties.get("odilon.server.presignedUrl")!=null)  ? properties.get("odilon.server.presignedUrl").toString().trim() : this.endpoint; 
+	    this.presignedHost =  (properties.get("odilon.server.presignedHost")!=null)  ? properties.get("odilon.server.presignedHost").toString().trim() : this.serverHost; 
 	    this.presignedPort = (properties.get("odilon.server.presignedPort")!=null)      ? Integer.valueOf(( properties.get("odilon.server.presignedPort").toString().trim())) : this.port;
+	    this.presignedSSL = (properties.get("odilon.server.isPresignedSSL")!=null)      ? 
+	            Boolean.valueOf(( properties.get("odilon.server.isPresignedSSL").toString().trim())) : this.isSSL;
+	         
 	    
-	    this.presignedSSL = (properties.get("odilon.server.presignedSSL")!=null)      ? Boolean.valueOf(( properties.get("odilon.server.presignedSSL").toString().trim())) : this.isSSL;
-
 		String tempDir = System.getProperty("tempDir");
 		String downloadDir = System.getProperty("downloadDir");
 		String lapse = System.getProperty("sleepMilliseconds");
@@ -171,18 +157,42 @@ public abstract class BaseTest {
 		if (downloadDir!=null)
 			DOWNLOAD_DIR=downloadDir.trim();
 
-		//if (tempEndpoint!=null)
-		//	endpoint=tempEndpoint.trim();
-
-		//if (tempPort!=null)
-		//	port= Integer.valueOf(tempPort.trim());
-
-		
 		setClient(client);
 		
 	}
 
-	
+    public OdilonClient getClient() {
+        try {
+            if (client==null) {
+                    this.client = new ODClient((isSSL()?"https":"http") + "://" + serverHost, port, accessKey, secretKey, isSSL(), isAcceptAllCertificates());
+                    if (this.presignedHost!=null)
+                        this.client.setPresignedUrl(this.presignedHost, this.presignedPort, this.presignedSSL);
+
+                    logger.debug(this.client.toString());
+                    logger.debug("");
+            }
+            
+        } catch (Exception e) {
+            error(e.getClass().getName() +( e.getMessage()!=null ? (" | " + e.getMessage()) : ""));
+        }
+        return client;
+    }
+
+
+    /**
+     * 
+     */
+    public void close() {
+        if (this.client!=null) {
+            try {
+                this.client.close();
+            } catch (ODClientException e) {
+                error(e.getClass().getName() +( e.getMessage()!=null ? (" | " + e.getMessage()) : ""));
+            }
+        }
+    }
+
+    
 	public void setClient(OdilonClient client) {
 		this.client = client;
 	}
@@ -197,7 +207,7 @@ public abstract class BaseTest {
 		if (this.standByClient==null) {
 		try {
 			
-				this.standByClient = new ODClient(getStandByEndpoint(), getStandByPort(), standByAccessKey, standBySecretKey, standBySSL);
+				this.standByClient = new ODClient(getStandByHost(), getStandByPort(), standByAccessKey, standBySecretKey, standBySSL);
 				logger.debug(standByClient.toString());
 		        
 			} catch (Exception e) {
@@ -211,39 +221,33 @@ public abstract class BaseTest {
 	
 	public int getStandByPort() {
 		
-		if (getStandByEndpoint()!=null) {
+		if (getStandByHost()!=null) {
 			return this.standByPort;
 		}
 		return -1;
 	}
 	
 
-	public String getStandByEndpoint() {
+	public String getStandByHost() {
 
-		if (standByEndpoint==null) {
+		if (standByHost==null) {
 	
 			if (isStandBy()) {
 				try {
-					
-					this.standByEndpoint = getClient().systemInfo().standbyUrl;
+					this.standByHost = getClient().systemInfo().standbyUrl;
 					this.standByPort = Integer.valueOf(getClient().systemInfo().standbyPort);
-					
 				} catch (ODClientException e) {
 					error(e);
 				}
 			}
 		}
-		
-		return standByEndpoint;
+		return standByHost;
 	}
 	
-
-	
-		
 	public void removeTestBucket() {
 		try {
-			
-			if (testBucket==null)
+
+		    if (testBucket==null)
 				return;
 			
 			String bucketName = testBucket.getName();
@@ -284,8 +288,8 @@ public abstract class BaseTest {
 			if (p==null || !p.equals("ok"))
 				error("ping  -> " + p!=null?p:"null");
 			else {
-				logger.debug("ping " +  getClient().getUrl() + " -> ok");
-				map.put("ping  " +  getClient().getUrl() , "ok");
+				logger.debug("ping " +  getClient().getSchemaAndHost() + " -> ok");
+				map.put("ping  " +  getClient().getSchemaAndHost() , "ok");
 			}
 		} catch (Exception e)
 		{
@@ -332,7 +336,6 @@ public abstract class BaseTest {
 		
 	}
 
-	
 	public long getSleepDurationMills() {
 		return LAPSE_BETWEEN_OP_MILLISECONDS;
 	}
@@ -341,7 +344,7 @@ public abstract class BaseTest {
 		LAPSE_BETWEEN_OP_MILLISECONDS = lAPSE_BETWEEN_OP_MILLISECONDS;
 	}
 	
-	public void setSSL( boolean b) {
+	public void setSSL(boolean b) {
 		this.isSSL=b;
 	}
 	
@@ -355,27 +358,6 @@ public abstract class BaseTest {
 	
 	public void setAcceptAllCertificates(boolean b) {
 		this.isAcceptAllCertificates=b;
-	}
-	
-	
-	
-	public OdilonClient getClient() {
-		try {
-			if (client==null) {
-					this.client = new ODClient((isSSL()?"https":"http") + "://" + endpoint, port, accessKey, secretKey, isSSL(), isAcceptAllCertificates());
-					
-					
-					//if (this.presignedUrl!=null)
-					//    this.client.setPresignedUrl(this.presignedUrl, this.presignedPort, this.presignedSSL);
-					
-					
-			        logger.debug(this.client.toString());
-			}
-	        
-		} catch (Exception e) {
-			error(e.getClass().getName() +( e.getMessage()!=null ? (" | " + e.getMessage()) : ""));
-		}
-		return client;
 	}
 	
 	

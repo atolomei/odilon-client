@@ -34,7 +34,6 @@ public class TestPresignedUrl extends BaseTest {
 
 		try {
 
-		    
 		    if (getClient().listBuckets().isEmpty()) {
 				createBucket();
 				addFiles();
