@@ -231,10 +231,10 @@ public class TestDeleteObject extends BaseTest {
 	 */
 	public boolean testAddObjects() {
 		
-        File dir = new File(SRC_DIR_V0);
+        File dir = new File(getSourceDir());
         
         if ( (!dir.exists()) || (!dir.isDirectory())) { 
-			throw new RuntimeException("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+			throw new RuntimeException("Dir not exists or the File is not Dir -> " + getSourceDir());
 		}
         
 		int counter = 0;
@@ -294,7 +294,7 @@ public class TestDeleteObject extends BaseTest {
 				error(e);
 		}
 			
-		String destFileName = DOWNLOAD_DIR_V0 + File.separator + meta.fileName;
+		String destFileName = super.getDownloadDirHeadVersion() + File.separator + meta.fileName;
 		
 		try {
 				getClient().getObject(meta.bucketName, meta.objectName, destFileName);

@@ -102,14 +102,14 @@ public class TestObjectPutVersion extends BaseTest {
 		}
 
 		
-        File dir = new File(SRC_DIR_V0);
+        File dir = new File( super.getSourceDir());
         
         if ( (!dir.exists()) || (!dir.isDirectory())) { 
-			error("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+			error("Dir not exists or the File is not Dir -> " + getSourceDir());
 		}
 
 
-        File v2dir = new File(SRC_DIR_V1);
+        File v2dir = new File( getSourceV1Dir() );
         
     	
 		FileUtils.deleteQuietly(v2dir);
@@ -120,7 +120,7 @@ public class TestObjectPutVersion extends BaseTest {
 		}
 		
         
-        File tmpdir = new File(DOWNLOAD_DIR_V0);
+        File tmpdir = new File(super.getDownloadDirHeadVersion());
         
         if ( (tmpdir.exists()) && (tmpdir.isDirectory())) { 
         	try {
@@ -189,7 +189,7 @@ public class TestObjectPutVersion extends BaseTest {
 	 */
 	private boolean putObject() {
 
-		File dir = new File(SRC_DIR_V0);
+		File dir = new File(getSourceDir());
 		
 		 counter = 0;
 		
@@ -248,7 +248,7 @@ public class TestObjectPutVersion extends BaseTest {
 			String name=FilenameUtils.getBaseName(srcname);
 			String ext=FilenameUtils.getExtension(srcname);
 			
-			String nameNewVersion=SRC_DIR_V1 + File.separator + name +"-v1" + "."+ext;
+			String nameNewVersion= getSourceV1Dir() + File.separator + name +"-v1" + "."+ext;
 			
 			try {
 				if ((new File(nameNewVersion)).exists())

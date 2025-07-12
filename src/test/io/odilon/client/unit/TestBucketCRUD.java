@@ -16,7 +16,6 @@
  */
 package io.odilon.client.unit;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;

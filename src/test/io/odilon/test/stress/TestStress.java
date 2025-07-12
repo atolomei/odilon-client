@@ -59,13 +59,16 @@ public class TestStress extends BaseTest {
 		this.up = new ArrayList<File>();
 		testFiles = new ConcurrentHashMap<String, TestFile>();
 		bannedDirs = new ArrayList<String>();
+		
+		// TODO AT
+		
 		bannedDirs.add("c:"+File.separator+"odilon");
 		bannedDirs.add("c:"+File.separator+"odilon-data");
 		bannedDirs.add("c:"+File.separator+"odilon-data-raid0");
 		bannedDirs.add("c:"+File.separator+"odilon-data-raid1");
 		bannedDirs.add("c:"+File.separator+"$RECYCLE.BIN");
 		totalSize = 0;
-		add(new File(SRC_DIR_V0));
+		add(new File(getSourceDir()));
 		double val = Double.valueOf(totalSize).doubleValue() / MB;
 		
 		
@@ -196,10 +199,10 @@ public class TestStress extends BaseTest {
 	 */
 	public boolean preCondition() {
 
-        File dir = new File(SRC_DIR_V0);
+        File dir = new File( super.getSourceDir());
         
         if ( (!dir.exists()) || (!dir.isDirectory())) { 
-			error("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+			error("Dir not exists or the File is not Dir -> " + getSourceDir());
 		}
 
         try {
@@ -215,7 +218,7 @@ public class TestStress extends BaseTest {
 		}
         
         
-        File tmpdir = new File(DOWNLOAD_DIR_V0);
+        File tmpdir = new File(super.getDownloadDirHeadVersion());
         
         if ( (tmpdir.exists()) && (tmpdir.isDirectory())) { 
         	try {

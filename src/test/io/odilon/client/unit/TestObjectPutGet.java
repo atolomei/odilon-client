@@ -1,4 +1,20 @@
- package io.odilon.client.unit;
+/*
+ * Odilon Object Storage
+ * (C) Novamens 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.odilon.client.unit;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -75,12 +91,23 @@ public class TestObjectPutGet extends BaseTest {
 	public boolean testAddObjectsStream(String version) {
 		
 	    Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
-        	
-	    downloadDir = super.DOWNLOAD_DIR_V0;
-	    sourceDir = super.SRC_DIR_V0;
-	    
-	    final File dir = new File(sourceDir);
+        
+	    downloadDir = super.getDownloadDirHeadVersion();
 	    final File dndir = new File(downloadDir);
+	    
+
+	    sourceDir = super.getSourceDir();
+	    final File dir = new File(sourceDir);
+	    
+        if ((!dir.exists()) || (!dir.isDirectory())) {
+        	try {
+				FileUtils.forceMkdir(dir);
+			} catch (IOException e) {
+					error(e.getClass().getName() + " | " + e.getMessage());
+			}
+        	
+        }
+			
 	    
         if ((!dir.exists()) || (!dir.isDirectory()))  
 			error("Dir not exists or the File is not Dir -> " + sourceDir);
@@ -213,8 +240,8 @@ public class TestObjectPutGet extends BaseTest {
 	public boolean testAddObjects() {
 		
 		
-	    downloadDir = DOWNLOAD_DIR_V0;
-	    sourceDir = SRC_DIR_V0;
+	    downloadDir = super.getDownloadDirHeadVersion();
+	    sourceDir = getSourceDir();
 	    
         File dir = new File(sourceDir);
         final File dndir = new File(downloadDir);
@@ -338,28 +365,28 @@ public class TestObjectPutGet extends BaseTest {
 	public boolean preCondition() {
 
 		{
-	        File dir = new File(SRC_DIR_V0);
+	        File dir = new File(getSourceDir());
 	        
 	        if ( (!dir.exists()) || (!dir.isDirectory())) { 
-				error("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+				error("Dir not exists or the File is not Dir -> " +  getSourceDir());
 			}
 		}
 		
 
 		{
-	        File dir = new File(SRC_DIR_V1);
+	        File dir = new File(getSourceV1Dir());
 	        
 	        if ( (!dir.exists()) || (!dir.isDirectory())) { 
-				error("Dir not exists or the File is not Dir -> " +SRC_DIR_V1);
+				error("Dir not exists or the File is not Dir -> " + getSourceV1Dir());
 			}
 		}
 
 		
 		{
-	        File dir = new File(SRC_DIR_V2);
+	        File dir = new File(getSourceV2Dir());
 	        
 	        if ( (!dir.exists()) || (!dir.isDirectory())) { 
-				error("Dir not exists or the File is not Dir -> " +SRC_DIR_V2);
+				error("Dir not exists or the File is not Dir -> " + getSourceV2Dir());
 			}
 		}
 		
@@ -376,7 +403,7 @@ public class TestObjectPutGet extends BaseTest {
         
         
         {
-        File tmpdir = new File(DOWNLOAD_DIR_V0);
+        File tmpdir = new File(super.getDownloadDirHeadVersion());
         
         if ( (tmpdir.exists()) && (tmpdir.isDirectory())) { 
         	try {

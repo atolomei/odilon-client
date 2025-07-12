@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.junit.Test;
 
-import io.odilon.client.OdilonClient;
 import io.odilon.client.error.ODClientException;
 import io.odilon.log.Logger;
 import io.odilon.model.Bucket;

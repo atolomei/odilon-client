@@ -42,6 +42,8 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.TreeMap;
 
+import org.apache.commons.io.FileUtils;
+
 /**
  * @author atolomei@novamens.com (Alejandro Tolomei)
  */
@@ -50,37 +52,38 @@ public abstract class BaseTest {
 	private static final Logger logger = Logger.getLogger(BaseTest.class.getName());
 
 	public static long THREE_SECONDS = 3000;
+
 	
-	public final String DOWNLOAD_STAND_BY_DIR  = "d:"+File.separator+ "test-files-standby-download";
+	private String source_dir;
+    private String source_dir_v1;
+    private String source_dir_v2;
+
+	private String download_dir;
+
+	public String DOWNLOAD_DIR_HEAD;
+	public String DOWNLOAD_DIR_V1;
+	public String DOWNLOAD_DIR_V2;
 	
-	private String SRC_DIR = "d:"+File.separator+"test-files";
-	private String DOWNLOAD_DIR = "d:"+File.separator+"test-files-download";
-	
-	public String SRC_DIR_V0 = SRC_DIR + File.separator + "v0";
-	   
-	public String SRC_DIR_V1 = SRC_DIR + File.separator + "v1";
-	public String SRC_DIR_V2 = SRC_DIR + File.separator + "v2";
-	
-	public String DOWNLOAD_DIR_V0 = DOWNLOAD_DIR + File.separator+"v0";
-	public String DOWNLOAD_DIR_V1 = DOWNLOAD_DIR + File.separator+"v1";
-	public String DOWNLOAD_DIR_V2 = DOWNLOAD_DIR + File.separator+"v2";
-	
-	public String DOWNLOAD_DIR_RESTORED = DOWNLOAD_DIR + File.separator+"restored";
-	
+	public String DOWNLOAD_DIR_RESTORED;
+	public String DOWNLOAD_STAND_BY_DIR;
+
+	public boolean isSSL = false;
+	public boolean isAcceptAllCertificates = true;
+
 	private OdilonClient client;
 	private Bucket testBucket;
 
-    public String serverHost = "localhost";
-    public int port = 9234;
+    private String serverHost = "localhost";
+    private int port = 9234;
+    
     private String accessKey = "odilon";
     private String secretKey = "odilon";
 	
-    
     private String presignedHost = serverHost;
 	private int  presignedPort = 9234;
 	private boolean presignedSSL = false;
 	
-	private int max = 40;
+	private int max = 10;
 	
 	private long max_length = 500 * 100 * 10000; // 500 MB
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
@@ -97,9 +100,6 @@ public abstract class BaseTest {
 	
 	private ODClient standByClient;
 
-	public boolean isSSL = false;
-	public boolean isAcceptAllCertificates = true;
-	
 	private Properties properties = new Properties();
 	
 	/**
@@ -127,35 +127,61 @@ public abstract class BaseTest {
          setMax((properties.get("max")!=null) ? Integer.valueOf(properties.get("max").toString().trim()) : 10);
 
 		this.serverHost  =  (properties.get("odilon.server.host")!=null)  ? properties.get("odilon.server.host").toString().trim() : "localhost"; 
-	    this.port      =  (properties.get("odilon.server.port")!=null)      ? Integer.valueOf(( properties.get("odilon.server.port").toString().trim())) : 80;
-	    this.isSSL     =  (properties.get("odilon.server.isSSL")!=null)      ? Boolean.valueOf(( properties.get("odilon.server.isSSL").toString().trim())) : false;
+	    this.port        =  (properties.get("odilon.server.port")!=null)      ? Integer.valueOf(( properties.get("odilon.server.port").toString().trim())) : 80;
+	    this.isSSL       =  (properties.get("odilon.server.isSSL")!=null)      ? Boolean.valueOf(( properties.get("odilon.server.isSSL").toString().trim())) : false;
 
-	    this.accessKey =  (properties.get("odilon.server.accessKey")!=null)  ? properties.get("odilon.server.accessKey").toString().trim() : "odilon";
-	    this.secretKey =  (properties.get("odilon.server.secretKey")!=null)  ? properties.get("odilon.server.secretKey").toString().trim() : "odilon";
+	    this.accessKey   =  (properties.get("odilon.server.accessKey")!=null)  ? properties.get("odilon.server.accessKey").toString().trim() : "odilon";
+	    this.secretKey   =  (properties.get("odilon.server.secretKey")!=null)  ? properties.get("odilon.server.secretKey").toString().trim() : "odilon";
 	    
-	    this.presignedHost =  (properties.get("odilon.server.presignedHost")!=null)  ? properties.get("odilon.server.presignedHost").toString().trim() : this.serverHost; 
+	    this.presignedHost =  (properties.get("odilon.server.presignedHost")!=null)     ? properties.get("odilon.server.presignedHost").toString().trim() : this.serverHost; 
 	    this.presignedPort = (properties.get("odilon.server.presignedPort")!=null)      ? Integer.valueOf(( properties.get("odilon.server.presignedPort").toString().trim())) : this.port;
-	    this.presignedSSL = (properties.get("odilon.server.isPresignedSSL")!=null)      ? 
+	    this.presignedSSL  = (properties.get("odilon.server.isPresignedSSL")!=null)      ? 
 	            Boolean.valueOf(( properties.get("odilon.server.isPresignedSSL").toString().trim())) : this.isSSL;
-	         
 	    
-		String tempDir = System.getProperty("tempDir");
-		String downloadDir = System.getProperty("downloadDir");
-		String lapse = System.getProperty("sleepMilliseconds");
+		this.source_dir    =  (properties.get("source.dir")!=null)    ? properties.get("source.dir").toString().trim()   : "./source"; 
+		this.download_dir  =  (properties.get("download.dir")!=null)  ? properties.get("download.dir").toString().trim() : "./download"; 
 		
-		if (lapse!=null)
-			LAPSE_BETWEEN_OP_MILLISECONDS  = Long.valueOf(lapse.trim());
-		
-		String maxLength = System.getProperty("maxLength");				
-		if (maxLength!=null)
-			max_length = Long.valueOf(maxLength.trim());
+		source_dir_v1 = source_dir + File.separator + "v1";
+	    File dir_v1 = new File(source_dir_v1);
+	        
+	        if ( (!dir_v1.exists()) || (!dir_v1.isDirectory())) { 
+				try {
+						FileUtils.forceMkdir(dir_v1);
+				} catch (IOException e) {
+					error(e.getClass().getName() + " | " + e.getMessage());
+				}
+			}
+
+			source_dir_v2 = source_dir + File.separator + "v2";
+		   File dir_v2 = new File(source_dir_v2);
+		    if ( (!dir_v2.exists()) || (!dir_v2.isDirectory())) { 
+				try {
+						FileUtils.forceMkdir(dir_v2);
+				} catch (IOException e) {
+					error(e.getClass().getName() + " | " + e.getMessage());
+				}
+			}
 
 		
-		if (tempDir!=null)
-			SRC_DIR=tempDir.trim();
+		DOWNLOAD_DIR_HEAD = download_dir + File.separator+"head";
+		DOWNLOAD_DIR_V1   = download_dir + File.separator+"v1";
+		DOWNLOAD_DIR_V2   = download_dir + File.separator+"v2";
 		
-		if (downloadDir!=null)
-			DOWNLOAD_DIR=downloadDir.trim();
+		DOWNLOAD_DIR_RESTORED = download_dir + File.separator+"restored";
+		DOWNLOAD_STAND_BY_DIR  = "d:"+File.separator+ "test-files-standby-download";
+	    
+		//String tempDir = System.getProperty("tempDir");
+		//String downloadDir = System.getProperty("downloadDir");
+		//String lapse = System.getProperty("sleepMilliseconds");
+		//if (lapse!=null)
+		//	LAPSE_BETWEEN_OP_MILLISECONDS  = Long.valueOf(lapse.trim());
+		//String maxLength = System.getProperty("maxLength");				
+		//if (maxLength!=null)
+	//		max_length = Long.valueOf(maxLength.trim());
+		//if (tempDir!=null)
+		//	source_dir=tempDir.trim();
+		//if (downloadDir!=null)
+		//	DOWNLOAD_DIR=downloadDir.trim();
 
 		setClient(client);
 		
@@ -421,14 +447,13 @@ public abstract class BaseTest {
 	 */
 	protected boolean putObjects(String bucketName) {
 		
-        File dir = new File(SRC_DIR_V0);
+        File dir = new File(this.source_dir);
         
         if ( (!dir.exists()) || (!dir.isDirectory())) { 
-			error("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+        	error("Dir not exists or the File is not Dir -> " + source_dir);
 		}
         
 		int counter = 0;
-		
 		
 		for (File fi:dir.listFiles()) {
 			
@@ -462,7 +487,7 @@ public abstract class BaseTest {
 				error(e);
 		}
 			
-		String destFileName = DOWNLOAD_DIR_V0 + File.separator + meta.fileName;
+		String destFileName = this.getDownloadDirHeadVersion() + File.separator + meta.fileName;
 		
 		try {
 				getClient().getObject(meta.bucketName, meta.objectName, destFileName);
@@ -498,6 +523,7 @@ public abstract class BaseTest {
 	return true;
 	}
 	
+
 	
 	/**
 	 * 
@@ -603,6 +629,23 @@ public abstract class BaseTest {
 	        }
 	    }
 
+	   public String getDownloadDirHeadVersion() {
+		return DOWNLOAD_DIR_HEAD;
+	   }
+
+	   public String getSourceDir() {
+		return this.source_dir;
+	   }
+
+	   public String getSourceV1Dir() {
+		 		return source_dir_v1;
+	   }
+
+	   public String getSourceV2Dir() {
+	 		return source_dir_v2;
+  }
 	
 }
  
+ 
+

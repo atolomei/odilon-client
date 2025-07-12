@@ -145,7 +145,7 @@ public class TestMasterStandBy extends BaseTest {
 
        	
        	{
-            File tmpdir = new File(DOWNLOAD_DIR_V0);
+            File tmpdir = new File(super.getDownloadDirHeadVersion());
             
             if ( (tmpdir.exists()) && (tmpdir.isDirectory())) { 
             	try {
@@ -163,7 +163,7 @@ public class TestMasterStandBy extends BaseTest {
         }
        	
        	
-        File v2dir = new File(SRC_DIR_V1);
+        File v2dir = new File(getSourceV1Dir());
 		FileUtils.deleteQuietly(v2dir);
        	try {
 			FileUtils.forceMkdir(v2dir);
@@ -324,8 +324,8 @@ public class TestMasterStandBy extends BaseTest {
 	
 	public boolean testAddObjects() {
 		
-	   downloadDir = DOWNLOAD_DIR_V0;
-	   sourceDir = SRC_DIR_V0;
+	   downloadDir = super.getDownloadDirHeadVersion();
+	   sourceDir =  getSourceDir();
         
 	   final File dir = new File(sourceDir);
 	   
@@ -434,7 +434,7 @@ public class TestMasterStandBy extends BaseTest {
 			String name=FilenameUtils.getBaseName(srcname);
 			String ext=FilenameUtils.getExtension(srcname);
 			
-			String nameNewVersion=SRC_DIR_V1 + File.separator + name +"-v1" + "."+ext;
+			String nameNewVersion= getSourceV1Dir() + File.separator + name +"-v1" + "."+ext;
 			
 			try {
 				if ((new File(nameNewVersion)).exists())

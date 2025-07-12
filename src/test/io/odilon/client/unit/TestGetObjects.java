@@ -40,15 +40,9 @@ public class TestGetObjects extends BaseTest {
 			
 	private static final Logger logger = Logger.getLogger(TestGetObjects.class.getName());
 	
-	static final String TEMP_DIR = "d:"+File.separator+"temp";
-	static final String DOWNLOAD_DIR = "d:"+File.separator+"temp" + File.separator+"download";
-	
-	
 	private Bucket bucket_1 = null;
 	
-	
 	public TestGetObjects () {}
-	
 	
 	@Override
 	public void executeTest() {
@@ -59,10 +53,8 @@ public class TestGetObjects extends BaseTest {
 			error("testGetObjects");
 		
 		showResults();
-	    
 	}
 
-	
 	private boolean testGetObjects() {
 		
 		try {
@@ -79,7 +71,7 @@ public class TestGetObjects extends BaseTest {
 		    		if (item.isOk()) {
 		    			ObjectMetadata meta = item.getObject();
 		    			try {
-		    				getClient().getObject(meta.bucketName, meta.objectName, DOWNLOAD_DIR + File.separator + meta.fileName);
+		    				getClient().getObject(meta.bucketName, meta.objectName, super.getDownloadDirHeadVersion() + File.separator + meta.fileName);
 		                      logger.debug(String.valueOf(counter) + " ->  o:" + item.getObject().objectName + " f: " + meta.fileName);
 						} catch (IOException e) {
 							error(e);
@@ -109,11 +101,6 @@ public class TestGetObjects extends BaseTest {
 
 	public boolean preCondition() {
 
-        //File dir = new File(TEMP_DIR);
-        
-       // if ( (!dir.exists()) || (!dir.isDirectory())) { 
-	//		error("Dir not exists or the File is not Dir -> " +TEMP_DIR);
-	//	}
 
         try {
 			
@@ -130,7 +117,7 @@ public class TestGetObjects extends BaseTest {
 		}
         
         
-        File tmpdir = new File(DOWNLOAD_DIR);
+        File tmpdir = new File(getDownloadDirHeadVersion());
         
         if ( (tmpdir.exists()) && (tmpdir.isDirectory())) { 
         	try {
@@ -160,5 +147,5 @@ public class TestGetObjects extends BaseTest {
 		
 		return true;
 	}
-
 }
+

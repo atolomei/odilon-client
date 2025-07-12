@@ -19,22 +19,11 @@ package io.odilon.client.unit;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.security.NoSuchAlgorithmException;
-import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 
 import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-
-import io.odilon.client.OdilonClient;
 import io.odilon.client.error.ODClientException;
 import io.odilon.client.util.FSUtil;
 import io.odilon.log.Logger;
@@ -146,10 +135,10 @@ public class TestVersionControlWipe extends BaseTest {
 	 */
 	public boolean testAddObjects() {
 		
-        File dir = new File(SRC_DIR_V0);
+        File dir = new File(getSourceDir());
         
         if ( (!dir.exists()) || (!dir.isDirectory())) { 
-			throw new RuntimeException("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+			throw new RuntimeException("Dir not exists or the File is not Dir -> " + getSourceDir());
 		}
         
 		int counter = 0;
@@ -195,7 +184,7 @@ public class TestVersionControlWipe extends BaseTest {
 				error(e);
 		}
 			
-		String destFileName = DOWNLOAD_DIR_V0 + File.separator + meta.fileName;
+		String destFileName = super.getDownloadDirHeadVersion() + File.separator + meta.fileName;
 		
 		try {
 				getClient().getObject(meta.bucketName, meta.objectName, destFileName);

@@ -134,15 +134,15 @@ public class TestVersionControlUpload extends BaseTest {
 
 		
 		{
-	        File dir = new File(SRC_DIR_V0);
+	        File dir = new File(getSourceDir());
 	        
 	        if ( (!dir.exists()) || (!dir.isDirectory())) { 
-				error("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+				error("Dir not exists or the File is not Dir -> " + getSourceDir());
 			}
 		}
 
 		{
-	        File dir = new File(SRC_DIR_V1);
+	        File dir = new File( super.getSourceV1Dir());
 	    
 	        FileUtils.deleteQuietly(dir);
 	       	try {
@@ -151,13 +151,13 @@ public class TestVersionControlUpload extends BaseTest {
 				error(e);
 			}
 	        if ( (!dir.exists()) || (!dir.isDirectory())) { 
-				error("Dir not exists or the File is not Dir -> " +SRC_DIR_V1);
+				error("Dir not exists or the File is not Dir -> " + getSourceV1Dir());
 			}
 		}
 
 		
 		{
-        File dir = new File(DOWNLOAD_DIR_V0);
+        File dir = new File(super.getDownloadDirHeadVersion());
         
         if ( (dir.exists()) && (dir.isDirectory())) { 
         	try {
@@ -225,7 +225,7 @@ public class TestVersionControlUpload extends BaseTest {
 	 */
 	private boolean putObject() {
 
-		File dir = new File(SRC_DIR_V0);
+		File dir = new File(getSourceDir());
 		
 		counterPutObject.set(0);	
 		
@@ -417,7 +417,7 @@ public class TestVersionControlUpload extends BaseTest {
 			String name=FilenameUtils.getBaseName(srcname);
 			String ext=FilenameUtils.getExtension(srcname);
 			
-			String nameSrcFileNewVersion=SRC_DIR_V1 + File.separator + name +"-v1" + "."+ext;
+			String nameSrcFileNewVersion= getSourceV1Dir() + File.separator + name +"-v1" + "."+ext;
 			
 			// copy src v1 to src dir
 			try {
@@ -507,7 +507,7 @@ public class TestVersionControlUpload extends BaseTest {
 						if (metaPreviousVersion==null) 
 							error(" previous version is null -> b:" + test.bucketName + " o:" + test.objectName);
 								
-						String previousVersionDestFileName = DOWNLOAD_DIR_V0 + File.separator + metaPreviousVersion.fileName;
+						String previousVersionDestFileName = super.getDownloadDirHeadVersion() + File.separator + metaPreviousVersion.fileName;
 						try {
 							if ((new File(previousVersionDestFileName)).exists())
 								FileUtils.forceDelete( new File(previousVersionDestFileName));

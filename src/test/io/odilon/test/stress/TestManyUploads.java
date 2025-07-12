@@ -75,8 +75,8 @@ public class TestManyUploads extends BaseTest {
 	public boolean testAddObjectsStream(String version) {
 		
     	
-	    downloadDir = DOWNLOAD_DIR_V0;
-	    sourceDir = SRC_DIR_V0;
+	    downloadDir = super.getDownloadDirHeadVersion();
+	    sourceDir =  getSourceDir();
 	    
 	    
 	    final File dir = new File(sourceDir);
@@ -230,28 +230,28 @@ public class TestManyUploads extends BaseTest {
 	public boolean preCondition() {
 
 		{
-	        File dir = new File(SRC_DIR_V0);
+	        File dir = new File( getSourceDir());
 	        
 	        if ( (!dir.exists()) || (!dir.isDirectory())) { 
-				error("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+				error("Dir not exists or the File is not Dir -> " +getSourceDir());
 			}
 		}
 		
 
 		{
-	        File dir = new File(SRC_DIR_V1);
+	        File dir = new File( getSourceV1Dir() );
 	        
 	        if ( (!dir.exists()) || (!dir.isDirectory())) { 
-				error("Dir not exists or the File is not Dir -> " +SRC_DIR_V1);
+				error("Dir not exists or the File is not Dir -> " + getSourceV1Dir());
 			}
 		}
 
 		
 		{
-	        File dir = new File(SRC_DIR_V2);
+	        File dir = new File(getSourceV2Dir());
 	        
 	        if ( (!dir.exists()) || (!dir.isDirectory())) { 
-				error("Dir not exists or the File is not Dir -> " +SRC_DIR_V2);
+				error("Dir not exists or the File is not Dir -> " +  getSourceV2Dir());
 			}
 		}
 		
@@ -268,7 +268,7 @@ public class TestManyUploads extends BaseTest {
         
         
         {
-        File tmpdir = new File(DOWNLOAD_DIR_V0);
+        File tmpdir = new File(super.getDownloadDirHeadVersion());
         
         if ( (tmpdir.exists()) && (tmpdir.isDirectory())) { 
         	try {

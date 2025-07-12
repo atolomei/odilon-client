@@ -95,10 +95,10 @@ public class TestManyPresignedUrl extends BaseTest {
 	 */
 	private boolean addFiles() {
 		
-        File dir = new File(SRC_DIR_V0);
+        File dir = new File( getSourceDir());
         
         if ( (!dir.exists()) || (!dir.isDirectory())) { 
-			error("Dir not exists or the File is not Dir -> " +SRC_DIR_V0);
+			error("Dir not exists or the File is not Dir -> " + getSourceDir());
 		}
         
 		int counter = 0;
