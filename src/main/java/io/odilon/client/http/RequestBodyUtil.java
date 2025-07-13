@@ -26,15 +26,13 @@ import okio.BufferedSink;
 import okio.Okio;
 import okio.Source;
 
-
 /**
  * 
  * @author atolomei@novamens.com (Alejandro Tolomei)
  */
 public class RequestBodyUtil {
 
-	
-	public static RequestBody create(final MediaType mediaType, final InputStream inputStream) {
+    public static RequestBody create(final MediaType mediaType, final InputStream inputStream) {
         return new RequestBody() {
             @Override
             public MediaType contentType() {

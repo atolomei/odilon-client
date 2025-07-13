@@ -23,18 +23,22 @@ import java.util.List;
 
 import org.apache.commons.validator.routines.RegexValidator;
 
-
 /**
- * <p><b>InetAddress</b> validation and conversion routines (<code>java.net.InetAddress</code>).</p>
- *
- * <p>This class provides methods to validate a candidate IP address.
+ * <p>
+ * <b>InetAddress</b> validation and conversion routines
+ * (<code>java.net.InetAddress</code>).
+ * </p>
  *
  * <p>
- * This class is a Singleton; you can retrieve the instance via the {@link #getInstance()} method.
+ * This class provides methods to validate a candidate IP address.
+ *
+ * <p>
+ * This class is a Singleton; you can retrieve the instance via the
+ * {@link #getInstance()} method.
  * </p>
  *
  * @author atolomei@novamens.com (Alejandro Tolomei)
- *  
+ * 
  */
 public class InetAddressValidator implements Serializable {
 
@@ -46,8 +50,7 @@ public class InetAddressValidator implements Serializable {
 
     private static final long serialVersionUID = -919201640201914789L;
 
-    private static final String IPV4_REGEX =
-            "^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$";
+    private static final String IPV4_REGEX = "^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$";
 
     // Max number of hex groups (separated by :) in an IPV6 address
     private static final int IPV6_MAX_HEX_GROUPS = 8;
@@ -65,6 +68,7 @@ public class InetAddressValidator implements Serializable {
 
     /**
      * Returns the singleton instance of this validator.
+     * 
      * @return the singleton instance of this validator
      */
     public static InetAddressValidator getInstance() {
@@ -73,6 +77,7 @@ public class InetAddressValidator implements Serializable {
 
     /**
      * Checks if the specified string is a valid IP address.
+     * 
      * @param inetAddress the string to validate
      * @return true if the string validates as an IP address
      */
@@ -82,6 +87,7 @@ public class InetAddressValidator implements Serializable {
 
     /**
      * Validates an IPv4 address. Returns true if valid.
+     * 
      * @param inet4Address the IPv4 address to validate
      * @return true if the argument contains a valid IPv4 address
      */
@@ -103,7 +109,7 @@ public class InetAddressValidator implements Serializable {
 
             try {
                 iIpSegment = Integer.parseInt(ipSegment);
-            } catch(NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 return false;
             }
 
@@ -122,6 +128,7 @@ public class InetAddressValidator implements Serializable {
 
     /**
      * Validates an IPv6 address. Returns true if valid.
+     * 
      * @param inet6Address the IPv6 address to validate
      * @return true if the argument contains a valid IPv6 address
      * 
@@ -148,7 +155,7 @@ public class InetAddressValidator implements Serializable {
         parts = parts[0].split("%", -1);
         if (parts.length > 2) {
             return false;
-        } else if (parts.length == 2){
+        } else if (parts.length == 2) {
             // The id syntax is implemenatation independent, but it presumably cannot allow:
             // whitespace, '/' or '%'
             if (!parts[1].matches("[^\\s/%]+")) {
@@ -218,9 +225,3 @@ public class InetAddressValidator implements Serializable {
         return true;
     }
 }
-
-
-
-	
-	
-
