@@ -334,6 +334,10 @@ public abstract class BaseTest {
 		error(e.getClass().getName() +( e.getMessage()!=null ? (" | " + e.getMessage()) : ""));
 	}
 	
+	public void error(Exception e, String str) {
+		error(e.getClass().getName() +( e.getMessage()!=null ? (" | " + e.getMessage()) : "") + (str!=null?str:""));
+	}
+
 	public void error(String string) {
 		logger.error(string);
 		System.exit(1);

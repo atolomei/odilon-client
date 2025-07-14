@@ -32,3 +32,5 @@ replay_pid*
 /dependencies.txt
 /deploy-maven-central
 /deploy-maven-central-1.7
+/deploy*
+

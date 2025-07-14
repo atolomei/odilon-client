@@ -24,12 +24,12 @@ public class TestServiceRequest extends BaseTest {
 
 	@Override
 	public void executeTest() {
-	
+
 		preCondition();
-		
+
 		int counter = 0;
 		while (counter++ < 100) {
-		try {
+			try {
 				((ODClient) getClient()).addServiceRequest("Test");
 				try {
 					Thread.sleep(500);
@@ -39,23 +39,23 @@ public class TestServiceRequest extends BaseTest {
 				error(e.getClass().getName() + " | " + e.getMessage());
 			}
 		}
-	
+
 	}
 
 	public boolean preCondition() {
-		
-		 try {
-				String p=ping();
-				if (p==null || !p.equals("ok"))
-					error("ping  -> " + p!=null?p:"null");
-				else {
-					getMap().put("ping", "ok");
-				}
-			} catch (Exception e)	{
-				error(e.getClass().getName() + " | " + e.getMessage());
+
+		try {
+			String p = ping();
+			if (p == null || !p.equals("ok"))
+				error("ping  -> " + p != null ? p : "null");
+			else {
+				getMap().put("ping", "ok");
 			}
-		 
-		 return true;
-		 
+		} catch (Exception e) {
+			error(e.getClass().getName() + " | " + e.getMessage());
+		}
+
+		return true;
+
 	}
 }

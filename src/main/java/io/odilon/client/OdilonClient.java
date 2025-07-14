@@ -1326,4 +1326,12 @@ public interface OdilonClient {
     public String getVersion();
 
     public String toJSON();
+
+    /**
+     * 
+     * 
+     * @param presignedUrl
+     * @return
+     */
+	public boolean isValidPresignedUrl(String presignedUrl);
 }

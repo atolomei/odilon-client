@@ -16,7 +16,6 @@
  */
 package io.odilon.client.unit;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -42,102 +41,91 @@ import io.odilon.util.OdilonFileUtils;
  * 
  */
 public class TestDeleteObject extends BaseTest {
-			
+
 	private static Logger logger = Logger.getLogger(TestDeleteObject.class.getName());
 
-	
 	static final int BUFFER_SIZE = 4096;
-	
-	//static final int MAX = 20;
+
+	// static final int MAX = 20;
 	static final long MAX_LENGTH = 100 * 10000; // 1 MB
-	
+
 	private int index = 0;
 	private int sub_index = 0;
-	
+
 	private Bucket bucket_1 = null;
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
-	private OffsetDateTime showStatus = OffsetDateTime.now();	
-	
-	
+	private OffsetDateTime showStatus = OffsetDateTime.now();
+
 	public TestDeleteObject() {
 	}
-		 
-	
+
 	public void executeTest() {
-		
+
 		bucket_1 = createTestDeleteBucket();
-		
+
 		index = 0;
 		testAddObjects();
-		
+
 		index = 0;
 		testDeleteObjects();
-		
-		
+
 		index = 0;
 		testDeleteNonExistentObjects();
-		
+
 		index = 0;
 		removeTestBucket();
 
-		//index = 0;
-		//testDeleteAllObjects();
-		
+		// index = 0;
+		// testDeleteAllObjects();
+
 		showResults();
 
 	}
 
 	public boolean testDeleteNonExistentObjects() {
-		
-		
+
 		try {
-			
+
 			sleep();
-			
+
 			getClient().deleteObject(this.bucket_1.getName(), randomString(12));
 			error("should have thrown exception - delete object non existent");
 			return false;
-			
+
 		} catch (ODClientException e) {
 			logger.debug("This exception is ok -> " + e.toString());
-			
+
 			logger.debug("testDeleteNonExistentObjects", "ok");
 			getMap().put("testDeleteNonExistentObjects", "ok");
-			
+
 			return true;
 		}
-		
-		
-		
-		
+
 	}
-	
 
 	public boolean testDeleteAllObjects() {
-		
-		
+
 		try {
-			
-		    sub_index = 0;
-		    
-			getClient().listBuckets().forEach( bucket ->  {
-				
+
+			sub_index = 0;
+
+			getClient().listBuckets().forEach(bucket -> {
+
 				try {
 
-					ResultSet<Item<ObjectMetadata>>  rs = getClient().listObjects(bucket);
+					ResultSet<Item<ObjectMetadata>> rs = getClient().listObjects(bucket);
 
 					while (rs.hasNext()) {
 						Item<ObjectMetadata> item = rs.next();
 						if (item.isOk()) {
-							getClient().deleteObject(item.getObject().bucketName, item.getObject().objectName);				
-						}
-						else {
+							getClient().deleteObject(item.getObject().bucketName, item.getObject().objectName);
+						} else {
 							logger.debug(item.getErrorString());
 						}
-				
+
 						/** display status every 4 seconds or so */
-						if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-							logger.info( "testDeleteAllObjects -> " + String.valueOf(sub_index) );
+						if (dateTimeDifference(showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS) > THREE_SECONDS) {
+							logger.info("testDeleteAllObjects -> " + String.valueOf(sub_index));
 							showStatus = OffsetDateTime.now();
 						}
 						sub_index++;
@@ -148,197 +136,182 @@ public class TestDeleteObject extends BaseTest {
 				}
 			});
 
-            logger.info( "testDeleteAllObjects -> " + String.valueOf(sub_index));
+			logger.info("testDeleteAllObjects -> " + String.valueOf(sub_index));
 			logger.debug("testDeleteAllObjects", "ok");
 			getMap().put("testDeleteAllObjects", "ok");
 
 			return true;
-			
+
 		} catch (ODClientException e) {
 			error(e);
 			return false;
 		}
-		
+
 	}
-	
-	
 
 	/**
 	 * 
 	 * @return
 	 */
 	public Bucket createTestDeleteBucket() {
-		
+
 		String bucketName = "test-delete";
-		
+
 		try {
 			if (!getClient().existsBucket(bucketName)) {
-					getClient().createBucket(bucketName);
-					logger.debug("createTestBucket -> ok");
-					getMap().put("createTestBucket", "ok");
+				getClient().createBucket(bucketName);
+				logger.debug("createTestBucket -> ok");
+				getMap().put("createTestBucket", "ok");
 			}
 			return getClient().getBucket(bucketName);
-			
+
 		} catch (ODClientException e) {
 			error(e);
 			return null;
 		}
-		
-		
-			
+
 	}
-	
+
 	public boolean testDeleteObjects() {
-	
-	   sub_index = 0;
-	   
-		for( TestFile tf: testFiles.values()) {
-			
+
+		sub_index = 0;
+
+		for (TestFile tf : testFiles.values()) {
+
 			try {
-				
+
 				if (getClient().existsObject(tf.bucketName, tf.objectName)) {
-					
-				    getClient().deleteObject(tf.bucketName, tf.objectName);
+
+					getClient().deleteObject(tf.bucketName, tf.objectName);
 
 					if (getClient().existsObject(tf.bucketName, tf.objectName)) {
 						error("should not exist ->" + tf.bucketName + " | " + tf.objectName);
 					}
-					
+
 					sleep();
 
 					/** display status every 4 seconds or so */
-					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-						logger.info( "testDeleteObjects -> " + String.valueOf(sub_index) + " / " + String.valueOf(testFiles.size()));
+					if (dateTimeDifference(showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS) > THREE_SECONDS) {
+						logger.info("testDeleteObjects -> " + String.valueOf(sub_index) + " / "
+								+ String.valueOf(testFiles.size()));
 						showStatus = OffsetDateTime.now();
 					}
 				}
 			} catch (ODClientException | IOException e) {
-				logger.error(e);	
+				logger.error(e);
 				error(e);
 			}
 			sub_index++;
 		}
 
-        logger.info( "testDeleteObjects -> " + String.valueOf(sub_index) + " / " + String.valueOf(testFiles.size()));
+		logger.info("testDeleteObjects -> " + String.valueOf(sub_index) + " / " + String.valueOf(testFiles.size()));
 		logger.debug("testDeleteObjects", "ok");
 		getMap().put("testDeleteObjects", "ok");
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * @return
 	 */
 	public boolean testAddObjects() {
-		
-        File dir = new File(getSourceDir());
-        
-        if ( (!dir.exists()) || (!dir.isDirectory())) { 
+
+		File dir = new File(getSourceDir());
+
+		if ((!dir.exists()) || (!dir.isDirectory())) {
 			throw new RuntimeException("Dir not exists or the File is not Dir -> " + getSourceDir());
 		}
-        
-		int counter = 0;
-		
-		String bucketName = null;
-		
-		
-		bucketName = this.bucket_1.getName();
-		
 
-		for (File fi:dir.listFiles()) {
-			
+		int counter = 0;
+
+		String bucketName = null;
+
+		bucketName = this.bucket_1.getName();
+
+		for (File fi : dir.listFiles()) {
+
 			if (counter == getMax())
 				break;
-			
-			if (!fi.isDirectory() && (FSUtil.isPdf(fi.getName()) || FSUtil.isImage(fi.getName()) || FSUtil.isZip(fi.getName())) && (fi.length()<MAX_LENGTH)) {
-				String objectName = FSUtil.getBaseName(fi.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*100000))).intValue());
+
+			if (!fi.isDirectory()
+					&& (FSUtil.isPdf(fi.getName()) || FSUtil.isImage(fi.getName()) || FSUtil.isZip(fi.getName()))
+					&& (fi.length() < MAX_LENGTH)) {
+				String objectName = FSUtil.getBaseName(fi.getName()) + "-"
+						+ String.valueOf(Double.valueOf((Math.abs(Math.random() * 100000))).intValue());
 				try {
-					
+
 					getClient().putObject(bucketName, objectName, fi);
-					testFiles.put(bucketName+"-"+objectName, new TestFile(fi, bucketName, objectName));
-					counter++; 
-					
+					testFiles.put(bucketName + "-" + objectName, new TestFile(fi, bucketName, objectName));
+					counter++;
+
 					sleep();
 
 					/** display status every 4 seconds or so */
-					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-						logger.info( "testAddObjects add -> " + String.valueOf(counter));
+					if (dateTimeDifference(showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS) > THREE_SECONDS) {
+						logger.info("testAddObjects add -> " + String.valueOf(counter));
 						showStatus = OffsetDateTime.now();
 					}
-					
+
 				} catch (ODClientException e) {
-					error(String.valueOf(e.getHttpStatus())+ " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
+					error(String.valueOf(e.getHttpStatus()) + " " + e.getMessage() + " "
+							+ String.valueOf(e.getErrorCode()));
 
 				}
 			}
 		}
-		
-		
-		logger.info( "testAddObjects -> Total:  " + String.valueOf(testFiles.size()));
-		
+
+		logger.info("testAddObjects -> Total:  " + String.valueOf(testFiles.size()));
+
 		index = testFiles.size();
-		
+
 		sub_index = 0;
-		
-		testFiles.forEach( (k,v) -> {
-		ObjectMetadata meta = null;
 
-		
-		try {
+		testFiles.forEach((k, v) -> {
+			ObjectMetadata meta = null;
 
-		    meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
-		    sub_index++;
-		    
-				
-		} catch (ODClientException e) {
+			try {
+
+				meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
+				sub_index++;
+
+			} catch (ODClientException e) {
 				error(e);
-		}
-			
-		String destFileName = super.getDownloadDirHeadVersion() + File.separator + meta.fileName;
-		
-		try {
+			}
+
+			String destFileName = super.getDownloadDirHeadVersion() + File.separator + meta.fileName;
+
+			try {
 				getClient().getObject(meta.bucketName, meta.objectName, destFileName);
-				
-		} catch (ODClientException | IOException e) {
+
+			} catch (ODClientException | IOException e) {
 				error(e);
-		}
-		
-		try {
-				String src_sha = v. getSrcFileSha256(0);
+			}
+
+			try {
+				String src_sha = v.getSrcFileSha256(0);
 				String new_sha = OdilonFileUtils.calculateSHA256String(new File(destFileName));
-				
+
 				if (!src_sha.equals(new_sha)) {
-					error("Error sha256 are not equal ->  b: " + meta.bucketName+" - o:"+meta.objectName + " f:" + meta.fileName);
+					error("Error sha256 are not equal ->  b: " + meta.bucketName + " - o:" + meta.objectName + " f:"
+							+ meta.fileName);
 				}
-				
-				
+
 				/** display status every 4 seconds or so */
-                if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-                    logger.info( "testAddObjects check -> " + String.valueOf(sub_index) + " / " + String.valueOf(testFiles.size()));
-                    showStatus = OffsetDateTime.now();
-                }
-				
-				
-					
+				if (dateTimeDifference(showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS) > THREE_SECONDS) {
+					logger.info("testAddObjects check -> " + String.valueOf(sub_index) + " / "
+							+ String.valueOf(testFiles.size()));
+					showStatus = OffsetDateTime.now();
+				}
+
 			} catch (NoSuchAlgorithmException | IOException e) {
 				error(e);
 			}
-		
 
-		
 		});
-	
-	logger.debug("testAddObjects ok");
-	getMap().put("testAddObjects", "ok");
-	return true;
+
+		logger.debug("testAddObjects ok");
+		getMap().put("testAddObjects", "ok");
+		return true;
 	}
-
-	
-
-
-//protected int getCounter() {
-//	return index;
-//}
-
 
 }

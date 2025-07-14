@@ -223,37 +223,9 @@ public class TestQuery extends BaseTest {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /** -----------------------------------------------------------
  * 
  * 
-
 private void dummy() {
 
 Path start = Paths.get(TEMP_DIR);
