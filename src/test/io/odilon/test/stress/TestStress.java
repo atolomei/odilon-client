@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.io.FileUtils;
 
 import io.odilon.client.error.ODClientException;
-import io.odilon.client.util.FSUtil;
 import io.odilon.log.Logger;
 import io.odilon.model.Bucket;
 import io.odilon.model.SharedConstant;
@@ -27,10 +26,6 @@ public class TestStress extends BaseTest {
 	static final double MB = SharedConstant.d_megabyte;;
 	static final double GB = SharedConstant.d_gigabyte;
 
-	//static final String SRC_DIR = "c:\\";
-	//static final String DOWNLOAD_DIR = "c:"+File.separator+"temp" + File.separator + "stress";
-
-			
 	private List<String> bannedDirs;
 	
 	static final int BUFFER_SIZE = 4096;

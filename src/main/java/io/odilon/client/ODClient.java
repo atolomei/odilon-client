@@ -252,6 +252,12 @@ public class ODClient implements OdilonClient {
 	private String presignedPortStr;
 	private boolean presignedSSL;
 
+	private int port;
+	
+	public int getPort() {
+		return this.port;
+	}
+	
 	/***
 	 * 
 	 * <p>
@@ -337,6 +343,7 @@ public class ODClient implements OdilonClient {
 			if (port > 0)
 				urlBuilder.port(port);
 
+			this.port=port;
 			this.serverBaseUrl = urlBuilder.build();
 			this.accessKey = accessKey;
 			this.secretKey = secretKey;

@@ -144,6 +144,7 @@ public class TestStressUploader implements Runnable {
 
 									try {
 										
+											@SuppressWarnings("unused")
 											ObjectMetadata meta = this.tester.getClient().putObjectStream( 	this.bucket.getName(), 
 																											objectName, 
 																											inputStream, 

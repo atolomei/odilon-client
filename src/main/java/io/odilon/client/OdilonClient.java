@@ -1255,6 +1255,18 @@ public interface OdilonClient {
 
     public String getSchemaAndHost();
 
+
+    
+    /**
+     * <p>
+     * Returns the port of the Odilon server (default port is 9234)
+     * </p>
+     * 
+     * @return server port
+     */
+    public int getPort();
+
+    
     /*
      * ======================================= 
      * CLIENT SETTINGS
