@@ -1,6 +1,6 @@
 /*
  * Odilon Object Storage
- * (C) Novamens 
+ * (c) kbee 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ public class TestPresignedUrl extends BaseTest {
 
 			{
 				
-				logger.debug("60 seconds expire time");
+				logger.debug("url -> 120 seconds expire time. binary object -> 120 secs. cache duration");
 
 				List<String> list = new ArrayList<String>();
 				
@@ -88,7 +88,7 @@ public class TestPresignedUrl extends BaseTest {
 					if (item.isOk()) {
 						ObjectMetadata meta = item.getObject();
 					
-						String str = getClient().getPresignedObjectUrl(meta.bucketName, meta.objectName, Optional.of(60));
+						String str = getClient().getPresignedObjectUrl(meta.bucketName, meta.objectName, Optional.of(120), Optional.of(120));
 						list.add(str);
 						logger.debug(meta.bucketName + " / " + meta.objectName + " -> " + str);
 						total++;

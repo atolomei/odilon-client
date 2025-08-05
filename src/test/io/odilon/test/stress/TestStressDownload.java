@@ -1,7 +1,7 @@
 package io.odilon.test.stress;
 /*
  * Odilon Object Storage
- * (C) Novamens 
+ * (c) kbee 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

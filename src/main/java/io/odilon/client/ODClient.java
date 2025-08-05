@@ -126,8 +126,6 @@ public class ODClient implements OdilonClient {
 
 	private static final String API_SERVICE_REQUES_ADD[] = { "servicerequest", "add" };
 
-	
-	
 	private static final String API_GET_VALID_PRESIGNED[] = { "isvalidpresigned" };
 
 	
@@ -1137,9 +1135,14 @@ public class ODClient implements OdilonClient {
 	 * specified when the URL is generated.
 	 * </p>
 	 */
-	public String getPresignedObjectUrl(String bucketName, String objectName, Optional<Integer> expires,
+	public String getPresignedObjectUrl(
+			String bucketName, 
+			String objectName, 
+			Optional<Integer> expires,
+			Optional<Integer> objectCacheExpiresInSeconds,		
 			Map<String, String> reqParams) throws ODClientException {
-		return getPresignedObjectUrl(Method.GET, bucketName, objectName, expires, reqParams);
+		return getPresignedObjectUrl(Method.GET, bucketName, objectName, expires, objectCacheExpiresInSeconds, reqParams);
+	
 	}
 
 	/**
@@ -1149,10 +1152,24 @@ public class ODClient implements OdilonClient {
 	 * specified when the URL is generated.
 	 * </p>
 	 */
-	public String getPresignedObjectUrl(String bucketName, String objectName, Optional<Integer> expires)
+	public String getPresignedObjectUrl(
+			String bucketName, 
+			String objectName, 
+			Optional<Integer> expires,
+			Optional<Integer> objectCacheExpiresInSeconds)
 			throws ODClientException {
-		return getPresignedObjectUrl(Method.GET, bucketName, objectName, expires, null);
+		return getPresignedObjectUrl(Method.GET, bucketName, objectName, expires, objectCacheExpiresInSeconds, null);
 	}
+	
+	
+	public String getPresignedObjectUrl(
+			String bucketName, 
+			String objectName, 
+			Optional<Integer> expires)
+			throws ODClientException {
+		return getPresignedObjectUrl(Method.GET, bucketName, objectName, expires, Optional.empty(), null);
+	}
+	
 
 	/**
 	 * <p>
@@ -1164,9 +1181,16 @@ public class ODClient implements OdilonClient {
 
 	@Override
 	public String getPresignedObjectUrl(String bucketName, String objectName) throws ODClientException {
-		return getPresignedObjectUrl(bucketName, objectName, Optional.empty(), null);
+		return getPresignedObjectUrl(bucketName, objectName, Optional.empty(), Optional.empty(), null);
 	}
 
+	
+	
+	
+	
+	
+	
+	
 	@Override
 	public boolean existsObject(String bucketName, String objectName) throws ODClientException, IOException {
 		Check.requireNonNullStringArgument(bucketName, "bucketName is null or empty");
@@ -1667,7 +1691,7 @@ public class ODClient implements OdilonClient {
 	 * @return string contains URL to download the object.
 	 */
 	private String getPresignedObjectUrl(Method method, String bucketName, String objectName,
-			Optional<Integer> expiresInSeconds, Map<String, String> reqParams) throws ODClientException {
+			Optional<Integer> urlExpiresInSeconds, Optional<Integer> objectCacheExpiresInSeconds, Map<String, String> reqParams) throws ODClientException {
 
 		Check.requireNonNullStringArgument(bucketName, "bucketName is null or empty");
 		Check.requireNonNullStringArgument(objectName, "objectName can not be null or empty | b:" + bucketName);
@@ -1677,8 +1701,11 @@ public class ODClient implements OdilonClient {
 		if (reqParams == null)
 			reqParams = new HashMap<String, String>();
 
-		reqParams.put("durationSeconds", String.valueOf(expiresInSeconds.orElse(DEFAULT_EXPIRY_TIME)));
+		reqParams.put("durationSeconds", String.valueOf(urlExpiresInSeconds.orElse(DEFAULT_EXPIRY_TIME)));
 
+		if (objectCacheExpiresInSeconds.isPresent())
+			reqParams.put("objectCacheExpiresSeconds", String.valueOf(objectCacheExpiresInSeconds.get()));
+		  		          
 		Multimap<String, String> queryParamMultiMap = Multimaps.forMap(reqParams);
 		httpResponse = executeGetReq(API_OBJECT_GET_PRESIGNEDURL, Optional.of(bucketName), Optional.of(objectName),
 				null, queryParamMultiMap);

@@ -614,12 +614,16 @@ public interface OdilonClient {
      * 
      * @param bucketName       can not be null
      * @param objectName       can not be null
-     * @param expiresInSeconds duration in seconds for the url to be valid
-     * 
+     * @param urlExpiresInSeconds duration in seconds for the url to be valid
+     * @param objectCacheExpiresInSeconds The HTTP header cache duration in seconds for the binary object served by this token. This tells the web browser downloading this object the maximum amount of time it can cache it before invalidating it.
+
      * @return temporary url to download the file without authentication
      * 
      */
-    public String getPresignedObjectUrl(String bucketName, String objectName, Optional<Integer> expiresInSeconds)
+    public String getPresignedObjectUrl(String bucketName,
+    									String objectName, 
+    									Optional<Integer> urlExpiresInSeconds, 
+    									Optional<Integer> objectCacheExpiresInSeconds)
             throws ODClientException;
 
     /**
@@ -640,6 +644,29 @@ public interface OdilonClient {
      */
     public String getPresignedObjectUrl(String bucketName, String objectName) throws ODClientException;
 
+    
+
+    /**
+     * <p>
+     * Returns a temporary URL to access or download the binary data of an Object
+     * without authentication
+     * </p>
+     * <p>
+     * This is method calls {@link #getPresignedObjectUrl} with the default value
+     * for {@code expiresInSeconds} (ie. 7 days in seconds)
+     * </p>
+     * 
+     * @param bucketName can not be null
+     * @param objectName can not be null
+     * @param expiresInSeconds duration in seconds for the url to be valid
+     * 
+     * @return temporary url to download the file without authentication
+     * 
+     */    
+    public String getPresignedObjectUrl(String bucketName, String objectName, Optional<Integer> expiresInSeconds)
+            throws ODClientException;
+
+    
     /*
      * -------------------- /* OBJECT put --------------------
      */

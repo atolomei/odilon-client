@@ -10,7 +10,7 @@
 	<packaging>jar</packaging>
 	<name>Odilon Client</name>
 	<description>
-		Odilon Java SDK for Odilon Object Storage (v.13+).
+		Odilon Java SDK for Odilon Object Storage.
 		A Java client program that interacts with the Odilon server must include
 		the Odilon Java SDK jar in the classpath.
 		https://odilon.io
@@ -34,6 +34,9 @@
 		<junit-version>5.10.1</junit-version>
 		<metrics.version>4.2.27</metrics.version>
 		<okhttp.version>4.12.0</okhttp.version>
+		
+		<maven-clean-plugin-version>3.3.2</maven-clean-plugin-version>
+		
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
 		<maven-javadoc-plugin-version>3.6.3</maven-javadoc-plugin-version>
@@ -68,11 +71,7 @@
 			<id>my-local-repo</id>
 			<url>file://${basedir}/nonstandardlib/</url>
 		</repository>
-
-		<repository>
-			<id>novamens-releases</id>
-			<url>https://maven.novamens.com/nexus/content/repositories/releases/</url>
-		</repository>
+		 
 	</repositories>
 
 	<dependencies>
@@ -143,7 +142,7 @@
 			<plugins>
 				<plugin>
 					<artifactId>maven-clean-plugin</artifactId>
-					<version>3.3.2</version>
+					<version>${maven-clean-plugin-version}</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-resources-plugin</artifactId>
