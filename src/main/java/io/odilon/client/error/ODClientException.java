@@ -29,107 +29,109 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.odilon.net.ErrorCode;
 
 /**
- *	<p>Exception thrown by the Odilon client library.<br/> 
- *It contains three main parts:
- *</p> 
- *<ul>
- *  <li>The code of the {@link io.odilon.net.ODHttpStatus ODHttpStatus} status ({@code int})</li>
- * <li>The code of the Odilon {@link  io.odilon.net.ErrorCode ErrorCode} ({@code int})</li>
+ * <p>
+ * Exception thrown by the Odilon client library.<br/>
+ * It contains three main parts:
+ * </p>
+ * <ul>
+ * <li>The code of the {@link io.odilon.net.ODHttpStatus ODHttpStatus} status
+ * ({@code int})</li>
+ * <li>The code of the Odilon {@link io.odilon.net.ErrorCode ErrorCode}
+ * ({@code int})</li>
  * <li>Odilon error message ({@code String})</li>
- *</ul>
+ * </ul>
  * 
  *
  * @author atolomei@novamens.com (Alejandro Tolomei)
  */
 public class ODClientException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	static private ObjectMapper mapper = new ObjectMapper();
-	
-	static  {
-		mapper.registerModule(new JavaTimeModule());
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	}	
-	
-	@JsonProperty("httpStatus")
-	private int httpStatus;
-	
-	@JsonProperty("odilonErrorCode")
-	private int odilonErrorCode;
+    static private ObjectMapper mapper = new ObjectMapper();
 
-	@JsonProperty("odilonErrorMessage")
-	private String odilonErrorMessage;
-	
-	@JsonProperty("context")
-	private Map<String, String> context = new HashMap<String, String>();
+    static {
+        mapper.registerModule(new JavaTimeModule());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
-	public ODClientException(Exception e) {
-		super(e);
-		this.httpStatus=0;
-		this.odilonErrorCode=ErrorCode.CLIENT_ERROR.value();
-		this.odilonErrorMessage= e.getClass().getName() + 
-								(e.getMessage()!=null? ( " | " + e.getMessage() ) :"" );
-	}
-	
-	public ODClientException(int odilonErrorCode, String odilonErrorMessage) {
-		super(odilonErrorMessage);
-		this.httpStatus=0;
-		this.odilonErrorCode=odilonErrorCode;
-		this.odilonErrorMessage=odilonErrorMessage;
-	}
+    @JsonProperty("httpStatus")
+    private int httpStatus;
 
-	public ODClientException(int httpStatus, int odilonErrorCode, String odilonErrorMessage) {
-		super(odilonErrorMessage);
-		this.httpStatus=httpStatus;
-		this.odilonErrorCode=odilonErrorCode;
-		this.odilonErrorMessage=odilonErrorMessage;
-	}
+    @JsonProperty("odilonErrorCode")
+    private int odilonErrorCode;
 
-	public String getMessage() {					
-		return odilonErrorMessage;
-	}
+    @JsonProperty("odilonErrorMessage")
+    private String odilonErrorMessage;
 
-	public int getHttpStatus() {
-		return httpStatus;
-	}
+    @JsonProperty("context")
+    private Map<String, String> context = new HashMap<String, String>();
 
-	public void setHttpStatus(int httpStatus) {
-		this.httpStatus = httpStatus;
-	}
+    public ODClientException(Exception e) {
+        super(e);
+        this.httpStatus = 0;
+        this.odilonErrorCode = ErrorCode.CLIENT_ERROR.value();
+        this.odilonErrorMessage = e.getClass().getName() + (e.getMessage() != null ? (" | " + e.getMessage()) : "");
+    }
 
-	public int getErrorCode() {
-		return odilonErrorCode;
-	}
+    public ODClientException(int odilonErrorCode, String odilonErrorMessage) {
+        super(odilonErrorMessage);
+        this.httpStatus = 0;
+        this.odilonErrorCode = odilonErrorCode;
+        this.odilonErrorMessage = odilonErrorMessage;
+    }
 
-	public void setErrorCode(int odilonErrorCode) {
-		this.odilonErrorCode = odilonErrorCode;
-	}
+    public ODClientException(int httpStatus, int odilonErrorCode, String odilonErrorMessage) {
+        super(odilonErrorMessage);
+        this.httpStatus = httpStatus;
+        this.odilonErrorCode = odilonErrorCode;
+        this.odilonErrorMessage = odilonErrorMessage;
+    }
 
-	public void setContext(Map<String, String> s) {
-		context=s;
-	}
-	
-	public Map<String, String> getContext() {
-		return context;
-	}
+    public String getMessage() {
+        return odilonErrorMessage;
+    }
 
-	@Override
-	public String toString() {
-			StringBuilder str = new StringBuilder();
-			str.append(this.getClass().getSimpleName() +"{");
-			str.append("\"httpStatus\":"  + String.valueOf(httpStatus));
-			str.append(", \"odilonErrorCode\": "  + String.valueOf(odilonErrorCode));
-			str.append(", \"odilonErrorMessage\": \""  + String.valueOf(Optional.ofNullable(odilonErrorMessage).orElse("null"))+"\"");
-			str.append("}");
-			return str.toString();
-	}
-	
-	public String toJSON() {
-	   try {
-			return mapper.writeValueAsString(this);
-		} catch (JsonProcessingException e) {
-					return "\"error\":\"" + e.getClass().getName()+ " | " + e.getMessage()+"\""; 
-		}
-	}
+    public int getHttpStatus() {
+        return httpStatus;
+    }
+
+    public void setHttpStatus(int httpStatus) {
+        this.httpStatus = httpStatus;
+    }
+
+    public int getErrorCode() {
+        return odilonErrorCode;
+    }
+
+    public void setErrorCode(int odilonErrorCode) {
+        this.odilonErrorCode = odilonErrorCode;
+    }
+
+    public void setContext(Map<String, String> s) {
+        context = s;
+    }
+
+    public Map<String, String> getContext() {
+        return context;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+        str.append(this.getClass().getSimpleName() + "{");
+        str.append("\"httpStatus\":" + String.valueOf(httpStatus));
+        str.append(", \"odilonErrorCode\": " + String.valueOf(odilonErrorCode));
+        str.append(", \"odilonErrorMessage\": \"" + String.valueOf(Optional.ofNullable(odilonErrorMessage).orElse("null")) + "\"");
+        str.append("}");
+        return str.toString();
+    }
+
+    public String toJSON() {
+        try {
+            return mapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            return "\"error\":\"" + e.getClass().getName() + " | " + e.getMessage() + "\"";
+        }
+    }
 }

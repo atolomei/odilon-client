@@ -33,56 +33,56 @@ import okio.Okio;
  * 
  */
 public class HttpRequestBody extends RequestBody {
-  private final String contentType;
-  private final Object data;
-  private final int len;
+    private final String contentType;
+    private final Object data;
+    private final int len;
 
-  public HttpRequestBody(final String contentType, final Object data, final int len) {
-    this.contentType = contentType;
-    this.data = data;
-    this.len = len;
-  }
-
-  @Override
-  public MediaType contentType() {
-    MediaType mediaType = null;
-
-    if (contentType != null) {
-      mediaType = MediaType.parse(contentType);
-    }
-    if (mediaType == null) {
-      mediaType = MediaType.parse("application/octet-stream");
+    public HttpRequestBody(final String contentType, final Object data, final int len) {
+        this.contentType = contentType;
+        this.data = data;
+        this.len = len;
     }
 
-    return mediaType;
-  }
+    @Override
+    public MediaType contentType() {
+        MediaType mediaType = null;
 
-  @Override
-  public long contentLength() {
-    if (data instanceof InputStream || data instanceof RandomAccessFile || data instanceof byte[]) {
-      return len;
+        if (contentType != null) {
+            mediaType = MediaType.parse(contentType);
+        }
+        if (mediaType == null) {
+            mediaType = MediaType.parse("application/octet-stream");
+        }
+
+        return mediaType;
     }
 
-    if (len == 0) {
-      return -1;
-    } else {
-      return len;
-    }
-  }
+    @Override
+    public long contentLength() {
+        if (data instanceof InputStream || data instanceof RandomAccessFile || data instanceof byte[]) {
+            return len;
+        }
 
-  @Override
-  public void writeTo(BufferedSink sink) throws IOException {
-    if (data instanceof InputStream) {
-      InputStream stream = (InputStream) data;
-      sink.writeAll(Okio.source(stream));
-    } else if (data instanceof RandomAccessFile) {
-      RandomAccessFile file = (RandomAccessFile) data;
-      sink.write(Okio.source(Channels.newInputStream(file.getChannel())), len);
-    } else if (data instanceof byte[]) {
-      byte[] bytes = (byte[]) data;
-      sink.write(bytes, 0, len);
-    } else {
-      sink.writeUtf8(data.toString());
+        if (len == 0) {
+            return -1;
+        } else {
+            return len;
+        }
     }
-  }
+
+    @Override
+    public void writeTo(BufferedSink sink) throws IOException {
+        if (data instanceof InputStream) {
+            InputStream stream = (InputStream) data;
+            sink.writeAll(Okio.source(stream));
+        } else if (data instanceof RandomAccessFile) {
+            RandomAccessFile file = (RandomAccessFile) data;
+            sink.write(Okio.source(Channels.newInputStream(file.getChannel())), len);
+        } else if (data instanceof byte[]) {
+            byte[] bytes = (byte[]) data;
+            sink.write(bytes, 0, len);
+        } else {
+            sink.writeUtf8(data.toString());
+        }
+    }
 }

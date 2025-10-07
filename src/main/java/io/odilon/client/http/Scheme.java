@@ -17,34 +17,38 @@
 package io.odilon.client.http;
 
 /**
- * <p>HTTP schemes</p>
+ * <p>
+ * HTTP schemes
+ * </p>
  * 
- *  @author atolomei@novamens.com (Alejandro Tolomei)
- *  
+ * @author atolomei@novamens.com (Alejandro Tolomei)
+ * 
  */
 public enum Scheme {
-  HTTP("http"), 
-  HTTPS("https");
-  private final String value;
+    HTTP("http"), HTTPS("https");
 
-  private Scheme(String value) {
-    this.value = value;
-  }
+    private final String value;
 
-  /**
-   * <p>Returns Scheme enum of given string</p>
-   */
-  public static Scheme fromString(String scheme) {
-    if (scheme == null) {
-      throw new IllegalArgumentException("null scheme");
+    private Scheme(String value) {
+        this.value = value;
     }
 
-    for (Scheme s : Scheme.values()) {
-      if (scheme.equalsIgnoreCase(s.value)) {
-        return s;
-      }
-    }
+    /**
+     * <p>
+     * Returns Scheme enum of given string
+     * </p>
+     */
+    public static Scheme fromString(String scheme) {
+        if (scheme == null) {
+            throw new IllegalArgumentException("null scheme");
+        }
 
-    throw new IllegalArgumentException("invalid HTTP scheme '" + scheme + "'");
-  }
+        for (Scheme s : Scheme.values()) {
+            if (scheme.equalsIgnoreCase(s.value)) {
+                return s;
+            }
+        }
+
+        throw new IllegalArgumentException("invalid HTTP scheme '" + scheme + "'");
+    }
 }

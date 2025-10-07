@@ -23,35 +23,37 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 /**
- * <p>{@link ResponseHeader} and {@link Response} into one object to pass/return in various methods</p>
+ * <p>
+ * {@link ResponseHeader} and {@link Response} into one object to pass/return in
+ * various methods
+ * </p>
  * 
  * @author atolomei@novamens.com (Alejandro Tolomei)
  * 
  */
 public class HttpResponse {
-	
-  private ResponseHeader header;
-  private Response response;
 
-  public HttpResponse(ResponseHeader header, Response response) {
-    this.header = header;
-    this.response = response;
-  }
+    private ResponseHeader header;
+    private Response response;
 
-  
-  public ResponseHeader header() {
-    return this.header;
-  }
+    public HttpResponse(ResponseHeader header, Response response) {
+        this.header = header;
+        this.response = response;
+    }
 
-  public ResponseBody body() {
-    return this.response.body();
-  }
+    public ResponseHeader header() {
+        return this.header;
+    }
 
-  public Response response() {
-    return this.response;
-  }
+    public ResponseBody body() {
+        return this.response.body();
+    }
 
-  public Map<String,List<String>> httpHeaders() {
-    return this.response.headers().toMultimap();
-  }
+    public Response response() {
+        return this.response;
+    }
+
+    public Map<String, List<String>> httpHeaders() {
+        return this.response.headers().toMultimap();
+    }
 }

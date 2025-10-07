@@ -22,21 +22,26 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p>HTTP header annotation interface</p>
+ * <p>
+ * HTTP header annotation interface
+ * </p>
  * 
  * @author atolomei@novamens.com (Alejandro Tolomei)
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
+@Target({ ElementType.FIELD })
 public @interface Header {
-  /**
-   * <p>HTTP header name</p>
-   */
-  String value();
+    /**
+     * <p>
+     * HTTP header name
+     * </p>
+     */
+    String value();
 
-  /**
-   * <p>Setter method name. 'setFieldName' is used if empty</p>
-   */
-  String setter() default "";
+    /**
+     * <p>
+     * Setter method name. 'setFieldName' is used if empty
+     * </p>
+     */
+    String setter() default "";
 }
-
