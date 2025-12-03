@@ -18,6 +18,7 @@ package io.odilon.client.http.multipart;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,9 +28,13 @@ import io.odilon.client.ODClient;
 import io.odilon.client.error.ODClientException;
 
 import io.odilon.errors.InternalCriticalException;
+import io.odilon.json.OdilonObjectMapper;
 import io.odilon.log.Logger;
 import io.odilon.net.ErrorCode;
 import io.odilon.net.ODHttpStatus;
+
+//import tools.jackson.core.type.TypeReference;
+//import tools.jackson.databind.ObjectMapper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -98,13 +103,16 @@ public class HttpRequest {
 	private static final int CONNECTION_TIMEOUT   = ODClient.DEFAULT_CONNECTION_TIMEOUT;
 	private static final String DEFAULT_USER_AGENT = ODClient.DEFAULT_USER_AGENT; 
 
-	
-	private static final ObjectMapper mapper = new ObjectMapper();
-	
+
+	/**
+	private static final  ObjectMapper mapper = new ObjectMapper();
 	static {
 		mapper.registerModule(new JavaTimeModule());
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
+	**/
+	
+	private static final  OdilonObjectMapper mapper = new OdilonObjectMapper();
 	
 	private int chunk = 0;
 	private HttpURLConnection conn = null;

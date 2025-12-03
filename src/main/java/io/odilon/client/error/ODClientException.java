@@ -21,12 +21,15 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.odilon.net.ErrorCode;
+
+//import tools.jackson.databind.ObjectMapper;
 
 /**
  * <p>
@@ -51,7 +54,7 @@ public class ODClientException extends Exception {
     static private ObjectMapper mapper = new ObjectMapper();
 
     static {
-        mapper.registerModule(new JavaTimeModule());
+    	mapper.registerModule(new JavaTimeModule());
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
@@ -130,7 +133,7 @@ public class ODClientException extends Exception {
     public String toJSON() {
         try {
             return mapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             return "\"error\":\"" + e.getClass().getName() + " | " + e.getMessage() + "\"";
         }
     }

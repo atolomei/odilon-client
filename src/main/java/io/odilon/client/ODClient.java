@@ -57,12 +57,16 @@ import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.io.FilenameUtils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
@@ -103,6 +107,9 @@ import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+//import tools.jackson.core.type.TypeReference;
+//import tools.jackson.databind.ObjectMapper;
 
 /**
  * <p>
@@ -496,9 +503,7 @@ public class ODClient implements OdilonClient {
 			request.setChunk(getChunkSize());
 
 		try (InputStream is = (stream instanceof BufferedInputStream) ? stream : (new BufferedInputStream(stream))) {
-			return request.exchange(new HttpFileEntity(is, objectName, size.orElse(Long.valueOf(-1).longValue())),
-					new TypeReference<ObjectMetadata>() {
-					});
+			return request.exchange(new HttpFileEntity(is, objectName, size.orElse(Long.valueOf(-1).longValue())),new TypeReference<ObjectMetadata>() {});
 
 		} catch (IOException e) {
 			throw new ODClientException(e);
@@ -678,7 +683,7 @@ public class ODClient implements OdilonClient {
 								}
 							}
 							return rl;
-						} catch (JsonProcessingException e) {
+						} catch (Exception e) {
 							throw new InternalCriticalException(e,
 									"Error mapping response JSON to " + DataList.class.getSimpleName() + " object");
 						}
@@ -737,7 +742,7 @@ public class ODClient implements OdilonClient {
 			});
 			return list;
 
-		} catch (JsonProcessingException e) {
+		} catch (Exception e) {
 			throw new ODClientException(ODHttpStatus.OK.value(), ErrorCode.INTERNAL_ERROR.getCode(),
 					e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
@@ -785,7 +790,7 @@ public class ODClient implements OdilonClient {
 			});
 			return list;
 
-		} catch (JsonProcessingException e) {
+		} catch (Exception e) {
 			throw new ODClientException(ODHttpStatus.OK.value(), ErrorCode.INTERNAL_ERROR.getCode(),
 					e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
@@ -838,7 +843,7 @@ public class ODClient implements OdilonClient {
 
 		try {
 			return this.objectMapper.readValue(str, Bucket.class);
-		} catch (JsonProcessingException e) {
+		} catch ( Exception e) {
 			throw new ODClientException(ODHttpStatus.OK.value(), ErrorCode.INTERNAL_ERROR.getCode(),
 					"error parsing Bucket from Server response" + " | " + e.getClass().getSimpleName() + " - "
 							+ e.getMessage());
@@ -1031,7 +1036,7 @@ public class ODClient implements OdilonClient {
 		}
 		try {
 			return this.objectMapper.readValue(str, SystemInfo.class);
-		} catch (JsonProcessingException e) {
+		} catch (Exception e) {
 			throw new ODClientException(ODHttpStatus.OK.value(), ErrorCode.INTERNAL_ERROR.getCode(),
 					"error parsing " + MetricsValues.class.getName() + " from Server response" + " | "
 							+ e.getClass().getSimpleName() + " - " + e.getMessage());
@@ -1063,7 +1068,7 @@ public class ODClient implements OdilonClient {
 		}
 		try {
 			return this.objectMapper.readValue(str, MetricsValues.class);
-		} catch (JsonProcessingException e) {
+		} catch (Exception e) {
 			throw new ODClientException(ODHttpStatus.OK.value(), ErrorCode.INTERNAL_ERROR.getCode(),
 					"error parsing " + MetricsValues.class.getName() + " from Server response" + " | "
 							+ e.getClass().getSimpleName() + " - " + e.getMessage());
@@ -1236,7 +1241,7 @@ public class ODClient implements OdilonClient {
 		}
 		try {
 			return this.objectMapper.readValue(str, ObjectMetadata.class);
-		} catch (JsonProcessingException e) {
+		} catch ( Exception e) {
 			throw new InternalCriticalException(e);
 		}
 	}
@@ -1280,7 +1285,7 @@ public class ODClient implements OdilonClient {
 
 			return this.objectMapper.readValue(str, ObjectMetadata.class);
 
-		} catch (JsonProcessingException e) {
+		} catch (Exception e) {
 			throw new InternalCriticalException(e);
 		}
 	}
@@ -2051,7 +2056,7 @@ public class ODClient implements OdilonClient {
 
 			throw (ex);
 
-		} catch (JsonProcessingException e) {
+		} catch (Exception e) {
 			throw new InternalCriticalException(e, str != null ? str : "");
 		}
 	}
