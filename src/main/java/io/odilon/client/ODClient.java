@@ -2136,9 +2136,15 @@ public class ODClient implements OdilonClient {
 			return "application/pdf";
 
 		if (FSUtil.isImage(src)) {
+			
 			String str = FilenameUtils.getExtension(src);
+			
 			if (str != null && (str.toLowerCase().equals("jpg") || str.toLowerCase().equals("jpeg")))
 				return "image/jpeg";
+			
+			if (str != null && (str.toLowerCase().endsWith("svg")))
+				return "image/svg+xml";
+			
 			return "image/" + str;
 		}
 		if (FSUtil.isVideo(src)) {
