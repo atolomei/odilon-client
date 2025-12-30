@@ -35,9 +35,9 @@ import okio.Okio;
 public class HttpRequestBody extends RequestBody {
     private final String contentType;
     private final Object data;
-    private final int len;
+    private final long len;
 
-    public HttpRequestBody(final String contentType, final Object data, final int len) {
+    public HttpRequestBody(final String contentType, final Object data, final long len) {
         this.contentType = contentType;
         this.data = data;
         this.len = len;
@@ -45,6 +45,7 @@ public class HttpRequestBody extends RequestBody {
 
     @Override
     public MediaType contentType() {
+    	
         MediaType mediaType = null;
 
         if (contentType != null) {
@@ -80,7 +81,7 @@ public class HttpRequestBody extends RequestBody {
             sink.write(Okio.source(Channels.newInputStream(file.getChannel())), len);
         } else if (data instanceof byte[]) {
             byte[] bytes = (byte[]) data;
-            sink.write(bytes, 0, len);
+            sink.write(bytes, 0, (int) len);
         } else {
             sink.writeUtf8(data.toString());
         }

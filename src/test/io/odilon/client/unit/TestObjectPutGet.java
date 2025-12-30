@@ -123,10 +123,14 @@ public class TestObjectPutGet extends BaseTest {
         	
 		int counter = 0;
 		String bucketName = this.bucket_1.getName();
+
+		int max =  (int) Math.round( Double.valueOf(Double.valueOf(getMax()).doubleValue()/2.0).doubleValue());
+		
+		logger.info("Trying to upload -> " + String.valueOf(max) +  "files" );
 		
 		for (File file : dir.listFiles()) {
 				
-				if (counter >=  (int) Math.round( Double.valueOf(Double.valueOf(getMax()).doubleValue()/2.0).doubleValue()))
+				if (counter >= max)
 					break;
 				
 				if (isElegible(file)) {
@@ -264,11 +268,15 @@ public class TestObjectPutGet extends BaseTest {
 		String bucketName = null;
 		bucketName = this.bucket_1.getName();
 			
+		int max =  (int) Math.round( Double.valueOf(Double.valueOf(getMax()).doubleValue()/2.0).doubleValue());
+		
+		logger.info("Trying to upload -> " + String.valueOf(max) +  "files" );
+
 		// put files
 		//
 		for (File fi:dir.listFiles()) {
 			
-		    if (counter >=  (int) Math.round( Double.valueOf(Double.valueOf(getMax()).doubleValue()/2.0).doubleValue()))
+		    if (counter >=  max)
 				break;
 			
 			if (isElegible(fi)) {

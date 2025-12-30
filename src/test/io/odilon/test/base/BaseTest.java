@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
@@ -85,7 +86,9 @@ public abstract class BaseTest {
 	
 	private int max = 10;
 	
-	private long max_length = 500 * 100 * 10000; // 500 MB
+	private long min_length = 30 * 1000 * 1000; // 30 MB
+	private long max_length = 700 * 1000 * 1000; // 700 MB
+	
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
 	private Map<String, String> map = new TreeMap<String, String>();
 
@@ -124,8 +127,11 @@ public abstract class BaseTest {
 		readConfigFiles();
 		
 
-         setMax((properties.get("max")!=null) ? Integer.valueOf(properties.get("max").toString().trim()) : 10);
+        setMax((properties.get("max")!=null) ? Integer.valueOf(properties.get("max").toString().trim()) : 10);
 
+        setMaxLength((properties.get("length.max")!=null) ? (Long.valueOf(properties.get("length.max").toString().trim())) : 20);
+        setMinLength((properties.get("length.min")!=null) ? (Long.valueOf(properties.get("length.min").toString().trim())) : 0);
+        
 		this.serverHost  =  (properties.get("odilon.server.host")!=null)  ? properties.get("odilon.server.host").toString().trim() : "localhost"; 
 	    this.port        =  (properties.get("odilon.server.port")!=null)      ? Integer.valueOf(( properties.get("odilon.server.port").toString().trim())) : 80;
 	    this.isSSL       =  (properties.get("odilon.server.isSSL")!=null)      ? Boolean.valueOf(( properties.get("odilon.server.isSSL").toString().trim())) : false;
@@ -187,7 +193,16 @@ public abstract class BaseTest {
 		
 	}
 
-    public OdilonClient getClient() {
+    private void setMinLength(long l) {
+    	this.min_length=l* 1000*1000;
+    	
+	}
+
+	private void setMaxLength(long i) {
+    	this.max_length=i* 1000*1000;
+	}
+
+	public OdilonClient getClient() {
         try {
             if (client==null) {
                     this.client = new ODClient((isSSL()?"https":"http") + "://" + serverHost, port, accessKey, secretKey, isSSL(), isAcceptAllCertificates());
@@ -426,25 +441,40 @@ public abstract class BaseTest {
 		if (file.isDirectory())
 			return false;
 		
+		if (file.length()<min_length)
+			return false;
+		
+		
 		if (file.length()>max_length)
 			return false;
 		
+		
 		if (	FSUtil.isText(file.getName()) 		|| 
-				FSUtil.isText(file.getName()) 		|| 
 				FSUtil.isPdf(file.getName())  		|| 
 				FSUtil.isImage(file.getName()) 		|| 
 				FSUtil.isMSOffice(file.getName()) 	||
 				FSUtil.isJar(file.getName()) 		||
 				FSUtil.isAudio(file.getName()) 		||
 				FSUtil.isVideo(file.getName()) 		||
-				FSUtil.isExecutable(file.getName()) ||
 				FSUtil.isZip(file.getName()))
-			
 			return true;
-		
+			
+		if (isWindows()) {
+			if (FSUtil.isExecutable(file.getName()))
+				return true;
+		}
+		else {
+			if (Files.isExecutable(file.toPath()))
+				return true;
+		}
 		return false;
 	}
 
+	public boolean isWindows() {
+		if  (System.getenv("OS")!=null && System.getenv("OS").toLowerCase().contains("windows"))
+			return true;
+		return false;
+	}
 	
 	/**
 	 * @return

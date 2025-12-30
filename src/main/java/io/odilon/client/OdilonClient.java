@@ -1373,4 +1373,36 @@ public interface OdilonClient {
      * @return
      */
 	public boolean isValidPresignedUrl(String presignedUrl);
+
+	/**
+	 * 
+	 * <p> Examples:<br/>
+	 * 
+	 * <ul>
+	 * <li>application/pdf</li>
+	 * <li>image/jpeg</li>
+	 * <li>image/svg+xml</li>
+	 * <li>image/png</li>
+	 * <li>video/mp4</li>
+	 * <li>audio/mp3</li>
+	 * <li>application/octet-stream</li>
+	 * 
+	 * </ul>
+	 * 
+	 * Default value is application/octet-stream
+	 * 
+	 * </p>
+	 * 
+	 * @param filename
+	 * @return
+	 */
+	public String getContentType(String filename);
+
+	
+	public String normalizeFileName(String name);
+	
+	
+	public String getFileName(String url);
+	
+	
 }

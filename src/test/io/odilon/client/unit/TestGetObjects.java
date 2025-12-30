@@ -72,7 +72,15 @@ public class TestGetObjects extends BaseTest {
 		    			ObjectMetadata meta = item.getObject();
 		    			try {
 		    				getClient().getObject(meta.bucketName, meta.objectName, super.getDownloadDirHeadVersion() + File.separator + meta.fileName);
-		                      logger.debug(String.valueOf(counter) + " ->  o:" + item.getObject().objectName + " f: " + meta.fileName);
+
+		    				File file = new File(getDownloadDirHeadVersion(), meta.fileName);
+		    				if (meta.getLength() - file.length()!=0) {
+			    				error(String.valueOf(counter) + " ->  o:" + item.getObject().objectName + " f: " + meta.fileName  +" | file size: " 
+			    						+ file.length() + " |  metadata size: " + meta.getLength());
+		    					
+			    				return false;
+		    				}
+		    				logger.debug(String.valueOf(counter) + " ->  o:" + item.getObject().objectName + " f: " + meta.fileName );
 						} catch (IOException e) {
 							error(e);
 						}

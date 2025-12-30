@@ -94,23 +94,16 @@ import java.security.cert.X509Certificate;
 @JsonInclude(Include.NON_NULL)
 public class HttpRequest {
 		
-	@SuppressWarnings("unused")
+	 
 	private static final Logger logger = Logger.getLogger(HttpRequest.class.getName());
 
-	private static final int BUFFER = 4096;
-	private static final int CHUNK_LEN = 4096;
+	 
+	private static final int DEFAULT_CHUNK_LEN = 16 * 1024;
 
 	private static final int CONNECTION_TIMEOUT   = ODClient.DEFAULT_CONNECTION_TIMEOUT;
 	private static final String DEFAULT_USER_AGENT = ODClient.DEFAULT_USER_AGENT; 
 
-
-	/**
-	private static final  ObjectMapper mapper = new ObjectMapper();
-	static {
-		mapper.registerModule(new JavaTimeModule());
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	}
-	**/
+ 
 	
 	private static final  OdilonObjectMapper mapper = new OdilonObjectMapper();
 	
@@ -299,22 +292,38 @@ public class HttpRequest {
     protected void write(HttpEntity entity) throws IOException {
         
         OutputStream outputStream = getConnection().getOutputStream();
-        byte[] buffer = new byte[BUFFER];
+        int buffSize = getChunk()>0?getChunk() : DEFAULT_CHUNK_LEN;
+        
+        buffSize = 1024;
+        
+        byte[] buffer = new byte[ buffSize ];
         int bytesRead = -1;
         long bytesWritten = 0;
         long totalBytes = entity.getSize();
         int progress = 0;
+        
+        logger.debug("buffSize -> " + buffSize);
+        
+        int buffersRead = 0;
         try  (InputStream inputStream = entity.getStream()) {
-	        while ((bytesRead = inputStream.read(buffer)) != -1) {
+        	
+        	while ((bytesRead = inputStream.read(buffer)) != -1) {
 	            outputStream.write( buffer, 0, bytesRead);
 	            bytesWritten += bytesRead;
+	            buffersRead++;
 	            progress = totalBytes>0 ? (int)((double) bytesWritten/(double)totalBytes * 100) : 0;
 	            if (getListener()!=null) getListener().onUpdate(progress);
 	        }
 	        outputStream.flush();
-        } 
+        }
+        catch (Exception e) {
+        	logger.debug(e);
+        	logger.debug("error buffers read -> " + buffersRead);
+        }
+        finally {
+            //logger.debug("Written -> " + String.valueOf(bytesWritten/1000) + " KBytes");
+        }
         
-        //logger.debug("Written -> " + String.valueOf(bytesWritten) + " bytes");
     }
 
     
@@ -348,10 +357,6 @@ public class HttpRequest {
     protected boolean getDoOutput() {
         return false;
     }
-    
-    	
-    
-    
      
   	
     protected HttpURLConnection openConnection() throws IOException {
@@ -398,11 +403,12 @@ public class HttpRequest {
         conn.setRequestMethod(getRequestMethod());
         conn.setRequestProperty("Content-Type", getContentType());
         conn.setRequestProperty("User-Agent", DEFAULT_USER_AGENT);
-        conn.setChunkedStreamingMode(CHUNK_LEN);
 
         if (getChunk()>0)
         	conn.setChunkedStreamingMode(getChunk());
-        
+        else
+            conn.setChunkedStreamingMode(DEFAULT_CHUNK_LEN);
+
         String base64Credentials = Base64.getEncoder().encodeToString(getCredentials().getBytes());
         
         if (getApiToken()!=null)
@@ -410,14 +416,8 @@ public class HttpRequest {
         else
             conn.setRequestProperty("Authorization", "Basic " + base64Credentials);
         
-
-        //if (conn instanceof HttpsURLConnection) {
-        //	((HttpsURLConnection)conn).setHostnameVerifier(WhitelistHostnameVerifier.INSTANCE);
-        //}
-		
         return conn;
-        
-       
+   
     }
 
     
