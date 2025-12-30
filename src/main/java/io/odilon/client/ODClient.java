@@ -345,8 +345,10 @@ public class ODClient implements OdilonClient {
 		
 		if (fileName.isPresent()) {
 			String regex = "[\\{\\}/<>\\*\\?´\\^`\\\\]+";
-			String normalizedName = fileName.get().replaceAll(regex, "-");
+			String rawName = this.normalizeFileName(fileName.get());
+			String normalizedName = rawName.replaceAll(regex, "-");
 			fname  = normalizedName;
+			
 		} else {
 			fname = objectName;
 		}
