@@ -257,7 +257,7 @@ public class ODClient implements OdilonClient {
 	private int port;
 
 	
-	
+	@Override
 	public String normalizeFileName(String name) {
 		String basename=FileNameUtils.getBaseName(name);
 		String extension = FileNameUtils.getExtension(name);
@@ -277,6 +277,7 @@ public class ODClient implements OdilonClient {
 	
 	}
 
+	@Override
 	public String getFileName(String url) {
 		if (url == null)
 			return null;
@@ -321,7 +322,7 @@ public class ODClient implements OdilonClient {
 			mediaType = MediaType.get("application/octet-stream");
 		}
 		
-		//ObjectMetadata meta = null;
+		 
 		String relativePath[] = API_OBJECT_UPLOAD;
 		boolean isError = true;
 		

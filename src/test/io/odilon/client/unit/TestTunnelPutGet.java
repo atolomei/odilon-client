@@ -87,152 +87,14 @@ public class TestTunnelPutGet extends BaseTest {
 
 		String s1 = "http://localhost:8087/webdav/aerolineas-btv/content/files/document/2022/06/13fa7b90-e1ac-11ec-abf9-0050569415cd/reporte%20y%20seguimiento%20da%F1os%20a%20aeronaves%20firmas%20(1).pdf";
 		urls.add(s1);
-
-		;
-
-		// if (!testAddObjectsNoTunnel("no tunnel")) {
-		// error("no tunnel");
-		// }
-
+ 
 		if (!testAddObjectsTunnel("tunnel"))
 			error("tunnel");
 
 		showResults();
 	}
 
-	public boolean testAddObjectsNoTunnel(String version) {
-
-		int counter = 0;
-		String bucketName = this.bucket_1.getName();
-
-		{
-
-			Path targetPath = Paths.get("/Users/alejandrotolomei/Downloads/", "tolomei.jpg");
-
-			String fileName = getFileName(targetPath.toFile().getName());
-			String objectName = FSUtil.getBaseName(fileName) + "-" + String.valueOf(Double.valueOf((Math.abs(Math.random() * 10000))).intValue());
-			long contentLength = targetPath.toFile().length();
-
-			try (InputStream inputStream = new BufferedInputStream(new FileInputStream(targetPath.toFile()))) {
-
-				List<String> customTags = new ArrayList<String>();
-				customTags.add(String.valueOf(counter));
-
-				ObjectMetadata meta = getClient().putObjectStream(bucketName, objectName, inputStream, Optional.of(fileName), Optional.of(contentLength), Optional.of(getClient().getContentType(fileName)), Optional.ofNullable(customTags));
-
-				testFiles.put(bucketName + "-" + objectName, new TestFile(targetPath.toFile(), bucketName, objectName));
-
-				logger.info(String.valueOf(testFiles.size() + " | test no Tunnel -> " + fileName + " | " + String.valueOf(meta.getLength() / 1000) + " KB"));
-				counter++;
-
-				sleep();
-
-				if (dateTimeDifference(showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS) > THREE_SECONDS) {
-					logger.info("test no Tunnel add -> " + String.valueOf(testFiles.size()));
-					showStatus = OffsetDateTime.now();
-				}
-
-			} catch (ODClientException e) {
-				error("Http status " + String.valueOf(e.getHttpStatus()) + " " + e.getMessage() + " | Odilon ErrCode: " + String.valueOf(e.getErrorCode()));
-			} catch (FileNotFoundException e1) {
-				error(e1);
-			} catch (IOException e) {
-				error(e);
-				return false;
-			}
-		}
-
-		logger.info("test no Tunnel add total -> " + String.valueOf(testFiles.size()));
-
-		sub_index = 0;
-
-		testFiles.forEach((k, v) -> {
-
-			ObjectMetadata meta = null;
-
-			try {
-				meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
-				sub_index++;
-
-			} catch (ODClientException e) {
-				error(e);
-			}
-
-			String destFileName = downloadDir + File.separator + meta.fileName;
-
-			if (new File(destFileName).exists())
-				FileUtils.deleteQuietly(new File(destFileName));
-
-			try {
-
-				getClient().getObject(meta.bucketName, meta.objectName, destFileName);
-
-			} catch (ODClientException | IOException e) {
-				error(e);
-			}
-
-			try {
-
-				String src_sha = v.getSrcFileSha256(0);
-				String new_sha = OdilonFileUtils.calculateSHA256String(new File(destFileName));
-
-				if (!src_sha.equals(new_sha)) {
-					StringBuilder str = new StringBuilder();
-					str.append("test no Tunnel Error sha256 are not equal -> " + meta.bucketName + " / " + meta.objectName);
-					str.append(" | src -> " + v.getSrcFile(0).getAbsolutePath() + "  " + String.valueOf(v.getSrcFile(0).length() / 1000.0) + " kbytes");
-					str.append(" | dest -> " + (new File(destFileName)).getAbsolutePath() + "  " + String.valueOf(new File(destFileName).length() / 1000.0) + " kbytes");
-					error(str.toString());
-				}
-
-			} catch (NoSuchAlgorithmException | IOException e) {
-				logger.error(e);
-				error(e);
-			}
-
-			if (dateTimeDifference(showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS) > THREE_SECONDS) {
-				logger.info("testTunnel check -> " + String.valueOf(sub_index) + " | " + meta.getFileName());
-				showStatus = OffsetDateTime.now();
-			}
-		});
-
-		logger.info("testTunnel -> ok " + String.valueOf(testFiles.size()));
-
-		getMap().put("testTunnel " + version + " | " + String.valueOf(testFiles.size()), "ok");
-
-		return true;
-
-	}
-
-	/**
-	 * 
-	 * 
-	 * 
-	 * 
-	 * 
-	 * @param connection
-	 */
-	private void testConnection(HttpURLConnection connection) {
-
-		try {
-			int responseCode = connection.getResponseCode();
-			if (responseCode != HttpURLConnection.HTTP_OK) {
-				error("response code not ok -> " + String.valueOf(responseCode));
-			} else {
-				logger.debug("Connection -> OK");
-			}
-
-		} catch (Exception e) {
-			error(e);
-		}
-
-	}
-
-	/**
-	 * 
-	 * 
-	 * 
-	 * 
-	 */
+ 
 	public boolean testAddObjectsTunnel(String version) {
 
 		Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
@@ -276,34 +138,13 @@ public class TestTunnelPutGet extends BaseTest {
 			String objectName = FSUtil.getBaseName(fileName) + "-" + String.valueOf(Double.valueOf((Math.abs(Math.random() * 10000))).intValue());
 
 			long contentLength = connection.getContentLengthLong();
-
-			/**
-			 * { try (InputStream inputStream = connection.getInputStream()) {
-			 * 
-			 * 
-			 * Path targetPath = Paths.get("/Users/alejandrotolomei/Downloads", fileName);
-			 * Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
-			 * 
-			 * 
-			 * } catch (IOException e) { error(e); } }
-			 **/
-
-			// Path targetPath = Paths.get("/Users/alejandrotolomei/Downloads",
-			// "reporte.pdf");
-			// String fileName = getFileName( targetPath.toFile().getName());
-			// String objectName = FSUtil.getBaseName(fileName) + "-" +
-			// String.valueOf(Double.valueOf((Math.abs(Math.random() * 10000))).intValue());
-
+ 
 			try (InputStream inputStream = connection.getInputStream()) {
-
-				// try (InputStream inputStream = new FileInputStream(targetPath.toFile())) {
-				// try (InputStream inputStream = new
-				// BufferedInputStream(connection.getInputStream())) {
 
 				List<String> customTags = new ArrayList<String>();
 				customTags.add(String.valueOf(counter));
 
-				ObjectMetadata meta = ((ODClient) getClient()).putObjectStream(
+				ObjectMetadata meta = getClient().putObjectStream(
 						bucketName, 
 						objectName, inputStream, 
 						Optional.of(fileName), 
@@ -340,6 +181,26 @@ public class TestTunnelPutGet extends BaseTest {
 
 	}
 
+	/**
+	 * @param connection
+	 */
+	
+	private void testConnection(HttpURLConnection connection) {
+
+		try {
+			int responseCode = connection.getResponseCode();
+			if (responseCode != HttpURLConnection.HTTP_OK) {
+				error("response code not ok -> " + String.valueOf(responseCode));
+			} else {
+				logger.debug("Connection -> OK");
+			}
+
+		} catch (Exception e) {
+			error(e);
+		}
+
+	}
+	
 	public String normalizeFileName(String name) {
 		String basename=FileNameUtils.getBaseName(name);
 		String extension = FileNameUtils.getExtension(name);
@@ -504,10 +365,126 @@ public class TestTunnelPutGet extends BaseTest {
 		}
 
 	}
+	// if (!testAddObjectsNoTunnel("no tunnel")) {
+	// error("no tunnel");
+	// }
+/**
+public boolean testAddObjectsNoTunnel(String version) {
 
-	/**
-	 * @param file
-	 * @return
-	 */
+int counter = 0;
+String bucketName = this.bucket_1.getName();
 
+{
+
+	Path targetPath = Paths.get("/Users/alejandrotolomei/Downloads/", "tolomei.jpg");
+
+	String fileName = getFileName(targetPath.toFile().getName());
+	String objectName = FSUtil.getBaseName(fileName) + "-" + String.valueOf(Double.valueOf((Math.abs(Math.random() * 10000))).intValue());
+	long contentLength = targetPath.toFile().length();
+
+	try (InputStream inputStream = new BufferedInputStream(new FileInputStream(targetPath.toFile()))) {
+
+		List<String> customTags = new ArrayList<String>();
+		customTags.add(String.valueOf(counter));
+
+		ObjectMetadata meta = getClient().putObjectStream(bucketName, objectName, inputStream, Optional.of(fileName), Optional.of(contentLength), Optional.of(getClient().getContentType(fileName)), Optional.ofNullable(customTags));
+
+		testFiles.put(bucketName + "-" + objectName, new TestFile(targetPath.toFile(), bucketName, objectName));
+
+		logger.info(String.valueOf(testFiles.size() + " | test no Tunnel -> " + fileName + " | " + String.valueOf(meta.getLength() / 1000) + " KB"));
+		counter++;
+
+		sleep();
+
+		if (dateTimeDifference(showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS) > THREE_SECONDS) {
+			logger.info("test no Tunnel add -> " + String.valueOf(testFiles.size()));
+			showStatus = OffsetDateTime.now();
+		}
+
+	} catch (ODClientException e) {
+		error("Http status " + String.valueOf(e.getHttpStatus()) + " " + e.getMessage() + " | Odilon ErrCode: " + String.valueOf(e.getErrorCode()));
+	} catch (FileNotFoundException e1) {
+		error(e1);
+	} catch (IOException e) {
+		error(e);
+		return false;
+	}
+}
+
+logger.info("test no Tunnel add total -> " + String.valueOf(testFiles.size()));
+
+sub_index = 0;
+
+testFiles.forEach((k, v) -> {
+
+	ObjectMetadata meta = null;
+
+	try {
+		meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
+		sub_index++;
+
+	} catch (ODClientException e) {
+		error(e);
+	}
+
+	String destFileName = downloadDir + File.separator + meta.fileName;
+
+	if (new File(destFileName).exists())
+		FileUtils.deleteQuietly(new File(destFileName));
+
+	try {
+
+		getClient().getObject(meta.bucketName, meta.objectName, destFileName);
+
+	} catch (ODClientException | IOException e) {
+		error(e);
+	}
+
+	try {
+
+		String src_sha = v.getSrcFileSha256(0);
+		String new_sha = OdilonFileUtils.calculateSHA256String(new File(destFileName));
+
+		if (!src_sha.equals(new_sha)) {
+			StringBuilder str = new StringBuilder();
+			str.append("test no Tunnel Error sha256 are not equal -> " + meta.bucketName + " / " + meta.objectName);
+			str.append(" | src -> " + v.getSrcFile(0).getAbsolutePath() + "  " + String.valueOf(v.getSrcFile(0).length() / 1000.0) + " kbytes");
+			str.append(" | dest -> " + (new File(destFileName)).getAbsolutePath() + "  " + String.valueOf(new File(destFileName).length() / 1000.0) + " kbytes");
+			error(str.toString());
+		}
+
+	} catch (NoSuchAlgorithmException | IOException e) {
+		logger.error(e);
+		error(e);
+	}
+
+	if (dateTimeDifference(showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS) > THREE_SECONDS) {
+		logger.info("testTunnel check -> " + String.valueOf(sub_index) + " | " + meta.getFileName());
+		showStatus = OffsetDateTime.now();
+	}
+});
+
+logger.info("testTunnel -> ok " + String.valueOf(testFiles.size()));
+
+getMap().put("testTunnel " + version + " | " + String.valueOf(testFiles.size()), "ok");
+
+return true;
+
+}
+
+*/
+
+	// Path targetPath = Paths.get("/Users/alejandrotolomei/Downloads",
+	// "reporte.pdf");
+	// String fileName = getFileName( targetPath.toFile().getName());
+	// String objectName = FSUtil.getBaseName(fileName) + "-" +
+	// String.valueOf(Double.valueOf((Math.abs(Math.random() * 10000))).intValue());
+
+
+
+	// try (InputStream inputStream = new FileInputStream(targetPath.toFile())) {
+	// try (InputStream inputStream = new
+	// BufferedInputStream(connection.getInputStream())) {
+
+	
 }
