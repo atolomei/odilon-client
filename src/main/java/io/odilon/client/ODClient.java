@@ -101,6 +101,7 @@ import io.odilon.model.list.ResultSet;
 import io.odilon.net.ErrorCode;
 import io.odilon.net.ODHttpStatus;
 import io.odilon.util.Check;
+import io.odilon.util.FileNameNormalizer;
 import io.odilon.util.OdilonFileUtils;
 import io.odilon.util.RandomIDGenerator;
 import okhttp3.Cache;
@@ -262,6 +263,8 @@ public class ODClient implements OdilonClient {
 		String basename=FileNameUtils.getBaseName(name);
 		String extension = FileNameUtils.getExtension(name);
 
+		
+		/**
 		String str = basename.replaceAll("[^\\x00-\\x7F]|[\\s]+", "-").toLowerCase().trim();
 		str = str.replace(",", "");
 		str=str.replace("%20", "-");
@@ -273,7 +276,9 @@ public class ODClient implements OdilonClient {
 		while (str.endsWith("-") && str.length()>1) {
 			str=str.substring(0, str.length()-2);
 		}
-		return str+"."+extension;
+		*/
+		basename=FileNameNormalizer.normalize(basename);
+		return basename+"."+extension;
 	
 	}
 

@@ -134,7 +134,7 @@ public class TestTunnelPutGet extends BaseTest {
 
 			testConnection(connection);
 
-			String fileName =   normalizeFileName( getFileName(url) );
+			String fileName =   getClient().normalizeFileName( getFileName(url) );
 			String objectName = FSUtil.getBaseName(fileName) + "-" + String.valueOf(Double.valueOf((Math.abs(Math.random() * 10000))).intValue());
 
 			long contentLength = connection.getContentLengthLong();
@@ -200,7 +200,7 @@ public class TestTunnelPutGet extends BaseTest {
 		}
 
 	}
-	
+	/**
 	public String normalizeFileName(String name) {
 		String basename=FileNameUtils.getBaseName(name);
 		String extension = FileNameUtils.getExtension(name);
@@ -219,7 +219,8 @@ public class TestTunnelPutGet extends BaseTest {
 		return str+"."+extension;
 	
 	}
-
+*/
+	
 	private String getFileName(String url) {
 		if (url == null)
 			return null;
