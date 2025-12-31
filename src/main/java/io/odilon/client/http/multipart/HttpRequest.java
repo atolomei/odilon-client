@@ -19,10 +19,7 @@ package io.odilon.client.http.multipart;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.core.type.TypeReference; 
 
 import io.odilon.client.ODClient;
 import io.odilon.client.error.ODClientException;
@@ -32,10 +29,7 @@ import io.odilon.json.OdilonObjectMapper;
 import io.odilon.log.Logger;
 import io.odilon.net.ErrorCode;
 import io.odilon.net.ODHttpStatus;
-
-//import tools.jackson.core.type.TypeReference;
-//import tools.jackson.databind.ObjectMapper;
-
+ 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,25 +37,22 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.Authenticator;
+ 
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.Socket;
+ 
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
+ 
 import java.security.cert.X509Certificate;
 import java.util.Base64;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
+ 
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509ExtendedTrustManager;
+ 
 import javax.net.ssl.X509TrustManager;
 
 /**
@@ -73,24 +64,12 @@ import javax.net.ssl.X509TrustManager;
  * 
  */
 
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.net.URLConnection;
  
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import java.security.cert.X509Certificate;
 
 
 
 
-
-
+@Deprecated
 @JsonInclude(Include.NON_NULL)
 public class HttpRequest {
 		

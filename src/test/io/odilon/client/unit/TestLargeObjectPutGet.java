@@ -132,6 +132,7 @@ public class TestLargeObjectPutGet extends BaseTest {
 				if (isElegible(file)) {
 					
 					String objectName = FSUtil.getBaseName(file.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*10000))).intValue());;
+					objectName = getClient().normalizeObjectName(objectName);
 
 					try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
 						
@@ -271,7 +272,8 @@ public class TestLargeObjectPutGet extends BaseTest {
 			if (isElegible(fi)) {
 				
 				String objectName = FSUtil.getBaseName(fi.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*100000))).intValue());
-				
+				objectName = getClient().normalizeObjectName(objectName);
+
 				try {
 					
 					getClient().putObject(bucketName, objectName, fi);

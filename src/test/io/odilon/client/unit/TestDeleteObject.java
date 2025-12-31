@@ -238,6 +238,8 @@ public class TestDeleteObject extends BaseTest {
 					&& (fi.length() < MAX_LENGTH)) {
 				String objectName = FSUtil.getBaseName(fi.getName()) + "-"
 						+ String.valueOf(Double.valueOf((Math.abs(Math.random() * 100000))).intValue());
+				objectName = getClient().normalizeObjectName(objectName);
+				
 				try {
 
 					getClient().putObject(bucketName, objectName, fi);

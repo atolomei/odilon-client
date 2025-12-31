@@ -117,6 +117,9 @@ public class TestFileCache extends BaseTest {
 				String objectName = FSUtil.getBaseName(fi.getName()) + "-"
 						+ String.valueOf(Double.valueOf((Math.abs(Math.random() * 100000))).intValue());
 
+				objectName = getClient().normalizeObjectName(objectName);
+
+				
 				try {
 					getClient().putObject(bucketName, objectName, fi);
 					testFiles.put(bucketName + "-" + objectName, new TestFile(fi, bucketName, objectName));

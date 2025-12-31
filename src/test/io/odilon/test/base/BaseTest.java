@@ -127,7 +127,7 @@ public abstract class BaseTest {
 		readConfigFiles();
 		
 
-        setMax((properties.get("max")!=null) ? Integer.valueOf(properties.get("max").toString().trim()) : 10);
+        setMax((properties.get("max")!=null) ? Integer.valueOf(properties.get("max").toString().trim()) : 100);
 
         setMaxLength((properties.get("length.max")!=null) ? (Long.valueOf(properties.get("length.max").toString().trim())) : 20);
         setMinLength((properties.get("length.min")!=null) ? (Long.valueOf(properties.get("length.min").toString().trim())) : 0);
@@ -457,6 +457,7 @@ public abstract class BaseTest {
 				FSUtil.isAudio(file.getName()) 		||
 				FSUtil.isVideo(file.getName()) 		||
 				FSUtil.isZip(file.getName()))
+	
 			return true;
 			
 		if (isWindows()) {
@@ -496,6 +497,8 @@ public abstract class BaseTest {
 			
 			if (!fi.isDirectory() && (FSUtil.isPdf(fi.getName()) || FSUtil.isImage(fi.getName()) || FSUtil.isZip(fi.getName())) && (fi.length()<getMaxLength())) {
 				String objectName = FSUtil.getBaseName(fi.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*100000))).intValue());
+				objectName = getClient().normalizeObjectName(objectName);
+
 				try {
 					
 					getClient().putObject(bucketName, objectName, fi);

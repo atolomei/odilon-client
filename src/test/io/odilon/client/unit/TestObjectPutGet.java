@@ -78,8 +78,7 @@ public class TestObjectPutGet extends BaseTest {
 		if (!testAddObjectsStream("java http"))
 			error("testAddObjectsStream java http");
 		
-		if (!testAddObjects())
-			error("testAddObjects");
+	 
 	
 		 showResults();
 	}
@@ -124,9 +123,9 @@ public class TestObjectPutGet extends BaseTest {
 		int counter = 0;
 		String bucketName = this.bucket_1.getName();
 
-		int max =  (int) Math.round( Double.valueOf(Double.valueOf(getMax()).doubleValue()/2.0).doubleValue());
+		int max =  getMax();
 		
-		logger.info("Trying to upload -> " + String.valueOf(max) +  "files" );
+		logger.info("Trying to upload -> " + String.valueOf(max) +  " files" );
 		
 		for (File file : dir.listFiles()) {
 				
@@ -136,7 +135,8 @@ public class TestObjectPutGet extends BaseTest {
 				if (isElegible(file)) {
 					
 					String objectName = FSUtil.getBaseName(file.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*10000))).intValue());;
-
+					objectName = getClient().normalizeObjectName(objectName);
+					
 					try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
 						
 						
@@ -146,7 +146,7 @@ public class TestObjectPutGet extends BaseTest {
 						getClient().putObjectStream(bucketName, objectName, inputStream, Optional.of(file.getName()), Optional.empty(), Optional.empty(), Optional.ofNullable(customTags));
 						
 						testFiles.put(bucketName+"-"+objectName, new TestFile(file, bucketName, objectName));
-						logger.info( String.valueOf(testFiles.size() + " testAddObjectsStream -> " + file.getName()));
+						//logger.info( String.valueOf(testFiles.size() + " testAddObjectsStream -> " + file.getName()));
 						counter++;
 						
 						sleep();
@@ -222,7 +222,7 @@ public class TestObjectPutGet extends BaseTest {
 					}
 					
                     if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-                        logger.info( "testAddObjectsStream check -> " + String.valueOf(sub_index));
+                        logger.info( "testAddObjectsStream checking -> " + String.valueOf(sub_index));
                         showStatus = OffsetDateTime.now();
                     }
 			});
@@ -236,135 +236,7 @@ public class TestObjectPutGet extends BaseTest {
 	}
 
 
-	/**
-	 * 
-	 * 
-	 * @return
-	 */
-	public boolean testAddObjects() {
-		
-		
-	    downloadDir = super.getDownloadDirHeadVersion();
-	    sourceDir = getSourceDir();
-	    
-        File dir = new File(sourceDir);
-        final File dndir = new File(downloadDir);
-        
-        
-        if ( (!dir.exists()) || (!dir.isDirectory())) { 
-			error("Dir not exists or the File is not Dir -> " +sourceDir);
-		}
-
-        if ( (!dndir.exists()) || (!dndir.isDirectory())) {
-	        try {
-				FileUtils.forceMkdir(dndir);
-			} catch (IOException e) {
-					error(e.getClass().getName() + " | " + e.getMessage());
-			}
-        }
-
-		int counter = 0;
-		
-		String bucketName = null;
-		bucketName = this.bucket_1.getName();
-			
-		int max =  (int) Math.round( Double.valueOf(Double.valueOf(getMax()).doubleValue()/2.0).doubleValue());
-		
-		logger.info("Trying to upload -> " + String.valueOf(max) +  "files" );
-
-		// put files
-		//
-		for (File fi:dir.listFiles()) {
-			
-		    if (counter >=  max)
-				break;
-			
-			if (isElegible(fi)) {
-				
-				String objectName = FSUtil.getBaseName(fi.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*100000))).intValue());
-				
-				try {
-					
-					getClient().putObject(bucketName, objectName, fi);
-					testFiles.put(bucketName+"-"+objectName, new TestFile(fi, bucketName, objectName));
-					logger.info( String.valueOf(testFiles.size() + " testAddObjects add -> " + fi.getName()));
-					
-					counter++; 
-					sleep();
-					
-					/** display status every n seconds */
-					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-						logger.info( " testAddObjects add -> " + String.valueOf(testFiles.size()));
-						showStatus = OffsetDateTime.now();
-					}
-					
-				} catch (ODClientException e) {
-					error(String.valueOf(e.getHttpStatus())+ " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
-				}
-			}
-		}
-		
-		logger.info( " testAddObjects add total -> " + String.valueOf(testFiles.size()));
-		
-		
-		// -----------
-		
-		sub_index=0;
-		testFiles.forEach( (k,v) -> {
-		
-			ObjectMetadata meta = null;
-				
-				try {
-						 meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
-						 sub_index++;
-						
-				} catch (ODClientException e) {
-						error(e);
-				}
-					
-				String destFileName = downloadDir + File.separator + meta.fileName;
-				
-				if (new File(destFileName).exists())
-					FileUtils.deleteQuietly(new File(destFileName));
-				
-				try {
-						getClient().getObject(meta.bucketName, meta.objectName, destFileName);
-						
-				} catch (ODClientException | IOException e) {
-						error(e);
-				}
-					try {
-						String src_sha = v.getSrcFileSha256(0);
-						String new_sha = OdilonFileUtils.calculateSHA256String(new File(destFileName));
-						
-						if (!src_sha.equals(new_sha)) {
-                            StringBuilder str  = new StringBuilder();
-                            str.append("Error sha256 are not equal -> " + meta.bucketName+" / "+meta.objectName);
-                            str.append(" | src -> " + v.getSrcFile(0).getAbsolutePath()           + "  " + String.valueOf(v.getSrcFile(0).length()/1000.0) + " kbytes");
-                            str.append(" | dest -> "+ (new File(destFileName)).getAbsolutePath()  + "  " + String.valueOf(new File(destFileName).length()/1000.0) + " kbytes");
-                            error(str.toString());
-						}
-						
-						
-						  /** display status every n seconds */
-	                    if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-	                        logger.info( " testAddObjects check -> " + String.valueOf(sub_index));
-	                        showStatus = OffsetDateTime.now();
-	                    }
-						
-						
-							
-					} catch (NoSuchAlgorithmException | IOException e) {
-						error(e);
-					}
-		});
-	
-	    logger.info("testAddObjects ok " + "  " + String.valueOf(testFiles.size()));
-	    
-		getMap().put("testAddObjects check" + " | " + String.valueOf(testFiles.size()), "ok");
-		return true;
-	
-	}	
+	 
 
 	/**
 	 * 

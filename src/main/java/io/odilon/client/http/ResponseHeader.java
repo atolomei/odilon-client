@@ -33,119 +33,117 @@ import io.odilon.log.Logger;
 
 public class ResponseHeader {
 
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(ResponseHeader.class.getName());
+	@SuppressWarnings("unused")
+	private static final Logger logger = Logger.getLogger(ResponseHeader.class.getName());
 
-    static final DateTimeFormatter http_date = DateTimeFormatter.RFC_1123_DATE_TIME;
+	static final DateTimeFormatter http_date = DateTimeFormatter.RFC_1123_DATE_TIME;
 
-    @Header("Content-Length")
-    private long contentLength;
-    @Header("Content-Type")
-    private String contentType;
-    @Header("Date")
-    private OffsetDateTime date;
-    @Header("ETag")
-    private String etag;
-    @Header("Last-Modified")
-    private OffsetDateTime lastModified;
-    @Header("Server")
-    private String server;
-    @Header("Status Code")
-    private String statusCode;
-    @Header("Transfer-Encoding")
-    private String transferEncoding;
+	@Header("Content-Length")
+	private long contentLength;
+	@Header("Content-Type")
+	private String contentType;
+	@Header("Date")
+	private OffsetDateTime date;
+	@Header("ETag")
+	private String etag;
+	@Header("Last-Modified")
+	private OffsetDateTime lastModified;
+	@Header("Server")
+	private String server;
+	@Header("Status Code")
+	private String statusCode;
+	@Header("Transfer-Encoding")
+	private String transferEncoding;
 
-    /**
-     * <p>
-     * Sets content length
-     * </p>
-     */
-    public void setContentLength(String contentLength) {
-        this.contentLength = Long.parseLong(contentLength);
-    }
+	/**
+	 * <p>
+	 * Sets content length
+	 * </p>
+	 */
+	public void setContentLength(String contentLength) {
+		this.contentLength = Long.parseLong(contentLength);
+	}
 
-    public long contentLength() {
-        return this.contentLength;
-    }
+	public long contentLength() {
+		return this.contentLength;
+	}
 
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
 
-    public String contentType() {
-        return this.contentType;
-    }
+	public String contentType() {
+		return this.contentType;
+	}
 
-    public void setDate(String strdate) {
-        this.date = OffsetDateTime.from(http_date.parse(strdate));
-    }
+	public void setDate(String strdate) {
+		this.date = OffsetDateTime.from(http_date.parse(strdate));
+	}
 
-    public OffsetDateTime date() {
-        return this.date;
-    }
+	public OffsetDateTime date() {
+		return this.date;
+	}
 
-    public void setEtag(String etag) {
-        this.etag = etag.replaceAll("\"", "");
-    }
+	public void setEtag(String etag) {
+		this.etag = etag.replaceAll("\"", "");
+	}
 
-    public String etag() {
-        return this.etag;
-    }
+	public String etag() {
+		return this.etag;
+	}
 
-    public void setLastModified(String lastModified) {
-        this.lastModified = OffsetDateTime.from(http_date.parse(lastModified));
-    }
+	public void setLastModified(String lastModified) {
+		this.lastModified = OffsetDateTime.from(http_date.parse(lastModified));
+	}
 
-    public OffsetDateTime lastModified() {
-        return this.lastModified;
-    }
+	public OffsetDateTime lastModified() {
+		return this.lastModified;
+	}
 
-    public void setServer(String server) {
-        this.server = server;
-    }
+	public void setServer(String server) {
+		this.server = server;
+	}
 
-    public String server() {
-        return this.server;
-    }
+	public String server() {
+		return this.server;
+	}
 
-    public void setStatusCode(String statusCode) {
-        this.statusCode = statusCode;
-    }
+	public void setStatusCode(String statusCode) {
+		this.statusCode = statusCode;
+	}
 
-    public String statusCode() {
-        return this.statusCode;
-    }
+	public String statusCode() {
+		return this.statusCode;
+	}
 
-    public void setTransferEncoding(String transferEncoding) {
-        this.transferEncoding = transferEncoding;
-    }
+	public void setTransferEncoding(String transferEncoding) {
+		this.transferEncoding = transferEncoding;
+	}
 
-    public String transferEncoding() {
-        return this.transferEncoding;
-    }
+	public String transferEncoding() {
+		return this.transferEncoding;
+	}
 
-    public String toJSON() {
-        StringBuilder str = new StringBuilder();
-        str.append("\"contentLength\":" + String.valueOf(contentLength));
-        str.append("\"contentType\":" + (Optional.ofNullable(contentType).isPresent() ? ("\"" + contentType + "\"") : "null"));
-        str.append("\"date\":" + (Optional.ofNullable(date).isPresent() ? ("\"" + date.toString() + "\"") : "null"));
-        str.append("\"etag\":" + (Optional.ofNullable(etag).isPresent() ? ("\"" + etag + "\"") : "null"));
-        str.append("\"lastModified\":"
-                + (Optional.ofNullable(lastModified).isPresent() ? ("\"" + lastModified.toString() + "\"") : "null"));
-        str.append("\"server\":" + (Optional.ofNullable(server).isPresent() ? ("\"" + server + "\"") : "null"));
-        str.append("\"statusCode\":" + (Optional.ofNullable(statusCode).isPresent() ? ("\"" + statusCode + "\"") : "null"));
-        str.append("\"transferEncoding\":"
-                + (Optional.ofNullable(transferEncoding).isPresent() ? ("\"" + transferEncoding + "\"") : "null"));
-        return str.toString();
-    }
+	public String toJSON() {
+		StringBuilder str = new StringBuilder();
+		str.append("\"contentLength\":" + String.valueOf(contentLength));
+		str.append("\"contentType\":" + (Optional.ofNullable(contentType).isPresent() ? ("\"" + contentType + "\"") : "null"));
+		str.append("\"date\":" + (Optional.ofNullable(date).isPresent() ? ("\"" + date.toString() + "\"") : "null"));
+		str.append("\"etag\":" + (Optional.ofNullable(etag).isPresent() ? ("\"" + etag + "\"") : "null"));
+		str.append("\"lastModified\":" + (Optional.ofNullable(lastModified).isPresent() ? ("\"" + lastModified.toString() + "\"") : "null"));
+		str.append("\"server\":" + (Optional.ofNullable(server).isPresent() ? ("\"" + server + "\"") : "null"));
+		str.append("\"statusCode\":" + (Optional.ofNullable(statusCode).isPresent() ? ("\"" + statusCode + "\"") : "null"));
+		str.append("\"transferEncoding\":" + (Optional.ofNullable(transferEncoding).isPresent() ? ("\"" + transferEncoding + "\"") : "null"));
+		return str.toString();
+	}
 
-    @Override
-    public String toString() {
-        StringBuilder str = new StringBuilder();
-        str.append(this.getClass().getSimpleName() + "{");
-        str.append(toJSON());
-        str.append("}");
-        return str.toString();
-    }
+	@Override
+	public String toString() {
+		StringBuilder str = new StringBuilder();
+		str.append(this.getClass().getSimpleName() + "{");
+		str.append(toJSON());
+		str.append("}");
+		return str.toString();
+	}
 
 }

@@ -1400,9 +1400,11 @@ public interface OdilonClient {
 
 	
 	public String normalizeFileName(String name);
-	
+	public String normalizeObjectName(String objectName);
 	
 	public String getFileName(String url);
+
+	
 	
 	
 }

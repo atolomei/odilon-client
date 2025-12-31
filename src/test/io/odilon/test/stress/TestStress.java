@@ -56,12 +56,13 @@ public class TestStress extends BaseTest {
 		bannedDirs = new ArrayList<String>();
 		
 		// TODO AT
-		
+		/**
 		bannedDirs.add("c:"+File.separator+"odilon");
 		bannedDirs.add("c:"+File.separator+"odilon-data");
 		bannedDirs.add("c:"+File.separator+"odilon-data-raid0");
 		bannedDirs.add("c:"+File.separator+"odilon-data-raid1");
 		bannedDirs.add("c:"+File.separator+"$RECYCLE.BIN");
+		**/
 		totalSize = 0;
 		add(new File(getSourceDir()));
 		double val = Double.valueOf(totalSize).doubleValue() / MB;
@@ -101,7 +102,7 @@ public class TestStress extends BaseTest {
 			try {
 				Thread.sleep(2000);
 				
-				if ((OffsetDateTime.now().isAfter(start.plusMinutes(30)))) 
+				if ((OffsetDateTime.now().isAfter(start.plusMinutes(10)))) 
 						done=true;
 				
 				if (uploader.isDone())
@@ -170,7 +171,7 @@ public class TestStress extends BaseTest {
 					if (isElegible(file)) {
 						up.add(file);
 						totalSize += file.length();
-						done = (up.size() == MAX);
+						done = (up.size() == getMax());
 						if (up.size() % 101 == 0)
 							logger.debug(String.valueOf(up.size()) + " | " + file.getAbsolutePath());
 					}

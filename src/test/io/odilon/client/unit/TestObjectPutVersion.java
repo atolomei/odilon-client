@@ -203,6 +203,8 @@ public class TestObjectPutVersion extends BaseTest {
 			
 			if (!fi.isDirectory() && (FSUtil.isPdf(fi.getName()) || FSUtil.isImage(fi.getName())) && (fi.length()<getMaxLength())) {
 				String objectName = FSUtil.getBaseName(fi.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*100000))).intValue());
+				objectName = getClient().normalizeObjectName(objectName);
+
 				try {
 					getClient().putObject(bucketName, objectName, fi);
 					counter++;

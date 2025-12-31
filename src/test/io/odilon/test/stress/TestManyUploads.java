@@ -122,6 +122,9 @@ public class TestManyUploads extends BaseTest {
 						
 						String objectName = FSUtil.getBaseName(file.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*10000))).intValue());;
 		
+						objectName = getClient().normalizeObjectName(objectName);
+
+						
 						try (InputStream inputStream = new BufferedInputStream(new FileInputStream(file))) {
 							
 							getClient().putObjectStream(bucketName, objectName, inputStream, Optional.of(file.getName()), Optional.empty());

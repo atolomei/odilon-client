@@ -106,6 +106,8 @@ private final File saveDir = new File(DOWNLOAD_DIR);
 					if (!fi.isDirectory() && (FSUtil.isPdf(fi.getName()) || FSUtil.isImage(fi.getName()) || FSUtil.isZip(fi.getName())) && (fi.length()<MAX_LENGTH)) {
 
 						String objectName = FSUtil.getBaseName(fi.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*10000))).intValue());;
+						objectName = getClient().normalizeObjectName(objectName);
+
 						InputStream inputStream = null;
 						
 						try {

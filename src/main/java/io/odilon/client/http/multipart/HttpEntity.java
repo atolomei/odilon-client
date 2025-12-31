@@ -24,6 +24,7 @@ import java.io.InputStream;
  * 
  * @author atolomei@novamens.com (Alejandro Tolomei)
  */
+@Deprecated
 public interface HttpEntity {
     public InputStream getStream() throws IOException;
     public long getSize();

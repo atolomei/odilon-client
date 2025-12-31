@@ -27,13 +27,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
- 
+
 import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
- 
+
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -63,10 +63,7 @@ import org.apache.commons.io.FilenameUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -80,8 +77,6 @@ import io.odilon.client.http.HttpResponse;
 import io.odilon.client.http.Method;
 import io.odilon.client.http.ResponseHeader;
 import io.odilon.client.http.Scheme;
-import io.odilon.client.http.multipart.HttpFileEntity;
-import io.odilon.client.http.multipart.HttpMultipart;
 import io.odilon.client.upload.InputStreamRequestBody;
 import io.odilon.client.util.FSUtil;
 import io.odilon.client.util.InetAddressValidator;
@@ -100,6 +95,7 @@ import io.odilon.model.list.DataList;
 import io.odilon.model.list.ResultSet;
 import io.odilon.net.ErrorCode;
 import io.odilon.net.ODHttpStatus;
+import io.odilon.test.base.NumberFormatter;
 import io.odilon.util.Check;
 import io.odilon.util.FileNameNormalizer;
 import io.odilon.util.OdilonFileUtils;
@@ -113,9 +109,6 @@ import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-//import tools.jackson.core.type.TypeReference;
-//import tools.jackson.databind.ObjectMapper;
 
 /**
  * <p>
@@ -139,6 +132,7 @@ public class ODClient implements OdilonClient {
 
 	private static final String API_SERVICE_REQUES_ADD[] = { "servicerequest", "add" };
 
+	@SuppressWarnings("unused")
 	private static final String API_GET_VALID_PRESIGNED[] = { "isvalidpresigned" };
 
 	/**
@@ -257,271 +251,6 @@ public class ODClient implements OdilonClient {
 	private boolean presignedSSL;
 	private int port;
 
-	
-	@Override
-	public String normalizeFileName(String name) {
-		String basename=FileNameUtils.getBaseName(name);
-		String extension = FileNameUtils.getExtension(name);
-
-		
-		/**
-		String str = basename.replaceAll("[^\\x00-\\x7F]|[\\s]+", "-").toLowerCase().trim();
-		str = str.replace(",", "");
-		str=str.replace("%20", "-");
-		str=str.replace("(", "-");
-		str=str.replace(")", "-");
-		str=str.replace("%f1", "");
-		str=str.replace("--", "-");
-		
-		while (str.endsWith("-") && str.length()>1) {
-			str=str.substring(0, str.length()-2);
-		}
-		*/
-		basename=FileNameNormalizer.normalize(basename);
-		return basename+"."+extension;
-	
-	}
-
-	@Override
-	public String getFileName(String url) {
-		if (url == null)
-			return null;
-		String arr[] = url.split("/");
-		return arr[arr.length - 1];
-	}
-
-	
-/**
- * 
- * 
- * 
- */
-	private ObjectMetadata putObjectStreamOkHttp(
-			
-			String bucketName, 
-			String objectName, 
-			InputStream stream, 
-			Optional<String> fileName, 
-			Optional<Long> size, 
-			Optional<String> contentType, 
-			Optional<List<String>> customTags) throws ODClientException {
-
-		if (!objectName.matches(SharedConstant.object_valid_regex))
-			throw new IllegalArgumentException("objectName must be >0 and <=" + String.valueOf(SharedConstant.MAX_OBJECT_CHARS) + ", and must match the java regex ->  " + SharedConstant.object_valid_regex + " | o:" + objectName);
-
-		checkBucketName(bucketName);
-		
-		String cType = null;
-
-		if (contentType.isPresent())
-			cType = contentType.get();
-		else if (fileName.isPresent())
-			cType = getContentType(fileName.get());
-		else
-			cType = DEFAULT_CONTENT_TYPE;
-
-	
-		MediaType mediaType = MediaType.get(cType);
-		 
-		if (mediaType==null) {
-			mediaType = MediaType.get("application/octet-stream");
-		}
-		
-		 
-		String relativePath[] = API_OBJECT_UPLOAD;
-		boolean isError = true;
-		
-		HttpUrl.Builder urlBuilder = this.serverBaseUrl.newBuilder();
-
-		if (relativePath != null) {
-			for (String str : relativePath)
-				urlBuilder.addEncodedPathSegment(str);
-		}
- 	 
-		urlBuilder.addEncodedPathSegment(bucketName);
-		urlBuilder.addEncodedPathSegment(objectName);
-		
-		String fname = null;
-		
-		if (fileName.isPresent()) {
-			String regex = "[\\{\\}/<>\\*\\?´\\^`\\\\]+";
-			String rawName = this.normalizeFileName(fileName.get());
-			String normalizedName = rawName.replaceAll(regex, "-");
-			fname  = normalizedName;
-			
-		} else {
-			fname = objectName;
-		}
-
-		urlBuilder.addEncodedQueryParameter("fileName", fname);
-		urlBuilder.addEncodedQueryParameter("Content-Type", cType);
-
-		if (customTags.isPresent()) {
-			StringBuilder str = new StringBuilder();
-			customTags.get().forEach(s -> str.append(str.length() > 0 ? ("||" + s) : s));
-			urlBuilder.addEncodedQueryParameter("customTags", str.toString());
-		}
-
-		HttpUrl url = urlBuilder.build();
-		
-		Request.Builder requestBuilder = new Request.Builder();
-		requestBuilder.url(url);
-	
-		if (this.accessKey != null && this.secretKey != null) {
-			String encoding = Base64.getEncoder().encodeToString((accessKey + ":" + secretKey).getBytes());
-			String authHeader = "Basic " + encoding;
-			requestBuilder.header("Authorization", authHeader);
-		}
-
-		requestBuilder.header("Host", this.shouldOmitPortInHostHeader(url) ? url.host() : (url.host() + ":" + url.port()));
-		requestBuilder.header("User-Agent", this.userAgent);
-		requestBuilder.header("Accept", APPLICATION_JSON);
-		requestBuilder.header("Accept-Charset", "utf-8");
-		requestBuilder.header("Accept-Encoding", "gzip, deflate");
-		requestBuilder.header("Date", http_date.format(OffsetDateTime.now()));
-		requestBuilder.header("Content-Encoding", "gzip, deflate");
-
-		
-		ObjectMetadata ometa = null;
-		
-		long start = System.currentTimeMillis();
-		
-		try (InputStream is = (stream instanceof BufferedInputStream) ? stream : (new BufferedInputStream(stream))) {
-				
-				RequestBody fileBody =
-				        new InputStreamRequestBody(
-				        		mediaType,
-				                stream);
-				
-				RequestBody multipartBody = new MultipartBody.Builder()
-				        .setType(MultipartBody.FORM)
-				        .addFormDataPart("file", fname, fileBody)
-				        .build();
-				
-				Request uploadRequest = requestBuilder.post(multipartBody).build();
-				
-
-				Response response = null;
-
-				try {
-					response = this.httpClient.newCall(uploadRequest).execute();
-	
-				} catch (ConnectException e) {
-					throw new ODClientException(ODHttpStatus.INTERNAL_SERVER_ERROR.value(), ErrorCode.SERVER_UNREACHEABLE.value(), e.getClass().getName() + " -> " + e.getMessage());
-
-				} catch (IOException e) {
-					throw new InternalCriticalException(e, "Caused by -> " + OkHttpClient.class.getName());
-				}
-
-				if (this.traceStream != null) {
-					this.traceStream.println(response.protocol().toString().toUpperCase(Locale.US) + " " + response.code());
-					this.traceStream.println(response.headers());
-				}
-
-				if (this.isLogStream && logger.isDebugEnabled()) {
-					logger.debug(response.protocol().toString().toUpperCase(Locale.US) + " " + response.code());
-					logger.debug(response.headers());
-				}
-
-				ResponseHeader header = new ResponseHeader();
-				HeaderParser.set(response.headers(), header);
-
-				if (response.isSuccessful()) {
-
-					if (this.traceStream != null)
-						this.traceStream.println(END_HTTP);
-
-					if (this.isLogStream && logger.isDebugEnabled())
-						logger.debug(END_HTTP);
-
-					
-					HttpResponse httpResponse =  new HttpResponse(header, response);
-					
-					String str = null;
-					
-					try {
-						str = httpResponse.body().string();
-					
-					
-					} catch (IOException e) {
-						throw new InternalCriticalException(e, "Error reading Response from " + HttpResponse.class.getName());
-					}
-
-					try {
-						
-						 ometa = getObjectMapper().readValue(str,ObjectMetadata.class);
-					
-						isError = false;
-						return ometa;
-						
-					} catch (Exception e) {
-						throw new InternalCriticalException(e, "Error mapping response JSON to " + DataList.class.getSimpleName() + " object");
-					}
-					
-				}
-
-				
-				/**
-				 * if response is not successful -> throw OdilonException
-				 * ----------------------------
-				 */
-
-				String str;
-
-				try {
-
-					str = response.body().string();
-
-					if (logger.isDebugEnabled()) {
-						logger.debug("error response body -> " + (str != null ? str : "null"));
-					}
-
-				} catch (IOException e) {
-					throw new InternalCriticalException(e, "caused by " + Response.class.getName());
-				}
-
-				int httpCode = response.code();
-
-				if (httpCode == ODHttpStatus.UNAUTHORIZED.value())
-					throw new ODClientException(ODHttpStatus.UNAUTHORIZED.value(), ErrorCode.AUTHENTICATION_ERROR.value(), ErrorCode.AUTHENTICATION_ERROR.getMessage());
-
-				if (httpCode == ODHttpStatus.INTERNAL_SERVER_ERROR.value()) {
-					throw new ODClientException(ODHttpStatus.INTERNAL_SERVER_ERROR.value(), ErrorCode.INTERNAL_ERROR.value(), response.toString());
-				}
-
-				if (httpCode == ODHttpStatus.FORBIDDEN.value()) {
-					throw new ODClientException(ODHttpStatus.INTERNAL_SERVER_ERROR.value(), ErrorCode.ACCESS_DENIED.value(), response.toString());
-				}
-
-				try {
-					OdilonErrorProxy proxy = this.objectMapper.readValue(str, OdilonErrorProxy.class);
-					ODClientException ex = new ODClientException(proxy.getHttpStatus(), proxy.getErrorCode(), proxy.getMessage());
-					Map<String, String> context = new HashMap<String, String>();
-					context.put("bucketName", bucketName );
-					context.put("objectName", objectName );
-
-					ex.setContext(context);
-					throw (ex);
-
-				} catch (Exception e) {
-					throw new InternalCriticalException(e, str != null ? str : "");
-				}
-		 
-		} catch (IOException e) {
-			isError = true;
-			throw new ODClientException(e);
-		} finally {
-			long end = System.currentTimeMillis();
-			if (!isError) {
-				logger.debug("Upload -> " + "bucketName. " + bucketName + " | " + "objectName. " + objectName + " | " + "fileName. " + fileName.orElse("null") + " | " + "size. " + (size.isPresent() ? String.valueOf(size.get()) : "null")
-						+ " | " + "contentType. " + contentType.orElse("null") + " | " + "customTags. " + String.join(", ", customTags.orElse(List.of("null"))) + " | " + "duration. " + String.valueOf(end - start) + " ms" + " | "
-						+ ((ometa != null) ? ("fileSize. " + String.valueOf(ometa.getLength()) + " bytes") : "fileSize. null"));
-			}
-		}
- 	}
-
-
-	
 	/***
 	 * 
 	 * <p>
@@ -584,12 +313,9 @@ public class ODClient implements OdilonClient {
 
 		this.httpClient = new OkHttpClient();
 
-		this.httpClient = this.httpClient.newBuilder().
-				connectTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS).
-				writeTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS).
-				readTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS).
-				protocols(protocol).cache(cache).build();
-		
+		this.httpClient = this.httpClient.newBuilder().connectTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS).writeTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS).readTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
+				.protocols(protocol).cache(cache).build();
+
 		this.serverSchemaAndHostStr = schemeAndHost;
 		HttpUrl url = HttpUrl.parse(this.serverSchemaAndHostStr);
 
@@ -699,92 +425,85 @@ public class ODClient implements OdilonClient {
 		return putObjectStream(bucketName, objectName, stream, fileName, size, contentType, Optional.empty());
 	}
 
-
 	@Override
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType, Optional<List<String>> customTags) throws ODClientException {
-	 	return putObjectStreamOkHttp(bucketName, objectName, stream, fileName, size, contentType, customTags);
-	}		
- 	
-	
+		return putObjectStreamOkHttp(bucketName, objectName, stream, fileName, size, contentType, customTags);
+	}
+
 	/**
 	 * 
-	public ObjectMetadata putObjectStreamV2(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType, Optional<List<String>> customTags) throws ODClientException {
-
-		if (!objectName.matches(SharedConstant.object_valid_regex))
-			throw new IllegalArgumentException("objectName must be >0 and <=" + String.valueOf(SharedConstant.MAX_OBJECT_CHARS) + ", and must match the java regex ->  " + SharedConstant.object_valid_regex + " | o:" + objectName);
-
-		String plainCredentials = accessKey + ":" + secretKey;
-
-		String cType = null;
-
-		if (contentType.isPresent())
-			cType = contentType.get();
-		else if (fileName.isPresent())
-			cType = getContentType(fileName.get());
-		else
-			cType = DEFAULT_CONTENT_TYPE;
-
-		HttpUrl.Builder urlBuilder = this.serverBaseUrl.newBuilder();
-
-		for (String str : API_OBJECT_UPLOAD)
-			urlBuilder.addEncodedPathSegment(str);
-
-		urlBuilder.addEncodedPathSegment(bucketName);
-		urlBuilder.addEncodedPathSegment(objectName);
-
-		if (fileName.isPresent()) {
-			String regex = "[\\{\\}/<>\\*\\?´\\^`\\\\]+";
-			String normalizedName = fileName.get().replaceAll(regex, "-");
-
-			urlBuilder.addEncodedQueryParameter("fileName", normalizedName);
-		} else {
-			urlBuilder.addEncodedQueryParameter("fileName", objectName);
-		}
-
-		urlBuilder.addEncodedQueryParameter("Content-Type", cType);
-
-		if (customTags.isPresent()) {
-
-			StringBuilder str = new StringBuilder();
-			customTags.get().forEach(s -> str.append(str.length() > 0 ? ("||" + s) : s));
-			urlBuilder.addEncodedQueryParameter("customTags", str.toString());
-		}
-
-		
-		// ----------
-		
-		HttpMultipart request = new HttpMultipart(urlBuilder.toString(), plainCredentials, this.getCharset(), isSSL(), isAcceptAllCertificates());
-
-		if (getChunkSize() > 0)
-			request.setChunk(getChunkSize());
-
-		long start = System.currentTimeMillis();
-
-		boolean error = false;
-		ObjectMetadata meta = null;
-
-		try (InputStream is = (stream instanceof BufferedInputStream) ? stream : (new BufferedInputStream(stream))) {
-			meta = request.exchange(new HttpFileEntity(is, objectName, size.orElse(Long.valueOf(-1).longValue())), new TypeReference<ObjectMetadata>() {
-			});
-			return meta;
-
-		} catch (IOException e) {
-			error = true;
-			throw new ODClientException(e);
-		} finally {
-			long end = System.currentTimeMillis();
-
-			if (!error) {
-				logger.debug("Upload -> " + "bucketName. " + bucketName + " | " + "objectName. " + objectName + " | " + "fileName. " + fileName.orElse("null") + " | " + "size. " + (size.isPresent() ? String.valueOf(size.get()) : "null")
-						+ " | " + "contentType. " + contentType.orElse("null") + " | " + "customTags. " + String.join(", ", customTags.orElse(List.of("null"))) + " | " + "duration. " + String.valueOf(end - start) + " ms" + " | "
-						+ ((meta != null) ? ("fileSize. " + String.valueOf(meta.getLength()) + " bytes") : "null"));
-			}
-		}
-		
-		// ----------
-
-		
-	}
+	 * public ObjectMetadata putObjectStreamV2(String bucketName, String objectName,
+	 * InputStream stream, Optional<String> fileName, Optional<Long> size,
+	 * Optional<String> contentType, Optional<List<String>> customTags) throws
+	 * ODClientException {
+	 * 
+	 * if (!objectName.matches(SharedConstant.object_valid_regex)) throw new
+	 * IllegalArgumentException("objectName must be >0 and <=" +
+	 * String.valueOf(SharedConstant.MAX_OBJECT_CHARS) + ", and must match the java
+	 * regex -> " + SharedConstant.object_valid_regex + " | o:" + objectName);
+	 * 
+	 * String plainCredentials = accessKey + ":" + secretKey;
+	 * 
+	 * String cType = null;
+	 * 
+	 * if (contentType.isPresent()) cType = contentType.get(); else if
+	 * (fileName.isPresent()) cType = getContentType(fileName.get()); else cType =
+	 * DEFAULT_CONTENT_TYPE;
+	 * 
+	 * HttpUrl.Builder urlBuilder = this.serverBaseUrl.newBuilder();
+	 * 
+	 * for (String str : API_OBJECT_UPLOAD) urlBuilder.addEncodedPathSegment(str);
+	 * 
+	 * urlBuilder.addEncodedPathSegment(bucketName);
+	 * urlBuilder.addEncodedPathSegment(objectName);
+	 * 
+	 * if (fileName.isPresent()) { String regex = "[\\{\\}/<>\\*\\?´\\^`\\\\]+";
+	 * String normalizedName = fileName.get().replaceAll(regex, "-");
+	 * 
+	 * urlBuilder.addEncodedQueryParameter("fileName", normalizedName); } else {
+	 * urlBuilder.addEncodedQueryParameter("fileName", objectName); }
+	 * 
+	 * urlBuilder.addEncodedQueryParameter("Content-Type", cType);
+	 * 
+	 * if (customTags.isPresent()) {
+	 * 
+	 * StringBuilder str = new StringBuilder(); customTags.get().forEach(s ->
+	 * str.append(str.length() > 0 ? ("||" + s) : s));
+	 * urlBuilder.addEncodedQueryParameter("customTags", str.toString()); }
+	 * 
+	 * 
+	 * // ----------
+	 * 
+	 * HttpMultipart request = new HttpMultipart(urlBuilder.toString(),
+	 * plainCredentials, this.getCharset(), isSSL(), isAcceptAllCertificates());
+	 * 
+	 * if (getChunkSize() > 0) request.setChunk(getChunkSize());
+	 * 
+	 * long start = System.currentTimeMillis();
+	 * 
+	 * boolean error = false; ObjectMetadata meta = null;
+	 * 
+	 * try (InputStream is = (stream instanceof BufferedInputStream) ? stream : (new
+	 * BufferedInputStream(stream))) { meta = request.exchange(new
+	 * HttpFileEntity(is, objectName, size.orElse(Long.valueOf(-1).longValue())),
+	 * new TypeReference<ObjectMetadata>() { }); return meta;
+	 * 
+	 * } catch (IOException e) { error = true; throw new ODClientException(e); }
+	 * finally { long end = System.currentTimeMillis();
+	 * 
+	 * if (!error) { logger.debug("Upload -> " + "bucketName. " + bucketName + " | "
+	 * + "objectName. " + objectName + " | " + "fileName. " +
+	 * fileName.orElse("null") + " | " + "size. " + (size.isPresent() ?
+	 * String.valueOf(size.get()) : "null") + " | " + "contentType. " +
+	 * contentType.orElse("null") + " | " + "customTags. " + String.join(", ",
+	 * customTags.orElse(List.of("null"))) + " | " + "duration. " +
+	 * String.valueOf(end - start) + " ms" + " | " + ((meta != null) ? ("fileSize. "
+	 * + String.valueOf(meta.getLength()) + " bytes") : "null")); } }
+	 * 
+	 * // ----------
+	 * 
+	 * 
+	 * }
 	 */
 
 	@Override
@@ -1801,7 +1520,6 @@ public class ODClient implements OdilonClient {
 		return VERSION;
 	}
 
-	
 	@Override
 	public String getContentType(String filename) {
 
@@ -1828,10 +1546,35 @@ public class ODClient implements OdilonClient {
 
 		return DEFAULT_CONTENT_TYPE;
 	}
-	
-	
+
 	public int getPort() {
 		return this.port;
+	}
+
+	@Override
+	public String normalizeFileName(String name) {
+		String basename = FileNameUtils.getBaseName(name);
+		String extension = FileNameUtils.getExtension(name);
+		if (basename.contains("%")) {
+			logger.debug(basename);
+			basename=basename.replace("%", "-").replace("(", "-").replace(")", "-");
+		}
+		basename = FileNameNormalizer.normalize(basename);
+		return basename + "." + extension;
+	}
+
+	@Override
+	public String normalizeObjectName(String name) {
+		return FileNameNormalizer.normalizeObjectName(name);
+	}
+
+	
+	@Override
+	public String getFileName(String url) {
+		if (url == null)
+			return null;
+		String arr[] = url.split("/");
+		return arr[arr.length - 1];
 	}
 
 	protected ObjectMapper getObjectMapper() {
@@ -1980,15 +1723,8 @@ public class ODClient implements OdilonClient {
 	 * @param length
 	 * @return
 	 */
-	private Request createRequest(String relativePath[], Method method, 
-			Optional<String> bucketName, 
-			Optional<String> objectName, 
-			Multimap<String, String> headerMap, 
-			Multimap<String, String> queryParamMap, 
-			final String contentType,
-			byte[] body, 
-			int length, 
-			boolean multiPart) throws NoSuchAlgorithmException, IOException {
+	private Request createRequest(String relativePath[], Method method, Optional<String> bucketName, Optional<String> objectName, Multimap<String, String> headerMap, Multimap<String, String> queryParamMap, final String contentType,
+			byte[] body, int length, boolean multiPart) throws NoSuchAlgorithmException, IOException {
 
 		HttpUrl.Builder urlBuilder = this.serverBaseUrl.newBuilder();
 
@@ -2253,11 +1989,10 @@ public class ODClient implements OdilonClient {
 		if (httpCode == ODHttpStatus.FORBIDDEN.value()) {
 			throw new ODClientException(ODHttpStatus.INTERNAL_SERVER_ERROR.value(), ErrorCode.ACCESS_DENIED.value(), response.toString());
 		}
-		if (httpCode == ODHttpStatus. NOT_FOUND.value()) {
+		if (httpCode == ODHttpStatus.NOT_FOUND.value()) {
 			throw new ODClientException(ODHttpStatus.NOT_FOUND.value(), ErrorCode.BUCKET_NOT_EXISTS.value(), response.toString());
 		}
-		
-		
+
 		try {
 			OdilonErrorProxy proxy = this.objectMapper.readValue(str, OdilonErrorProxy.class);
 			ODClientException ex = new ODClientException(proxy.getHttpStatus(), proxy.getErrorCode(), proxy.getMessage());
@@ -2330,12 +2065,6 @@ public class ODClient implements OdilonClient {
 	 * 
 	 */
 
-	private static boolean isLinux() {
-		if (System.getenv("OS") != null && System.getenv("OS").toLowerCase().contains("windows"))
-			return false;
-		return true;
-	}
-
 	private String getCacheWorkDir() {
 		return getHomeDirAbsolutePath() + File.separator + "tmp" + File.separator + rand.randomString(6);
 	}
@@ -2346,7 +2075,231 @@ public class ODClient implements OdilonClient {
 		return windows_home;
 	}
 
+	private static boolean isLinux() {
+		if (System.getenv("OS") != null && System.getenv("OS").toLowerCase().contains("windows"))
+			return false;
+		return true;
+	}
 
+	/**
+	 * 
+	 * 
+	 * 
+	 */
+	private ObjectMetadata putObjectStreamOkHttp(
+
+			String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType, Optional<List<String>> customTags) throws ODClientException {
+
+		if (!objectName.matches(SharedConstant.object_valid_regex))
+			throw new IllegalArgumentException("objectName must be >0 and <=" + String.valueOf(SharedConstant.MAX_OBJECT_CHARS) + ", and must match the java regex ->  " + SharedConstant.object_valid_regex + " | o:" + objectName);
+
+		if (!FileNameNormalizer.isValidObjectName(objectName) )
+			throw new IllegalArgumentException("objectName is not valid  " + " | o:" + objectName +" | FileNameNormalizer.isValidObjectName( objectName ) must return true");
+			
+		
+		checkBucketName(bucketName);
+
+		String cType = null;
+
+		if (contentType.isPresent())
+			cType = contentType.get();
+		else if (fileName.isPresent())
+			cType = getContentType(fileName.get());
+		else
+			cType = DEFAULT_CONTENT_TYPE;
+
+		MediaType mediaType = MediaType.get(cType);
+
+		if (mediaType == null) {
+			mediaType = MediaType.get("application/octet-stream");
+		}
+
+		String relativePath[] = API_OBJECT_UPLOAD;
+		boolean isError = true;
+
+		HttpUrl.Builder urlBuilder = this.serverBaseUrl.newBuilder();
+
+		if (relativePath != null) {
+			for (String str : relativePath)
+				urlBuilder.addEncodedPathSegment(str);
+		}
+
+		urlBuilder.addEncodedPathSegment(bucketName);
+		urlBuilder.addEncodedPathSegment(objectName);
+
+		String fname = null;
+
+		if (fileName.isPresent()) {
+			
+			String rawName = this.normalizeFileName(fileName.get());
+
+			String regex = "[\\{\\}/<>\\*\\?´\\^`\\\\]+";
+			String normalizedName = rawName.replaceAll(regex, "-");
+			fname = normalizedName;
+
+		} else {
+			fname = objectName;
+		}
+
+		urlBuilder.addEncodedQueryParameter("fileName", fname);
+		urlBuilder.addEncodedQueryParameter("Content-Type", cType);
+
+		if (customTags.isPresent()) {
+			StringBuilder str = new StringBuilder();
+			customTags.get().forEach(s -> str.append(str.length() > 0 ? ("||" + s) : s));
+			urlBuilder.addEncodedQueryParameter("customTags", str.toString());
+		}
+
+		HttpUrl url = urlBuilder.build();
+
+		Request.Builder requestBuilder = new Request.Builder();
+		requestBuilder.url(url);
+
+		if (this.accessKey != null && this.secretKey != null) {
+			String encoding = Base64.getEncoder().encodeToString((accessKey + ":" + secretKey).getBytes());
+			String authHeader = "Basic " + encoding;
+			requestBuilder.header("Authorization", authHeader);
+		}
+
+		requestBuilder.header("Host", this.shouldOmitPortInHostHeader(url) ? url.host() : (url.host() + ":" + url.port()));
+		requestBuilder.header("User-Agent", this.userAgent);
+		requestBuilder.header("Accept", APPLICATION_JSON);
+		requestBuilder.header("Accept-Charset", "utf-8");
+		requestBuilder.header("Accept-Encoding", "gzip, deflate");
+		requestBuilder.header("Date", http_date.format(OffsetDateTime.now()));
+		requestBuilder.header("Content-Encoding", "gzip, deflate");
+
+		ObjectMetadata ometa = null;
+
+		long start = System.currentTimeMillis();
+
+		try (InputStream is = (stream instanceof BufferedInputStream) ? stream : (new BufferedInputStream(stream))) {
+
+			RequestBody fileBody = new InputStreamRequestBody(mediaType, stream);
+
+			RequestBody multipartBody = new MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart("file", fname, fileBody).build();
+
+			Request uploadRequest = requestBuilder.post(multipartBody).build();
+
+			Response response = null;
+
+			try {
+				response = this.httpClient.newCall(uploadRequest).execute();
+
+			} catch (ConnectException e) {
+				throw new ODClientException(ODHttpStatus.INTERNAL_SERVER_ERROR.value(), ErrorCode.SERVER_UNREACHEABLE.value(), e.getClass().getName() + " -> " + e.getMessage());
+
+			} catch (IOException e) {
+				throw new InternalCriticalException(e, "Caused by -> " + OkHttpClient.class.getName());
+			}
+
+			if (this.traceStream != null) {
+				this.traceStream.println(response.protocol().toString().toUpperCase(Locale.US) + " " + response.code());
+				this.traceStream.println(response.headers());
+			}
+
+			if (this.isLogStream && logger.isDebugEnabled()) {
+				logger.debug(response.protocol().toString().toUpperCase(Locale.US) + " " + response.code());
+				logger.debug(response.headers());
+			}
+
+			ResponseHeader header = new ResponseHeader();
+			HeaderParser.set(response.headers(), header);
+
+			if (response.isSuccessful()) {
+
+				if (this.traceStream != null)
+					this.traceStream.println(END_HTTP);
+
+				if (this.isLogStream && logger.isDebugEnabled())
+					logger.debug(END_HTTP);
+
+				HttpResponse httpResponse = new HttpResponse(header, response);
+
+				String str = null;
+
+				try {
+					str = httpResponse.body().string();
+
+				} catch (IOException e) {
+					throw new InternalCriticalException(e, "Error reading Response from " + HttpResponse.class.getName());
+				}
+
+				try {
+
+					ometa = getObjectMapper().readValue(str, ObjectMetadata.class);
+
+					isError = false;
+					return ometa;
+
+				} catch (Exception e) {
+					throw new InternalCriticalException(e, "Error mapping response JSON to " + DataList.class.getSimpleName() + " object");
+				}
+
+			}
+
+			/**
+			 * if response is not successful -> throw OdilonException
+			 * ----------------------------
+			 */
+
+			String str;
+
+			try {
+
+				str = response.body().string();
+
+				if (logger.isDebugEnabled()) {
+					logger.debug("error response body -> " + (str != null ? str : "null"));
+				}
+
+			} catch (IOException e) {
+				throw new InternalCriticalException(e, "caused by " + Response.class.getName());
+			}
+
+			int httpCode = response.code();
+
+			if (httpCode == ODHttpStatus.UNAUTHORIZED.value())
+				throw new ODClientException(ODHttpStatus.UNAUTHORIZED.value(), ErrorCode.AUTHENTICATION_ERROR.value(), ErrorCode.AUTHENTICATION_ERROR.getMessage());
+
+			if (httpCode == ODHttpStatus.INTERNAL_SERVER_ERROR.value()) {
+				throw new ODClientException(ODHttpStatus.INTERNAL_SERVER_ERROR.value(), ErrorCode.INTERNAL_ERROR.value(), response.toString());
+			}
+
+			if (httpCode == ODHttpStatus.FORBIDDEN.value()) {
+				throw new ODClientException(ODHttpStatus.INTERNAL_SERVER_ERROR.value(), ErrorCode.ACCESS_DENIED.value(), response.toString());
+			}
+
+			try {
+				OdilonErrorProxy proxy = this.objectMapper.readValue(str, OdilonErrorProxy.class);
+				ODClientException ex = new ODClientException(proxy.getHttpStatus(), proxy.getErrorCode(), proxy.getMessage());
+				Map<String, String> context = new HashMap<String, String>();
+				context.put("bucketName", bucketName);
+				context.put("objectName", objectName);
+
+				ex.setContext(context);
+				throw (ex);
+
+			} catch (Exception e) {
+				
+				String info = "bucketName. " + bucketName + " | " + "objectName. " + objectName + " | " + "fileName. " + fileName.orElse("null") + " | " + "size. " + (size.isPresent() ? String.valueOf(size.get()) : "null")
+				+ " | " + "contentType. " + contentType.orElse("null") + " | " + "customTags. " + String.join(", ", customTags.orElse(List.of("null")));
+				
+				throw new InternalCriticalException(e, (str != null ? str : "") + " |" + info);
+			}
+
+		} catch (IOException e) {
+			isError = true;
+			throw new ODClientException(e);
+		} finally {
+			long end = System.currentTimeMillis();
+			if (!isError) {
+				logger.debug("Upload -> " + "bucketName. " + bucketName + " | " + "objectName. " + objectName + " | " + "fileName. " + fileName.orElse("null") + " | " + "size. " + (size.isPresent() ? String.valueOf(size.get()) : "null")
+						+ " | " + "contentType. " + contentType.orElse("null") + " | " + "customTags. " + String.join(", ", customTags.orElse(List.of("null"))) + " | " + "duration. " + String.valueOf(end - start) + " ms" + " | "
+						+ ((ometa != null) ? ("fileSize. " + NumberFormatter.formatNumber(ometa.getLength()) + " bytes") : "fileSize. null"));
+			}
+		}
+	}
 
 	/**
 	 * @param endpoint
@@ -2376,97 +2329,58 @@ public class ODClient implements OdilonClient {
 		return true;
 	}
 
-/**
-	 private ObjectMetadata putObjectInternal(String bucketName, String objectName, File file, String fileName) throws ODClientException {
-			 
-			Check.requireNonNullStringArgument(bucketName, "bucketName is null or empty");
-			Check.requireNonNullStringArgument(objectName, "object is null or empty");
-			Check.requireNonNullArgument(file, "file is null"); 
-			Check.requireNonNullStringArgument(fileName, "fileName is null");
-			
-			if (!objectName.matches(SharedConstant.object_valid_regex)) 
-				throw new IllegalArgumentException(	"objectName must be >0 and <"+String.valueOf(SharedConstant.MAX_OBJECT_CHARS) +
-													", and must match the java regex ->  " + SharedConstant.object_valid_regex + " | o:" +	objectName);
-			 if (!file.exists()) 
-				 throw new IllegalArgumentException("file does not exist -> " + file.getName());
-			 
-			 Path filePath = file.toPath();
-			 if (!Files.isRegularFile(filePath))
-			      throw new IllegalArgumentException("'" + file.getName() + "': not a regular file");
-			 
-			 Map<String, String> headerMap = new HashMap<>();
-			 Map<String,String> queryParamMap = new HashMap<String,String>();
-
-			 try {
-				 headerMap.put("Content-Type", Optional.ofNullable(Files.probeContentType(filePath)).orElse(DEFAULT_CONTENT_TYPE));
-			 } catch (IOException e) {
-					throw new InternalCriticalException(e);
-			 }
-			 
-			 long length = file.length();
-
-			 queryParamMap.put("fileName", fileName);
-			 
-			 HttpResponse response = null;
-			 RandomAccessFile raFile = null;
-			 
-			try { 
-				try {
-					raFile = new RandomAccessFile(filePath.toFile(), "r");
-				} catch (FileNotFoundException e) {
-						throw new InternalCriticalException(e);
-				}
-															
-				response = executePost(API_OBJECT_UPLOAD, Optional.of(bucketName), Optional.of(objectName), headerMap, queryParamMap, raFile, (int) length, true);
-
-				 try {
-					 	String str = response.body().string();
-					 	try {
-							return this.objectMapper.readValue(str, ObjectMetadata.class);
-							
-						  } catch (JsonProcessingException e) {
-								throw new InternalCriticalException(e);
-						  }
-					  	
-				 } catch (IOException e) {
-						throw new InternalCriticalException(e);
-				 }
-				} finally {
-					if (raFile!=null)
-						try {
-							raFile.close();
-						} catch (IOException e) {
-								throw new InternalCriticalException(e);
-						}
-				}
-		 }
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
+	/**
+	 * private ObjectMetadata putObjectInternal(String bucketName, String
+	 * objectName, File file, String fileName) throws ODClientException {
+	 * 
+	 * Check.requireNonNullStringArgument(bucketName, "bucketName is null or
+	 * empty"); Check.requireNonNullStringArgument(objectName, "object is null or
+	 * empty"); Check.requireNonNullArgument(file, "file is null");
+	 * Check.requireNonNullStringArgument(fileName, "fileName is null");
+	 * 
+	 * if (!objectName.matches(SharedConstant.object_valid_regex)) throw new
+	 * IllegalArgumentException( "objectName must be >0 and
+	 * <"+String.valueOf(SharedConstant.MAX_OBJECT_CHARS) + ", and must match the
+	 * java regex -> " + SharedConstant.object_valid_regex + " | o:" + objectName);
+	 * if (!file.exists()) throw new IllegalArgumentException("file does not exist
+	 * -> " + file.getName());
+	 * 
+	 * Path filePath = file.toPath(); if (!Files.isRegularFile(filePath)) throw new
+	 * IllegalArgumentException("'" + file.getName() + "': not a regular file");
+	 * 
+	 * Map<String, String> headerMap = new HashMap<>(); Map<String,String>
+	 * queryParamMap = new HashMap<String,String>();
+	 * 
+	 * try { headerMap.put("Content-Type",
+	 * Optional.ofNullable(Files.probeContentType(filePath)).orElse(DEFAULT_CONTENT_TYPE));
+	 * } catch (IOException e) { throw new InternalCriticalException(e); }
+	 * 
+	 * long length = file.length();
+	 * 
+	 * queryParamMap.put("fileName", fileName);
+	 * 
+	 * HttpResponse response = null; RandomAccessFile raFile = null;
+	 * 
+	 * try { try { raFile = new RandomAccessFile(filePath.toFile(), "r"); } catch
+	 * (FileNotFoundException e) { throw new InternalCriticalException(e); }
+	 * 
+	 * response = executePost(API_OBJECT_UPLOAD, Optional.of(bucketName),
+	 * Optional.of(objectName), headerMap, queryParamMap, raFile, (int) length,
+	 * true);
+	 * 
+	 * try { String str = response.body().string(); try { return
+	 * this.objectMapper.readValue(str, ObjectMetadata.class);
+	 * 
+	 * } catch (JsonProcessingException e) { throw new InternalCriticalException(e);
+	 * }
+	 * 
+	 * } catch (IOException e) { throw new InternalCriticalException(e); } } finally
+	 * { if (raFile!=null) try { raFile.close(); } catch (IOException e) { throw new
+	 * InternalCriticalException(e); } } }
+	 * 
+	 */
 
 }
-
-
-
-
-
-
-
-
-
-
-
 
 /**
  * @param bucketName

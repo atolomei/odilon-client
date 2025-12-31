@@ -24,6 +24,7 @@ import java.io.InputStream;
  * 
  * @author atolomei@novamens.com (Alejandro Tolomei)
  */
+@Deprecated
 public class HttpFileEntity implements HttpEntity {
 
 	private String name;

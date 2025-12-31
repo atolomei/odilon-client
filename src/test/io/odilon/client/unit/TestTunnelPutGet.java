@@ -136,6 +136,7 @@ public class TestTunnelPutGet extends BaseTest {
 
 			String fileName =   getClient().normalizeFileName( getFileName(url) );
 			String objectName = FSUtil.getBaseName(fileName) + "-" + String.valueOf(Double.valueOf((Math.abs(Math.random() * 10000))).intValue());
+			objectName = getClient().normalizeObjectName(objectName);
 
 			long contentLength = connection.getContentLengthLong();
  
@@ -381,6 +382,8 @@ String bucketName = this.bucket_1.getName();
 
 	String fileName = getFileName(targetPath.toFile().getName());
 	String objectName = FSUtil.getBaseName(fileName) + "-" + String.valueOf(Double.valueOf((Math.abs(Math.random() * 10000))).intValue());
+					objectName = getClient().normalizeObjectName(objectName);
+
 	long contentLength = targetPath.toFile().length();
 
 	try (InputStream inputStream = new BufferedInputStream(new FileInputStream(targetPath.toFile()))) {

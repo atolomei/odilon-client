@@ -27,6 +27,7 @@ import java.net.URLConnection;
  *  @author atolomei@novamens.com (Alejandro Tolomei)
  *  
  */
+@Deprecated
 public class HttpMultipart extends HttpRequest {
 
     private final String boundary = "===" + System.currentTimeMillis() + "===";

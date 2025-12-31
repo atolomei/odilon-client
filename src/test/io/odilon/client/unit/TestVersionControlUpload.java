@@ -224,6 +224,7 @@ public class TestVersionControlUpload extends BaseTest {
 
 				String objectName = FSUtil.getBaseName(fi.getName()) + "-"
 						+ String.valueOf(Double.valueOf((Math.abs(Math.random() * 100000))).intValue());
+				objectName = getClient().normalizeObjectName(objectName);
 
 				try {
 

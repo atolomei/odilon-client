@@ -46,7 +46,7 @@ public class TestStressUploader implements Runnable {
 			
 	static public Logger logger = Logger.getLogger(TestStressUploader.class.getName());
 	
-	private  int maxUploadingThread  = 7;
+	private  int maxUploadingThread  = 4;
 	private AtomicLong total_uploaded = new AtomicLong(0);
 	private AtomicLong totalUpload_bytes = new AtomicLong(0);
 	private AtomicBoolean isError = new AtomicBoolean(false);
@@ -135,7 +135,10 @@ public class TestStressUploader implements Runnable {
 						if (exit() || isError().get())
 							return null;
 						
-						String objectName = FSUtil.getBaseName(file.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*10000))).intValue());;
+						String objectName = FSUtil.getBaseName(this.tester.getClient().normalizeFileName(file.getName()))+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*10000))).intValue());;
+						objectName = this.tester.getClient().normalizeObjectName(objectName);
+
+						
 						InputStream inputStream = null;
 						
 						try {
@@ -164,6 +167,12 @@ public class TestStressUploader implements Runnable {
 											this.total_uploaded.incrementAndGet();
 											this.totalUpload_bytes.addAndGet(file.length());
 											
+											try {
+												Thread.sleep(200);
+											} catch (InterruptedException e) {
+											}
+											
+											
 									} catch (Exception e) {
 										this.tester.error(e);
 										this.isError.set(true);
@@ -188,7 +197,7 @@ public class TestStressUploader implements Runnable {
 			try {
 				
 				if (!exit())
-					executor.invokeAll(tasks, 12, TimeUnit.HOURS);
+					executor.invokeAll(tasks, 4, TimeUnit.HOURS);
 				
 			} catch (InterruptedException e) {
 				logger.error(e);
