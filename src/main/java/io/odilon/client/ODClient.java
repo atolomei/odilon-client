@@ -80,7 +80,7 @@ import io.odilon.client.http.Scheme;
 import io.odilon.client.upload.InputStreamRequestBody;
 import io.odilon.client.util.FSUtil;
 import io.odilon.client.util.InetAddressValidator;
-
+import io.odilon.client.util.NumberFormatter;
 import io.odilon.errors.InternalCriticalException;
 import io.odilon.errors.OdilonErrorProxy;
 import io.odilon.log.Logger;
@@ -95,7 +95,7 @@ import io.odilon.model.list.DataList;
 import io.odilon.model.list.ResultSet;
 import io.odilon.net.ErrorCode;
 import io.odilon.net.ODHttpStatus;
-import io.odilon.test.base.NumberFormatter;
+ 
 import io.odilon.util.Check;
 import io.odilon.util.FileNameNormalizer;
 import io.odilon.util.OdilonFileUtils;

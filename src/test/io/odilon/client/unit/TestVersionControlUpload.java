@@ -35,11 +35,11 @@ import org.apache.commons.io.FilenameUtils;
 
 import io.odilon.client.error.ODClientException;
 import io.odilon.client.util.FSUtil;
+import io.odilon.client.util.NumberFormatter;
 import io.odilon.log.Logger;
 import io.odilon.model.Bucket;
 import io.odilon.model.ObjectMetadata;
 import io.odilon.test.base.BaseTest;
-import io.odilon.test.base.NumberFormatter;
 import io.odilon.test.base.TestFile;
 import io.odilon.util.OdilonFileUtils;
 

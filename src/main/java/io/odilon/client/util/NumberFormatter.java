@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.odilon.test.base;
+package io.odilon.client.util;
 
 import java.math.RoundingMode;
 import java.text.NumberFormat;
