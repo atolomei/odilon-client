@@ -75,10 +75,7 @@ public class TestDeleteObject extends BaseTest {
 		index = 0;
 		removeTestBucket();
 
-		// index = 0;
-		// testDeleteAllObjects();
-
-		showResults();
+	 	showResults();
 
 	}
 

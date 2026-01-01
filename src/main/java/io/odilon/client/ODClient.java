@@ -101,6 +101,7 @@ import io.odilon.util.FileNameNormalizer;
 import io.odilon.util.OdilonFileUtils;
 import io.odilon.util.RandomIDGenerator;
 import okhttp3.Cache;
+import okhttp3.CacheControl;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -281,6 +282,9 @@ public class ODClient implements OdilonClient {
 		this(schemeAndHost, port, accessKey, secretKey, secure, false);
 	}
 
+	public void evictCache() {
+		
+	}
 	/**
 	 * @param schemeAndHost         can not be null
 	 * @param port                  can not be null (normally default port is 9234)
@@ -313,8 +317,12 @@ public class ODClient implements OdilonClient {
 
 		this.httpClient = new OkHttpClient();
 
-		this.httpClient = this.httpClient.newBuilder().connectTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS).writeTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS).readTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
-				.protocols(protocol).cache(cache).build();
+		this.httpClient = this.httpClient.newBuilder().
+				connectTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS).
+				writeTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS).
+				readTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
+				.protocols(protocol).
+				cache(cache).build();
 
 		this.serverSchemaAndHostStr = schemeAndHost;
 		HttpUrl url = HttpUrl.parse(this.serverSchemaAndHostStr);
@@ -625,6 +633,19 @@ public class ODClient implements OdilonClient {
 		return listObjects(bucketName, Optional.of(prefix), Optional.empty());
 	}
 
+	boolean okHttpCacheEnabled = true;
+	
+
+	@Override
+	public boolean isCacheEnabled() {
+		return this.okHttpCacheEnabled;
+	}
+	
+	@Override
+	public void setCacheEnabled ( boolean b) {
+		this.okHttpCacheEnabled=b;
+	}
+	
 	@Override
 	public ResultSet<Item<ObjectMetadata>> listObjects(String bucketName, final Optional<String> prefix, final Optional<Integer> pageSize) throws ODClientException {
 
@@ -1750,6 +1771,10 @@ public class ODClient implements OdilonClient {
 
 		Request.Builder requestBuilder = new Request.Builder();
 
+		if (!this.isCacheEnabled())
+			requestBuilder.cacheControl(new CacheControl.Builder().noCache().build());
+	  
+		 
 		requestBuilder.url(url);
 
 		String sha256 = null;

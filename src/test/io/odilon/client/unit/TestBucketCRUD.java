@@ -26,293 +26,270 @@ import io.odilon.model.Bucket;
 import io.odilon.test.base.BaseTest;
 
 /**
- * 1. create a bucket that does not exists -> must return ok
- * 2. remove a bucket that does not exists -> must throw exception 
- * 3. remove a bucket that does exists and is empty-> must return ok
- * 4. remove a bucket that does exists and is not empty-> must throw exception
- * 5. create a bucket that exists -> error -> must throw exception
- *  
- *  @author atolomei@novamens.com (Alejandro Tolomei)
+ * 1. create a bucket that does not exists -> must return ok 2. remove a bucket
+ * that does not exists -> must throw exception 3. remove a bucket that does
+ * exists and is empty-> must return ok 4. remove a bucket that does exists and
+ * is not empty-> must throw exception 5. create a bucket that exists -> error
+ * -> must throw exception
+ * 
+ * @author atolomei@novamens.com (Alejandro Tolomei)
  */
 public class TestBucketCRUD extends BaseTest {
-		
+
 	private static final Logger logger = Logger.getLogger(TestBucketCRUD.class.getName());
 
-	private String buckets[] = {"bucket1", "bucket2", "bucket3", "bucket4", "bucket5"};
-	
-	
+	private String buckets[] = { "bucket1", "bucket2", "bucket3", "bucket4", "bucket5" };
+
 	private String bucketEmpty;
 
-	
-	
 	public TestBucketCRUD() {
 		logger.debug("Start " + this.getClass().getName());
 	}
 
 	@Override
 	public void executeTest() {
-	 
+
 		setSleepDurationMills(300);
-		
+
 		try {
-			String p=ping();
-			if (p==null || !p.equals("ok"))
-				throw new RuntimeException("ping error -> " + p!=null?p:"null");
+			String p = ping();
+			if (p == null || !p.equals("ok"))
+				throw new RuntimeException("ping error -> " + p != null ? p : "null");
 			else {
 				getMap().put("ping", "ok");
 			}
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
 			error(e.getClass().getName() + " | " + e.getMessage());
 		}
-		
+
 		if (!makeBuckets())
-	        	error("makeBuckets");
-		  
+			error("makeBuckets");
+
 		if (!listBuckets())
-        	error("listBuckets");
-		
+			error("listBuckets");
+
 		if (!renameBuckets())
-        	error("renameBuckets");
-		
+			error("renameBuckets");
+
 		if (!listBuckets())
-       	error("listBuckets");
-	
-	     if (!testCreateRemoveCreateBucketEmtpy())
-	        error("testCreateRemoveCreateBucketEmtpy");
-	     
-        if (!testCreateBucketDoesNotExist())
-        	error("testCreateBucketDoesNotExist");
-        
-        if (!testRemoveBucketEmtpy())
-        	error("testRemoveBucketEmtpy");
+			error("listBuckets");
 
-        if (!testRemoveAllBucketsEmtpy())
-        	error("testRemoveAllBucketsEmtpy");
+		if (!testCreateRemoveCreateBucketEmtpy())
+			error("testCreateRemoveCreateBucketEmtpy");
 
-        if (!testRemoveBucketDoesNotExist())
-        	error("testRemoveBucketDoesNotExist");
-        
-        
-        showResults();
+		if (!testCreateBucketDoesNotExist())
+			error("testCreateBucketDoesNotExist");
+
+		if (!testRemoveBucketEmtpy())
+			error("testRemoveBucketEmtpy");
+
+		if (!testRemoveAllBucketsEmtpy())
+			error("testRemoveAllBucketsEmtpy");
+
+		if (!testRemoveBucketDoesNotExist())
+			error("testRemoveBucketDoesNotExist");
+
+		showResults();
 	}
-	
 
 	private boolean testCreateRemoveCreateBucketEmtpy() {
-	    this.bucketEmpty = "bucket"+randomString(12);
-        try {
-	    
-        	getClient().createBucket(bucketEmpty);
-		    Assert.assertTrue(getClient().existsBucket(bucketEmpty));
-        	
-		    getClient().deleteBucket(bucketEmpty);
-		    Assert.assertFalse(getClient().existsBucket(bucketEmpty));
-
-		    getClient().createBucket(bucketEmpty);
-		    Assert.assertTrue(getClient().existsBucket(bucketEmpty));
-		    
-		    logger.debug("testCreateRemoveCreateBucketEmtpy -> ok");
-			getMap().put("testCreateRemoveCreateBucketEmtpy", "ok");
-	    	return true;
-	    	
-        }  catch (Exception e) {
-        	error(e);
-        	return false;
-    	}
-	}
-
-	
-								
-	private boolean testCreateBucketDoesNotExist() {
-	    this.bucketEmpty = "bucket"+randomString(12);
-        try {
-	    	getClient().createBucket(bucketEmpty);
-	    	logger.debug("testCreateBucketDoesNotExist -> ok");
-			getMap().put("testCreateBucketDoesNotExist", "ok");
-	    	return true;
-        }  catch (Exception e) {
-        	error(e);
-    	}
-        return false;
-	}
-	
-	private boolean testRemoveAllBucketsEmtpy() {
-		
+		this.bucketEmpty = "bucket" + randomString(12);
 		try {
-        		for (Bucket bucket:getClient().listBuckets()) {
-        			if (getClient().isEmpty(bucket.getName())) {
-        				getClient().deleteBucket(bucket.getName());
-        			}
-        		}
-        		logger.debug("testRemoveAllBucketsEmtpy -> ok");
-        		getMap().put("testRemoveAllBucketsEmtpy", "ok");
-        		return true;
-        }  catch (Exception e) {
-    		error(e);
-    	}
-		return false;
-		
-		
+
+			getClient().createBucket(bucketEmpty);
+			Assert.assertTrue(getClient().existsBucket(bucketEmpty));
+
+			getClient().deleteBucket(bucketEmpty);
+			Assert.assertFalse(getClient().existsBucket(bucketEmpty));
+
+			getClient().createBucket(bucketEmpty);
+			Assert.assertTrue(getClient().existsBucket(bucketEmpty));
+
+			logger.debug("testCreateRemoveCreateBucketEmtpy -> ok");
+			getMap().put("testCreateRemoveCreateBucketEmtpy", "ok");
+			return true;
+
+		} catch (Exception e) {
+			error(e);
+			return false;
+		}
 	}
-	
-	
+
+	private boolean testCreateBucketDoesNotExist() {
+		this.bucketEmpty = "bucket" + randomString(12);
+		try {
+			getClient().createBucket(bucketEmpty);
+			logger.debug("testCreateBucketDoesNotExist -> ok");
+			getMap().put("testCreateBucketDoesNotExist", "ok");
+			return true;
+		} catch (Exception e) {
+			error(e);
+		}
+		return false;
+	}
+
+	private boolean testRemoveAllBucketsEmtpy() {
+
+		try {
+			for (Bucket bucket : getClient().listBuckets()) {
+				if (getClient().isEmpty(bucket.getName())) {
+					getClient().deleteBucket(bucket.getName());
+				}
+			}
+			logger.debug("testRemoveAllBucketsEmtpy -> ok");
+			getMap().put("testRemoveAllBucketsEmtpy", "ok");
+			return true;
+		} catch (Exception e) {
+			error(e);
+		}
+		return false;
+
+	}
+
 	private boolean testRemoveBucketEmtpy() {
 		try {
-        	if (bucketEmpty != null) { 
-        		getClient().deleteBucket(bucketEmpty);
-        		logger.debug("testRemoveBucketEmtpy -> ok");
-        		getMap().put("testRemoveBucketEmtpy", "ok");
-        		return true;
-        	}
-        	else {
-        		throw new RuntimeException("bucket is null but it must exist here. aborting");
-        	}
-        	
-        }  catch (Exception e) {
-    		error(e);
-    	}
-		return false;	
+			if (bucketEmpty != null) {
+				getClient().deleteBucket(bucketEmpty);
+				logger.debug("testRemoveBucketEmtpy -> ok");
+				getMap().put("testRemoveBucketEmtpy", "ok");
+				return true;
+			} else {
+				throw new RuntimeException("bucket is null but it must exist here. aborting");
+			}
+
+		} catch (Exception e) {
+			error(e);
+		}
+		return false;
 	}
 
-	
 	private boolean testRemoveBucketDoesNotExist() {
-		
-	    String b_doesNotExist = "bucket"+randomString(12);
-	    
+
+		String b_doesNotExist = "bucket" + randomString(12);
+
 		try {
 			getClient().deleteBucket(b_doesNotExist);
 			logger.error("must have thrown exception here");
 			return false;
-        	
-        }  catch (ODClientException e) {
-        	logger.debug("This exception is ok -> " + e.toString());
-        	logger.debug("testRemoveBucketDoesNotExist -> ok");
-        	getMap().put("testRemoveBucketDoesNotExist", "ok");
-    		return true;
-    	}	
+
+		} catch (ODClientException e) {
+			logger.debug("This exception is ok -> " + e.toString());
+			logger.debug("testRemoveBucketDoesNotExist -> ok");
+			getMap().put("testRemoveBucketDoesNotExist", "ok");
+			return true;
+		}
 	}
-	
 
 	public boolean renameBuckets() {
-		
-		
+
 		try {
-	        
+
 			List<Bucket> list = getClient().listBuckets();
-	        Assert.assertNotNull(list);
-	        
-	        for (Bucket bucket: list) {
-	        	String o_name = bucket.getName();
-	        	String n_name = bucket.getName()+"-"+randomString(5);
-	        	
-	        	getClient().renameBucket(o_name, n_name);
-	        	
-	        	if (getClient().existsBucket(o_name))
-	        		error("rename failed -> " + o_name);
-	        	
-	        	if (!getClient().existsBucket(n_name))
-	        		error("rename failed -> " + o_name);
-	        	
-	        	
-	        	Bucket bu=getClient().getBucket(n_name);
-	        	
-	        	if (bu==null)
-	        		error("rename failed -> " + o_name);
-	        	
-	        	if (!bu.getName().equals(n_name))
-	        		error("rename failed -> " + o_name);
-	        	
-	        	logger.debug("Rename ok: " + o_name + " -> " + n_name);
-	        	
-	        	sleep();
-	        	
-	        }
-	        
-	        getMap().put("renameBuckets", "ok");
-	        return true;
-	        
-        }  catch (Exception e) {
-    		error(e);
-    	}
-        return false;
-        
-		
-		
-		
+			Assert.assertNotNull(list);
+
+			for (Bucket bucket : list) {
+				String o_name = bucket.getName();
+				String n_name = bucket.getName() + "-" + randomString(5);
+
+				getClient().renameBucket(o_name, n_name);
+
+				if (getClient().existsBucket(o_name))
+					error("rename failed -> " + o_name);
+
+				if (!getClient().existsBucket(n_name))
+					error("rename failed -> " + o_name);
+
+				Bucket bu = getClient().getBucket(n_name);
+
+				if (bu == null)
+					error("rename failed -> " + o_name);
+
+				if (!bu.getName().equals(n_name))
+					error("rename failed -> " + o_name);
+
+				logger.debug("Rename ok: " + o_name + " -> " + n_name);
+
+				sleep();
+
+			}
+
+			getMap().put("renameBuckets", "ok");
+			return true;
+
+		} catch (Exception e) {
+			error(e);
+		}
+		return false;
+
 	}
 
 	/**
 	 * 
 	 */
 	public boolean makeBuckets() {
-		
-		
-			/**------------------
-			 * remove buckets if exist
-			 */
-			try {
-				logger.debug("Total buckets -> " + getClient().listBuckets().size());
-				
-				for (String s: buckets) {
-					if (getClient().existsBucket(s))  {
-						if (getClient().isEmpty(s)) { 
-							logger.debug("removing bucket -> " + s);
-							getClient().deleteBucket(s);
-							org.junit.Assert.assertFalse(getClient().existsBucket(s));
-						}
+
+		/**
+		 * ------------------ remove buckets if exist
+		 */
+		try {
+			logger.debug("Total buckets -> " + getClient().listBuckets().size());
+
+			for (String s : buckets) {
+				if (getClient().existsBucket(s)) {
+					if (getClient().isEmpty(s)) {
+						logger.debug("removing bucket -> " + s);
+						getClient().deleteBucket(s);
+						org.junit.Assert.assertFalse(getClient().existsBucket(s));
 					}
 				}
-			} catch (Exception e) {
-				error(e);
 			}
-	    	
-			/**------------------
-			 * create buckets
-			 */
-			try {
-				int n = 0;
-				for (String s: buckets) {
-					if (!getClient().existsBucket(s)) {
-						getClient().createBucket(s);
-						n++;
-						
-						sleep();
-						
-						org.junit.Assert.assertTrue(getClient().existsBucket(s));
-					}
+		} catch (Exception e) {
+			error(e);
+		}
+
+		/**
+		 * ------------------ create buckets
+		 */
+		try {
+			int n = 0;
+			for (String s : buckets) {
+				if (!getClient().existsBucket(s)) {
+					getClient().createBucket(s);
+					n++;
+
+					sleep();
+
+					org.junit.Assert.assertTrue(getClient().existsBucket(s));
 				}
-				logger.debug("created -> " + String.valueOf(n) + " buckets");
-				getMap().put("makeBuckets", "ok");
-				return true;
-					
-			} catch (Exception e) {
-				error(e);
 			}
-	
-			return false;
+			logger.debug("created -> " + String.valueOf(n) + " buckets");
+			getMap().put("makeBuckets", "ok");
+			return true;
+
+		} catch (Exception e) {
+			error(e);
+		}
+
+		return false;
 	}
 
-	
 	/**
 	 * @return
 	 */
 	public boolean listBuckets() {
-        try {
-	        List<Bucket> list = getClient().listBuckets();
-	        Assert.assertNotNull(list);
-	        for (Bucket bucket: list) {
-	        	logger.debug(bucket.getName());
-	        }
-	        getMap().put("listBuckets", "ok");
-	        return true;
-	        
-        }  catch (Exception e) {
-    		error(e);
-    	}
-        return false;
+		try {
+			List<Bucket> list = getClient().listBuckets();
+			Assert.assertNotNull(list);
+			for (Bucket bucket : list) {
+				logger.debug(bucket.getName());
+			}
+			getMap().put("listBuckets", "ok");
+			return true;
+
+		} catch (Exception e) {
+			error(e);
+		}
+		return false;
 	}
 
-	
-	
-	
 }

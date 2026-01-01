@@ -42,7 +42,7 @@ import io.odilon.util.OdilonFileUtils;
  * @author atolomei@novamens.com (Alejandro Tolomei)
  */
 public class TestFileCache extends BaseTest {
-	
+
 	private static final Logger logger = Logger.getLogger(TestObjectPutGet.class.getName());
 
 	long LAPSE_BETWEEN_PUT_MILLISECONDS = 1600;
@@ -75,28 +75,34 @@ public class TestFileCache extends BaseTest {
 		preCondition();
 
 		try {
-			if (getClient().systemInfo().redundancyLevel != RedundancyLevel.RAID_6) {
-				logger.info("Cache can be tested only on RAID 6 | current -> " + getClient().systemInfo().redundancyLevel.getName());
-				showResults();
+			getClient().setCacheEnabled(false);
 
-				return;
+			try {
+				if (getClient().systemInfo().redundancyLevel != RedundancyLevel.RAID_6) {
+					logger.info("Cache can be tested only on RAID 6 | current -> " + getClient().systemInfo().redundancyLevel.getName());
+					showResults();
+					return;
+				}
+			} catch (ODClientException e) {
+				error(e.getClass().getName() + " | " + e.getMessage());
 			}
-		} catch (ODClientException e) {
-			error(e.getClass().getName() + " | " + e.getMessage());
+
+			if (!testFileCache("testFileCache"))
+				error("testFileCache");
+
+			showResults();
+		} finally {
+			getClient().setCacheEnabled(true);
+
 		}
-
-		
-		if (!testFileCache())
-			error("testFileCache()");
-
-		showResults();
-
 	}
 
 	/**
 	 * @return
 	 */
-	public boolean testFileCache() {
+	public boolean testFileCache(String mname) {
+
+		logger.debug("Starting " + mname);
 
 		File dir = new File(getSourceDir());
 
@@ -117,6 +123,9 @@ public class TestFileCache extends BaseTest {
 			error(e);
 		}
 
+		logger.debug("Cache hit counter -> " + metrics.cacheFileHitCounter);
+ 
+
 		// put files
 		//
 		for (File fi : dir.listFiles()) {
@@ -126,13 +135,12 @@ public class TestFileCache extends BaseTest {
 
 			if (isElegible(fi)) {
 
-				String objectName = FSUtil.getBaseName(fi.getName()) + "-"
-						+ String.valueOf(Double.valueOf((Math.abs(Math.random() * 100000))).intValue());
+				String objectName = FSUtil.getBaseName(fi.getName()) + "-" + String.valueOf(Double.valueOf((Math.abs(Math.random() * 100000))).intValue());
 
 				objectName = getClient().normalizeObjectName(objectName);
 
-				
 				try {
+
 					getClient().putObject(bucketName, objectName, fi);
 					testFiles.put(bucketName + "-" + objectName, new TestFile(fi, bucketName, objectName));
 					counter++;
@@ -141,24 +149,25 @@ public class TestFileCache extends BaseTest {
 
 					/** display status every 4 seconds or so */
 					if (dateTimeDifference(showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS) > THREE_SECONDS) {
-						logger.info(" testFileCache -> " + String.valueOf(testFiles.size()));
+						logger.info(mname + " -> " + String.valueOf(testFiles.size()));
 						showStatus = OffsetDateTime.now();
 					}
 
 				} catch (ODClientException e) {
-					error(String.valueOf(e.getHttpStatus()) + " " + e.getMessage() + " "
-							+ String.valueOf(e.getErrorCode()));
+					error(String.valueOf(e.getHttpStatus()) + " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
 				}
 			}
 		}
 
-		logger.info(" testAddObjects total -> " + String.valueOf(testFiles.size()));
+		logger.info(mname + " total -> " + String.valueOf(testFiles.size()));
 
 		try {
 			metrics = getClient().metrics();
 		} catch (ODClientException e) {
 			error(e);
 		}
+
+		logger.debug("Cache hit counter -> " + metrics.cacheFileHitCounter);
 
 		long hit1 = metrics.cacheFileHitCounter;
 		// long miss1 = metrics.cacheFileMissCounter;
@@ -184,54 +193,22 @@ public class TestFileCache extends BaseTest {
 			}
 
 			try {
+
+				logger.debug("1. should add to cache -> b:" +  meta.bucketName + " o:" + meta.objectName);
 				getClient().getObject(meta.bucketName, meta.objectName, destFileName);
 
-			} catch (ODClientException | IOException e) {
-				error(e);
-			}
-
-			TestFile t_file = testFiles.get(meta.bucketName + "-" + meta.objectName);
-
-			if (t_file != null) {
-
+				
 				try {
-					String src_sha = t_file.getSrcFileSha256(0);
-					String new_sha = OdilonFileUtils.calculateSHA256String(new File(destFileName));
-
-					if (!src_sha.equals(new_sha)) {
-						error("Error sha256 are not equal -> " + meta.bucketName + "-" + meta.objectName);
-					}
-
-				} catch (NoSuchAlgorithmException | IOException e) {
-					error(e);
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+				 
 				}
-			} else {
-				error("Test file does not exist -> " + meta.bucketName + "-" + meta.objectName);
-			}
-		});
 
-		// -----------
-
-		testFiles.forEach((k, v) -> {
-
-			ObjectMetadata meta = null;
-
-			try {
-				meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
-
-			} catch (ODClientException e) {
-				error(e);
-			}
-
-			String destFileName = super.getDownloadDirHeadVersion() + File.separator + meta.fileName;
-
-			if ((new File(destFileName)).exists()) {
-				FileUtils.deleteQuietly(new File(destFileName));
-			}
-
-			try {
+				logger.debug("2. should hit server cache -> b:" +  meta.bucketName + " o:" + meta.objectName);
+				/** should hit server cache */
 				getClient().getObject(meta.bucketName, meta.objectName, destFileName);
 
+				
 			} catch (ODClientException | IOException e) {
 				error(e);
 			}
@@ -261,6 +238,7 @@ public class TestFileCache extends BaseTest {
 		} catch (ODClientException e) {
 			error(e);
 		}
+		logger.debug("Cache hit counter -> " + metrics.cacheFileHitCounter);
 
 		long hit2 = metrics.cacheFileHitCounter;
 		long miss2 = metrics.cacheFileMissCounter;
@@ -268,6 +246,7 @@ public class TestFileCache extends BaseTest {
 
 		try {
 
+			logger.debug("Server cacheFileHitCounter [" + hit2 + "] >=  test files [" + testFiles.size() + "] -> " + (hit2 >= testFiles.size() ? "true" : "false"));
 			Assert.assertTrue(hit2 >= testFiles.size());
 			Assert.assertTrue((disk2 - disk1) >= 0);
 
@@ -275,10 +254,9 @@ public class TestFileCache extends BaseTest {
 			error(e);
 		}
 
-		logger.debug("Assert ok (hit2 - hit1) -> " + String.valueOf(hit2) + " - " + String.valueOf(hit1) + "  = "
-				+ String.valueOf(hit2 - hit1));
+		logger.debug("Assert ok (hit2 - hit1) -> " + String.valueOf(hit2) + " - " + String.valueOf(hit1) + "  = " + String.valueOf(hit2 - hit1));
 
-		getMap().put("testFileCache()" + " | " + String.valueOf(testFiles.size()), "ok");
+		getMap().put(mname, "ok");
 
 		return true;
 
@@ -325,7 +303,6 @@ public class TestFileCache extends BaseTest {
 			error(e.getClass().getName() + " | " + e.getMessage());
 		}
 
-		
 		{
 			File tmpdir = new File(super.getDownloadDirHeadVersion());
 
