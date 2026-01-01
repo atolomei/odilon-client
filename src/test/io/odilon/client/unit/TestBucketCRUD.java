@@ -52,7 +52,7 @@ public class TestBucketCRUD extends BaseTest {
 	@Override
 	public void executeTest() {
 	 
-		setSleepDurationMills(2000);
+		setSleepDurationMills(300);
 		
 		try {
 			String p=ping();

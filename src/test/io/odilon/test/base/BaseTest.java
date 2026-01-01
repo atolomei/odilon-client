@@ -61,7 +61,7 @@ public abstract class BaseTest {
 
 	private String download_dir;
 
-	public String DOWNLOAD_DIR_HEAD;
+	public String DOWNLOAD_DIR_V0;
 	public String DOWNLOAD_DIR_V1;
 	public String DOWNLOAD_DIR_V2;
 	
@@ -129,8 +129,8 @@ public abstract class BaseTest {
 
         setMax((properties.get("max")!=null) ? Integer.valueOf(properties.get("max").toString().trim()) : 100);
 
-        setMaxLength((properties.get("length.max")!=null) ? (Long.valueOf(properties.get("length.max").toString().trim())) : 20);
-        setMinLength((properties.get("length.min")!=null) ? (Long.valueOf(properties.get("length.min").toString().trim())) : 0);
+        setMaxLengthMB((properties.get("length.max")!=null) ? (Long.valueOf(properties.get("length.max").toString().trim())) : 20);
+        setMinLengthMB((properties.get("length.min")!=null) ? (Long.valueOf(properties.get("length.min").toString().trim())) : 0);
         
 		this.serverHost  =  (properties.get("odilon.server.host")!=null)  ? properties.get("odilon.server.host").toString().trim() : "localhost"; 
 	    this.port        =  (properties.get("odilon.server.port")!=null)      ? Integer.valueOf(( properties.get("odilon.server.port").toString().trim())) : 80;
@@ -169,36 +169,24 @@ public abstract class BaseTest {
 			}
 
 		
-		DOWNLOAD_DIR_HEAD = download_dir + File.separator+"head";
+		DOWNLOAD_DIR_V0 = download_dir + File.separator+"v0";
 		DOWNLOAD_DIR_V1   = download_dir + File.separator+"v1";
 		DOWNLOAD_DIR_V2   = download_dir + File.separator+"v2";
 		
 		DOWNLOAD_DIR_RESTORED = download_dir + File.separator+"restored";
 		DOWNLOAD_STAND_BY_DIR  = "d:"+File.separator+ "test-files-standby-download";
-	    
-		//String tempDir = System.getProperty("tempDir");
-		//String downloadDir = System.getProperty("downloadDir");
-		//String lapse = System.getProperty("sleepMilliseconds");
-		//if (lapse!=null)
-		//	LAPSE_BETWEEN_OP_MILLISECONDS  = Long.valueOf(lapse.trim());
-		//String maxLength = System.getProperty("maxLength");				
-		//if (maxLength!=null)
-	//		max_length = Long.valueOf(maxLength.trim());
-		//if (tempDir!=null)
-		//	source_dir=tempDir.trim();
-		//if (downloadDir!=null)
-		//	DOWNLOAD_DIR=downloadDir.trim();
-
+	  
 		setClient(client);
 		
 	}
 
-    private void setMinLength(long l) {
+    private void setMinLengthMB(long l) {
     	this.min_length=l* 1000*1000;
     	
 	}
 
-	private void setMaxLength(long i) {
+    
+	private void setMaxLengthMB(long i) {
     	this.max_length=i* 1000*1000;
 	}
 
@@ -667,7 +655,7 @@ public abstract class BaseTest {
 	    }
 
 	   public String getDownloadDirHeadVersion() {
-		return DOWNLOAD_DIR_HEAD;
+		return DOWNLOAD_DIR_V0;
 	   }
 
 	   public String getSourceDir() {

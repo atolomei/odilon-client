@@ -1556,7 +1556,6 @@ public class ODClient implements OdilonClient {
 		String basename = FileNameUtils.getBaseName(name);
 		String extension = FileNameUtils.getExtension(name);
 		if (basename.contains("%")) {
-			logger.debug(basename);
 			basename=basename.replace("%", "-").replace("(", "-").replace(")", "-");
 		}
 		basename = FileNameNormalizer.normalize(basename);

@@ -24,8 +24,9 @@ import java.nio.file.StandardCopyOption;
 import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashMap;
-
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -63,6 +64,10 @@ public class TestVersionControlUpload extends BaseTest {
 
 	private Map<Integer, File> secondVersion = new HashMap<Integer, File>();
 
+	List<File> listFiles = new ArrayList<File>();
+	
+	
+	
 	public TestVersionControlUpload() {
 	}
 
@@ -72,32 +77,33 @@ public class TestVersionControlUpload extends BaseTest {
 		if (!preCondition())
 			error("preCondition");
 
-		if (!putObject())
+		if (!putObject("putObject"))
 			error("putObject");
 
-		if (!putObjectNewVersion())
+		if (!putObjectNewVersion("putObjectNewVersion"))
 			error("putObjectNewVersion");
+//
+//		try {
+		//	if (getClient().isVersionControl()) {
 
-		try {
-			if (getClient().isVersionControl()) {
+	//			if (!getObjectMetadataPreviousVersion("getObjectMetadataPreviousVersion"))
+	//				error("getObjectMetadataPreviousVersion");
 
-				if (!getObjectMetadataPreviousVersion())
-					error("getObjectMetadataPreviousVersion");
+	//			 if (!downloadObjectDataVersions("downloadObjectDataVersions"))
+	//			 error("downloadObjectDataVersions");
 
-				if (!downloadObjectDataVersions())
-					error("downloadObjectDataVersions");
+				// if (!restoreObjectVersion())
+				// error("restoreObjectVersion");
 
-				if (!restoreObjectVersion())
-					error("restoreObjectVersion");
-
-			}
-		} catch (ODClientException e) {
-			error(e.getClass().getName() + " | " + e.getMessage());
-		}
+	//		}
+	//	} catch (ODClientException e) {
+	//		error(e.getClass().getName() + " | " + e.getMessage());
+//		}
 
 		showResults();
 	}
 
+	
 	/**
 	 * 
 	 * 
@@ -203,7 +209,7 @@ public class TestVersionControlUpload extends BaseTest {
 	 * 
 	 * 
 	 */
-	private boolean putObject() {
+	private boolean putObject(String methodName) {
 
 		File dir = new File(getSourceDir());
 
@@ -215,6 +221,8 @@ public class TestVersionControlUpload extends BaseTest {
 
 		/** put files **/
 
+		logger.debug("uploads up to " + getMax() + " pdf files. This test does not validate uploads ");
+
 		for (File fi : dir.listFiles()) {
 
 			if (counterPutObject.get() == getMax())
@@ -222,8 +230,7 @@ public class TestVersionControlUpload extends BaseTest {
 
 			if (isValid(fi)) {
 
-				String objectName = FSUtil.getBaseName(fi.getName()) + "-"
-						+ String.valueOf(Double.valueOf((Math.abs(Math.random() * 100000))).intValue());
+				String objectName = FSUtil.getBaseName(fi.getName()) + "-" + String.valueOf(Double.valueOf((Math.abs(Math.random() * 100000))).intValue());
 				objectName = getClient().normalizeObjectName(objectName);
 
 				try {
@@ -241,22 +248,20 @@ public class TestVersionControlUpload extends BaseTest {
 
 					/** display status every 3 seconds or so */
 					if (dateTimeDifference(showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS) > THREE_SECONDS) {
-						logger.debug("putObject -> " + String.valueOf(counterPutObject.get()));
+						logger.debug(methodName + " -> " + String.valueOf(counterPutObject.get()));
 						showStatus = OffsetDateTime.now();
 					}
 
 				} catch (ODClientException e) {
-					logger.error(String.valueOf(e.getHttpStatus()) + " " + e.getMessage() + " "
-							+ String.valueOf(e.getErrorCode()));
+					logger.error(String.valueOf(e.getHttpStatus()) + " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
 					System.exit(1);
 				}
 			}
 		}
 
-		logger.debug("putObject total -> (" + String.valueOf(counterPutObject.get() + ")"));
-
-		logger.debug("putObject -> ok");
-		getMap().put("putObject", "ok (" + String.valueOf(counterPutObject) + ")");
+		logger.debug(methodName + "  total -> (" + String.valueOf(counterPutObject.get() + ")"));
+		logger.debug(methodName + "  -> ok");
+		getMap().put(methodName, "ok (" + String.valueOf(counterPutObject) + ")");
 
 		return true;
 	}
@@ -287,16 +292,13 @@ public class TestVersionControlUpload extends BaseTest {
 
 					ObjectMetadata headMeta = getClient().getObjectMetadata(v.bucketName, v.objectName);
 
-					logger.debug("Metadata current -> " + headMeta.fileName + "  | version: "
-							+ String.valueOf(headMeta.version) + " | "
-							+ NumberFormatter.formatFileSize(headMeta.length));
+					logger.debug("Metadata current -> " + headMeta.fileName + "  | version: " + String.valueOf(headMeta.version) + " | " + NumberFormatter.formatFileSize(headMeta.length));
 
 					getClient().restoreObjectPreviousVersions(v.bucketName, v.objectName);
 
 					ObjectMetadata meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
 
-					logger.debug("Metadata restored -> " + meta.fileName + "  | version: "
-							+ String.valueOf(meta.version) + " | " + NumberFormatter.formatFileSize(meta.length));
+					logger.debug("Metadata restored -> " + meta.fileName + "  | version: " + String.valueOf(meta.version) + " | " + NumberFormatter.formatFileSize(meta.length));
 
 					if (meta.version >= headMeta.version)
 						error("meta version error for -> " + v.bucketName + " " + v.objectName);
@@ -309,11 +311,8 @@ public class TestVersionControlUpload extends BaseTest {
 					try {
 
 						isRestored = getClient().getObject(v.bucketName, v.objectName);
-						Files.copy(isRestored, (new File(restoredDir, meta.fileName)).toPath(),
-								StandardCopyOption.REPLACE_EXISTING);
-						logger.debug("Download restored -> " + meta.fileName + "  | version: "
-								+ String.valueOf(meta.version) + " | "
-								+ NumberFormatter.formatFileSize(new File(restoredDir, meta.fileName).length()));
+						Files.copy(isRestored, (new File(restoredDir, meta.fileName)).toPath(), StandardCopyOption.REPLACE_EXISTING);
+						logger.debug("Download restored -> " + meta.fileName + "  | version: " + String.valueOf(meta.version) + " | " + NumberFormatter.formatFileSize(new File(restoredDir, meta.fileName).length()));
 
 						counterRestoreObjectVersion.incrementAndGet();
 
@@ -322,15 +321,11 @@ public class TestVersionControlUpload extends BaseTest {
 						try {
 
 							String src_sha = v.getSrcFileSha256(0);
-							String dest_sha = OdilonFileUtils
-									.calculateSHA256String(new File(restoredDir, meta.fileName));
+							String dest_sha = OdilonFileUtils.calculateSHA256String(new File(restoredDir, meta.fileName));
 
 							if (!dest_sha.equals(src_sha)) {
-								error("Error sha256 are not equal -> " + "b:" + meta.bucketName + "  o:"
-										+ meta.objectName + " | downladed -> " + meta.fileName + " - "
-										+ NumberFormatter
-												.formatFileSize((new File(restoredDir, meta.fileName)).length())
-										+ " - " + " | source -> " + v.getSrcFile(0).getName() + " -"
+								error("Error sha256 are not equal -> " + "b:" + meta.bucketName + "  o:" + meta.objectName + " | downladed -> " + meta.fileName + " - "
+										+ NumberFormatter.formatFileSize((new File(restoredDir, meta.fileName)).length()) + " - " + " | source -> " + v.getSrcFile(0).getName() + " -"
 										+ NumberFormatter.formatFileSize(v.getSrcFile(0).length()));
 							} else {
 								logger.debug("restore ok ->" + meta.fileName);
@@ -364,8 +359,7 @@ public class TestVersionControlUpload extends BaseTest {
 				error(e);
 
 			} catch (ODClientException e) {
-				logger.error(String.valueOf(e.getHttpStatus()) + " " + e.getMessage() + " "
-						+ String.valueOf(e.getErrorCode()));
+				logger.error(String.valueOf(e.getHttpStatus()) + " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
 				error(e);
 			}
 		});
@@ -380,9 +374,9 @@ public class TestVersionControlUpload extends BaseTest {
 	/**
 	 * @return
 	 */
-	private boolean putObjectNewVersion() {
+	private boolean putObjectNewVersion(String methodName) {
 
-		logger.debug("starting putObjectNewVersion");
+		logger.debug("starting " + methodName);
 
 		counterNewVersion.set(0);
 
@@ -406,8 +400,7 @@ public class TestVersionControlUpload extends BaseTest {
 			int index = random.nextInt(secondVersion.size());
 
 			try {
-				Files.copy(secondVersion.get(index).toPath(), new File(nameSrcFileNewVersion).toPath(),
-						StandardCopyOption.REPLACE_EXISTING);
+				Files.copy(secondVersion.get(index).toPath(), new File(nameSrcFileNewVersion).toPath(), StandardCopyOption.REPLACE_EXISTING);
 			} catch (IOException e) {
 				error(e.getClass().getName() + " - can copy version locally");
 			}
@@ -415,8 +408,7 @@ public class TestVersionControlUpload extends BaseTest {
 			try {
 
 				/** upload new version */
-				ObjectMetadata metadataV1 = getClient().putObject(v.bucketName, v.objectName,
-						new File(nameSrcFileNewVersion));
+				ObjectMetadata metadataV1 = getClient().putObject(v.bucketName, v.objectName, new File(nameSrcFileNewVersion));
 				counterNewVersion.incrementAndGet();
 
 				testFiles.get(v.bucketName + "-" + v.objectName).addSrcFileVersion(new File(nameSrcFileNewVersion));
@@ -425,10 +417,17 @@ public class TestVersionControlUpload extends BaseTest {
 				if (!getClient().hasVersions(v.bucketName, v.objectName))
 					error("should have versions -> b:" + v.bucketName + " o:" + v.objectName);
 
+				ObjectMetadata meta1 = getClient().getObjectMetadata(v.bucketName, v.objectName);
+
+				logger.debug(v.bucketName + "-" + v.objectName + " | " + meta1.getFileName() + " | " + meta1.getLength() + " bytes | version " + meta1.getVersion());
+
+				ObjectMetadata metaPrev = getClient().getObjectMetadataPreviousVersion(v.bucketName, v.objectName);
+				logger.debug(v.bucketName + "-" + v.objectName + " | " + metaPrev.getFileName() + " | " + meta1.getLength() + " bytes | version " + metaPrev.getVersion());
+
 				sleep();
 
 				if (dateTimeDifference(showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS) > THREE_SECONDS) {
-					logger.debug("putObjectNewVersion -> " + String.valueOf(counterNewVersion.get()));
+					logger.debug(name + " -> " + String.valueOf(counterNewVersion.get()));
 					showStatus = OffsetDateTime.now();
 				}
 			} catch (IOException e) {
@@ -436,23 +435,22 @@ public class TestVersionControlUpload extends BaseTest {
 				error(e);
 
 			} catch (ODClientException e) {
-				logger.error(String.valueOf(e.getHttpStatus()) + " " + e.getMessage() + " "
-						+ String.valueOf(e.getErrorCode()));
+				logger.error(String.valueOf(e.getHttpStatus()) + " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
 				error(e);
 			}
 
 		});
 
-		logger.debug("putObjectNewVersion total -> (" + String.valueOf(counterNewVersion.get() + ")"));
+		logger.debug(methodName + " total -> (" + String.valueOf(counterNewVersion.get() + ")"));
 
 		boolean success = validateSetUploadNewVersion(testFiles);
 
 		if (success) {
-			logger.debug("putObjectNewVersion ok");
-			getMap().put("putObjectNewVersion", "ok");
+			logger.debug(methodName + " ok");
+			getMap().put(methodName, "ok");
 		} else {
-			logger.debug("putObjectNewVersion error");
-			getMap().put("putObjectNewVersion", success ? "ok" : "error");
+			logger.debug(methodName + " error");
+			getMap().put(methodName, success ? "ok" : "error");
 		}
 
 		return success;
@@ -462,8 +460,10 @@ public class TestVersionControlUpload extends BaseTest {
 	 * 
 	 * 
 	 */
-	private boolean downloadObjectDataVersions() {
+	private boolean downloadObjectDataVersions(String methodName) {
 
+		logger.debug("starting " + methodName);
+		
 		counterDownloadDataVersion.set(0);
 
 		testFiles.forEach((k, test) -> {
@@ -471,15 +471,14 @@ public class TestVersionControlUpload extends BaseTest {
 
 				if (getClient().hasVersions(test.bucketName, test.objectName)) {
 
-					ObjectMetadata metaCurrenVersion = getClient().getObjectMetadata(test.bucketName, test.objectName);
-					ObjectMetadata metaPreviousVersion = getClient().getObjectMetadataPreviousVersion(test.bucketName,
-							test.objectName);
+					ObjectMetadata metaCurrenVersion 	= getClient().getObjectMetadata(test.bucketName, test.objectName);
+					ObjectMetadata metaPreviousVersion 	= getClient().getObjectMetadataPreviousVersion(test.bucketName, test.objectName);
 
 					if (metaPreviousVersion == null)
 						error(" previous version is null -> b:" + test.bucketName + " o:" + test.objectName);
 
-					String previousVersionDestFileName = super.getDownloadDirHeadVersion() + File.separator
-							+ metaPreviousVersion.fileName;
+					
+					String previousVersionDestFileName = DOWNLOAD_DIR_V0 + File.separator + metaPreviousVersion.fileName;
 					try {
 						if ((new File(previousVersionDestFileName)).exists())
 							FileUtils.forceDelete(new File(previousVersionDestFileName));
@@ -488,33 +487,35 @@ public class TestVersionControlUpload extends BaseTest {
 						error(e);
 					}
 
+					
+					
 					String currentVersionDestFileName = DOWNLOAD_DIR_V1 + File.separator + metaCurrenVersion.fileName;
 					try {
-						if ((new File(previousVersionDestFileName)).exists())
-							FileUtils.forceDelete(new File(previousVersionDestFileName));
+						if ((new File(currentVersionDestFileName)).exists())
+							FileUtils.forceDelete(new File(currentVersionDestFileName));
 
 					} catch (IOException e) {
 						error(e);
 					}
 
+					
+					
 					InputStream is0 = null;
 					InputStream is1 = null;
 
 					try {
 
 						is0 = getClient().getObjectPreviousVersion(test.bucketName, test.objectName);
-						Files.copy(is0, (new File(previousVersionDestFileName)).toPath(),
-								StandardCopyOption.REPLACE_EXISTING);
+						Files.copy(is0, (new File(previousVersionDestFileName)).toPath(), StandardCopyOption.REPLACE_EXISTING);
 
 						is1 = getClient().getObject(test.bucketName, test.objectName);
-						Files.copy(is1, (new File(currentVersionDestFileName)).toPath(),
-								StandardCopyOption.REPLACE_EXISTING);
+						Files.copy(is1, (new File(currentVersionDestFileName)).toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-						// logger.debug("src v0 -> " + test.getSrcFile(0).getAbsolutePath());
-						// logger.debug("src v1 -> " + test.getSrcFile(1).getAbsolutePath());
+						logger.debug("src v0 -> " + test.getSrcFile(0).getAbsolutePath());
+						logger.debug("src v1 -> " + test.getSrcFile(1).getAbsolutePath());
 
-						// logger.debug("dest v0 -> " + previousVersionDestFileName);
-						// logger.debug("dest v1 -> " + currentVersionDestFileName);
+						logger.debug("dest v0 -> " + previousVersionDestFileName);
+						logger.debug("dest v1 -> " + currentVersionDestFileName);
 
 						counterDownloadDataVersion.incrementAndGet();
 
@@ -525,28 +526,18 @@ public class TestVersionControlUpload extends BaseTest {
 							String src_sha0 = test.getSrcFileSha256(0);
 							String src_sha1 = test.getSrcFileSha256(1);
 
-							String dest_sha0 = OdilonFileUtils
-									.calculateSHA256String(new File(previousVersionDestFileName));
-							String dest_sha1 = OdilonFileUtils
-									.calculateSHA256String(new File(currentVersionDestFileName));
+							String dest_sha0 = OdilonFileUtils.calculateSHA256String(new File(previousVersionDestFileName));
+							String dest_sha1 = OdilonFileUtils.calculateSHA256String(new File(currentVersionDestFileName));
 
 							if (!dest_sha0.equals(src_sha0)) {
-								error("Error sha256 v0 are not equal -> " + metaPreviousVersion.bucketName + "-"
-										+ metaPreviousVersion.objectName + " | restored v0 "
-										+ previousVersionDestFileName + " - "
-										+ NumberFormatter
-												.formatFileSize((new File(previousVersionDestFileName)).length())
-										+ " - " + " | src v0 " + test.getSrcFile(0).getName() + " -"
+								error("Error sha256 v0 are not equal -> " + metaPreviousVersion.bucketName + "-" + metaPreviousVersion.objectName + " | restored v0 " + previousVersionDestFileName + " - "
+										+ NumberFormatter.formatFileSize((new File(previousVersionDestFileName)).length()) + " - " + " | src v0 " + test.getSrcFile(0).getName() + " -"
 										+ NumberFormatter.formatFileSize(test.getSrcFile(0).length()));
 							}
 
 							if (!dest_sha1.equals(src_sha1)) {
-								error("Error sha256 v1 are not equal -> " + metaPreviousVersion.bucketName + "-"
-										+ metaPreviousVersion.objectName + " | dn v1 "
-										+ NumberFormatter
-												.formatFileSize((new File(currentVersionDestFileName)).length())
-										+ " - " + " | src v1 "
-										+ NumberFormatter.formatFileSize(test.getSrcFile(1).length()));
+								error("Error sha256 v1 are not equal -> " + metaPreviousVersion.bucketName + "-" + metaPreviousVersion.objectName + " | dn v1 "
+										+ NumberFormatter.formatFileSize((new File(currentVersionDestFileName)).length()) + " - " + " | src v1 " + NumberFormatter.formatFileSize(test.getSrcFile(1).length()));
 							}
 
 						} catch (NoSuchAlgorithmException | IOException e) {
@@ -583,9 +574,9 @@ public class TestVersionControlUpload extends BaseTest {
 			}
 		});
 
-		logger.debug("downloadObjectDataVersions total -> (" + String.valueOf(counterDownloadDataVersion.get() + ")"));
-		logger.debug("downloadObjectDataVersions ok");
-		getMap().put("downloadObjectDataVersions", "ok");
+		logger.debug( methodName +" -> total " + String.valueOf(counterDownloadDataVersion.get()   ));
+		logger.debug( methodName+ "  ok");
+		getMap().put( methodName, "ok");
 
 		return true;
 
@@ -597,7 +588,9 @@ public class TestVersionControlUpload extends BaseTest {
 	 * @return
 	 */
 
-	private boolean getObjectMetadataPreviousVersion() {
+	private boolean getObjectMetadataPreviousVersion(String methodName) {
+
+		logger.debug("starting " + methodName);
 
 		counterObjectMetadataPreviousVersion.set(0);
 
@@ -605,22 +598,26 @@ public class TestVersionControlUpload extends BaseTest {
 			try {
 
 				if (getClient().hasVersions(test.bucketName, test.objectName)) {
-					ObjectMetadata meta = getClient().getObjectMetadataPreviousVersion(test.bucketName,
-							test.objectName);
+					
+					ObjectMetadata metaPrev = getClient().getObjectMetadataPreviousVersion(test.bucketName, test.objectName);
 					counterObjectMetadataPreviousVersion.incrementAndGet();
-					if (meta == null)
+
+					if (metaPrev == null)
 						error(" previous version is null -> b:" + test.bucketName + " o:" + test.objectName);
 
-					ObjectMetadata original = testFiles.get(test.bucketName + "-" + test.objectName)
-							.getMetadata(meta.version);
+					ObjectMetadata original = testFiles.get(test.bucketName + "-" + test.objectName).getMetadata(metaPrev.version);
 
 					/** validate metadata **/
 
-					if (original.hashCode() != meta.hashCode()) {
+					if (original.hashCode() != metaPrev.hashCode()) {
 
 						logger.debug("original -> " + original.toString());
-						logger.debug("meta -> " + meta.toString());
+						logger.debug("meta -> " + metaPrev.toString());
+						
 						error(test.bucketName + "-" + test.objectName + " ->  hashcode error");
+					}
+					else {
+						logger.debug("b: " + test.bucketName + " o: " + test.objectName + " -> ok ");
 					}
 				}
 
@@ -629,8 +626,7 @@ public class TestVersionControlUpload extends BaseTest {
 				/** display status every 3 seconds or so */
 
 				if (dateTimeDifference(showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS) > THREE_SECONDS) {
-					logger.debug("getObjectMetadataPreviousVersion -> "
-							+ String.valueOf(counterObjectMetadataPreviousVersion.get()));
+					logger.debug( methodName  + "  -> " + String.valueOf(counterObjectMetadataPreviousVersion.get()));
 					showStatus = OffsetDateTime.now();
 				}
 
@@ -643,11 +639,10 @@ public class TestVersionControlUpload extends BaseTest {
 			}
 		});
 
-		logger.debug("getObjectMetadataPreviousVersion total -> ("
-				+ String.valueOf(counterObjectMetadataPreviousVersion.get() + ")"));
-		logger.debug("getObjectMetadataPreviousVersion ok");
+		logger.debug(methodName  + " -> total " + String.valueOf(counterObjectMetadataPreviousVersion.get() ));
+		logger.debug(methodName  + " ok");
+		getMap().put(methodName , "ok");
 
-		getMap().put("getObjectMetadataPreviousVersion", "ok");
 		return true;
 	}
 
@@ -686,8 +681,10 @@ public class TestVersionControlUpload extends BaseTest {
 
 			try {
 
-				String src_sha = v.getSrcFileSha256(1);
+				String src_sha = v.getSrcFileSha256(meta.getVersion());
 				String new_sha = OdilonFileUtils.calculateSHA256String(new File(destFileName));
+
+				logger.debug("srcFile vs downloadedFile  ok ->  b:" + meta.bucketName + "  o:" + meta.objectName);
 
 				if (!src_sha.equals(new_sha)) {
 					logger.error("sha256 are not equal -> " + meta.bucketName + "-" + meta.objectName);

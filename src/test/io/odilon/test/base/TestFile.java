@@ -47,15 +47,7 @@ public class TestFile {
 		addSrcFileVersion(file);
 	}
 
-	/**
-	 * public TestFile(File file, String bucketName, String objectName,
-	 * ObjectMetadata meta) {
-	 * 
-	 * this.bucketName = bucketName; this.objectName =objectName;
-	 * meta.put(meta.version);
-	 * 
-	 * }
-	 **/
+ 
 
 	public void addMetaVersion(ObjectMetadata meta) {
 		metadata.put(Integer.valueOf(meta.version), meta);

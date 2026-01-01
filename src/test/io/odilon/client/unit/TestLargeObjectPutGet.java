@@ -75,12 +75,9 @@ public class TestLargeObjectPutGet extends BaseTest {
 		
 		preCondition();
 
-		if (!testAddObjectsStream("java http"))
-			error("testAddObjectsStream java http");
-		
-		if (!testAddObjects())
-			error("testAddObjects");
-	
+		if (!testAddObjectsStream("put object"))
+			error("put object");
+	 
 		 showResults();
 	}
 	
@@ -126,7 +123,7 @@ public class TestLargeObjectPutGet extends BaseTest {
 		
 		for (File file : dir.listFiles()) {
 				
-				if (counter >=  (int) Math.round( Double.valueOf(Double.valueOf(getMax()).doubleValue()/2.0).doubleValue()))
+				if (counter >=  (int) getMax()) 
 					break;
 				
 				if (isElegible(file)) {

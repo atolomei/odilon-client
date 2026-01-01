@@ -118,6 +118,15 @@
 			<AppenderRef ref="Console"/>
 		</Asynclogger>´
 
+
+		
+		<Asynclogger name="io.odilon.client.ODClient"  level="debug" additivity="false">
+			<appender-ref ref="odilon"/>
+			<AppenderRef ref="Console"/>
+		</Asynclogger>´
+
+
+
 		<Asynclogger name="org.springframework"  level="error" additivity="false">
 			<appender-ref ref="odilon"/>
 			<AppenderRef ref="Console"/>

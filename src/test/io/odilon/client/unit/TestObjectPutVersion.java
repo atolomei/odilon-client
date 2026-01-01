@@ -16,9 +16,9 @@
  */
 package io.odilon.client.unit;
 
-
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.security.NoSuchAlgorithmException;
@@ -29,16 +29,18 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.hamcrest.core.Is;
 
 import io.odilon.client.error.ODClientException;
 import io.odilon.client.util.FSUtil;
 import io.odilon.log.Logger;
 import io.odilon.model.Bucket;
 import io.odilon.model.ObjectMetadata;
+import io.odilon.model.list.Item;
+import io.odilon.model.list.ResultSet;
 import io.odilon.test.base.BaseTest;
 import io.odilon.test.base.TestFile;
 import io.odilon.util.OdilonFileUtils;
-
 
 /**
  * 
@@ -46,20 +48,16 @@ import io.odilon.util.OdilonFileUtils;
  */
 public class TestObjectPutVersion extends BaseTest {
 
-	
-	private static final Logger logger = Logger.getLogger(TestObjectPutGet.class.getName());
-	
-	
-	
+	private static final Logger logger = Logger.getLogger(TestObjectPutVersion.class.getName());
+
 	private Map<String, TestFile> testFiles = new HashMap<String, TestFile>();
-	
+
 	private Bucket bucket_1;
 
 	int counter = 0;
-	
+
 	OffsetDateTime showStatus = OffsetDateTime.now();
 
-	
 	/**
 	 * 
 	 * uploada n files and then a new version for each of them
@@ -67,20 +65,22 @@ public class TestObjectPutVersion extends BaseTest {
 	 */
 	public TestObjectPutVersion() {
 	}
-	
+
+	String baseDir = "/opt/dev-data/test-files/test-version";
+	String downloadDir = "/opt/dev-data/test-files/test-version/download";
+
+	String fileNameV0 = "tolomei.jpg";
+	String fileNameV1 = "tolomei-v1.jpg";
 
 	@Override
 	public void executeTest() {
-		
-		if (!preCondition()) 
+
+		if (!preCondition())
 			error("preCondition");
-		
-		if (!putObject())
+
+		if (!putObject("putObjectVersion"))
 			error("putObject");
-		
-		if (!putObjectNewVersion())
-			error("putObjectNewVersion");
-		
+
 		showResults();
 
 	}
@@ -88,284 +88,323 @@ public class TestObjectPutVersion extends BaseTest {
 	public boolean preCondition() {
 
 		try {
-			String p=ping();
-			
-			if (p==null || !p.equals("ok"))
-				error("ping  -> " + p!=null?p:"null");
+			String p = ping();
+
+			if (p == null || !p.equals("ok"))
+				error("ping  -> " + p != null ? p : "null");
 			else {
 				logger.debug("ping -> ok");
 				getMap().put("ping", "ok");
 			}
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
 			error(e.getClass().getName() + " | " + e.getMessage());
 		}
 
-		
-        File dir = new File( super.getSourceDir());
-        
-        if ( (!dir.exists()) || (!dir.isDirectory())) { 
-			error("Dir not exists or the File is not Dir -> " + getSourceDir());
+		File dir = new File(baseDir);
+		if ((!dir.exists()) || (!dir.isDirectory())) {
+			error("Dir not exists or the File is not Dir -> " + baseDir);
 		}
 
+		File dndir = new File(downloadDir);
+		if ((!dndir.exists()) || (!dndir.isDirectory())) {
+			error("Download dir not exists or the File is not Dir -> " + downloadDir);
+		}
 
-        File v2dir = new File( getSourceV1Dir() );
-        
-    	
-		FileUtils.deleteQuietly(v2dir);
-       	try {
-			FileUtils.forceMkdir(v2dir);
+		try {
+			FileUtils.cleanDirectory(dndir);
 		} catch (IOException e) {
-			error(e);
+			error("Download dir can not be cleaned up -> " + downloadDir);
 		}
-		
-        
-        File tmpdir = new File(super.getDownloadDirHeadVersion());
-        
-        if ( (tmpdir.exists()) && (tmpdir.isDirectory())) { 
-        	try {
-				FileUtils.forceDelete(tmpdir);
-			} catch (IOException e) {
-				logger.error(e);
-				error(e.getClass().getName() + " | " + e.getMessage());
+
+		File file = new File(baseDir, fileNameV0);
+		if ((!file.exists()) || (file.isDirectory())) {
+			error(" not exists or is Dir ->  " + fileNameV0);
+		}
+
+		File file1 = new File(baseDir, fileNameV0);
+		if ((!file1.exists()) || (file1.isDirectory())) {
+			error(" not exists or is Dir ->  " + fileNameV1);
+		}
+
+		try {
+
+			if (!getClient().existsBucket("test-put-version-simple")) {
+				getClient().createBucket("test-put-version-simple");
 			}
-		}
-       	try {
-				FileUtils.forceMkdir(tmpdir);
-				
-		} catch (IOException e) {
-				logger.error(e);
-				error(e.getClass().getName() + " | " + e.getMessage());
-		}
-		
-       	
-       	
-       	File tmpdirv1 = new File(DOWNLOAD_DIR_V1);
-        
-        if ( (tmpdirv1.exists()) && (tmpdirv1.isDirectory())) { 
-        	try {
-				FileUtils.forceDelete(tmpdirv1);
-			} catch (IOException e) {
-				logger.error(e);
-				error(e.getClass().getName() + " | " + e.getMessage());
-			}
-		}
-       	try {
-				FileUtils.forceMkdir(tmpdirv1);
-				
-		} catch (IOException e) {
-				logger.error(e);
-				error(e.getClass().getName() + " | " + e.getMessage());
-		}
-        
-       	
-       	
-		try {	
-			
-			if (!getClient().existsBucket("test-put-version")) {
-				getClient().createBucket("test-put-version");
-			}
-			
-			bucket_1 = getClient().getBucket("test-put-version");
-			
+			bucket_1 = getClient().getBucket("test-put-version-simple");
+
 		} catch (ODClientException e) {
 			logger.error(e);
 			error(e.getClass().getName() + " | " + e.getMessage());
 		}
-		
-		
+
+		try {
+			if (!getClient().isEmpty(bucket_1.getName())) {
+				logger.debug("emptyting test bucket " + bucket_1.getName());
+				ResultSet<Item<ObjectMetadata>> r = getClient().listObjects(bucket_1);
+				while (r.hasNext()) {
+					Item<ObjectMetadata> i = r.next();
+					if (i.isOk()) {
+						logger.debug("deleting ->  b:" + i.getObject().getBucketName() + " o:" + i.getObject().getObjectName());
+						getClient().deleteObject(i.getObject().getBucketName(), i.getObject().getObjectName());
+					}
+				}
+			}
+		} catch (ODClientException e) {
+			logger.error(e);
+			error(e.getClass().getName() + " | " + e.getMessage());
+		}
+
 		logger.debug("precondition -> ok");
 		getMap().put("precondition", "ok");
-		
+
 		return true;
 	}
 
-	
-	
-	
 	/**
 	 * 
 	 * 
 	 */
-	private boolean putObject() {
+	private boolean putObject(String mname) {
 
-		File dir = new File(getSourceDir());
-		
-		 counter = 0;
-		
+		logger.debug("Starting " + mname);
+
 		String bucketName = bucket_1.getName();
-		
-		// put files
-		for (File fi:dir.listFiles()) {
 
-			if (counter == getMax())
-				break;
+		File file0 = new File(baseDir, fileNameV0);
+
+		String objectName = FSUtil.getBaseName(file0.getName()) + "-" + String.valueOf(Double.valueOf((Math.abs(Math.random() * 100000))).intValue());
+		objectName = getClient().normalizeObjectName(objectName);
+
+		try {
+
+			// version 0
 			
-			if (!fi.isDirectory() && (FSUtil.isPdf(fi.getName()) || FSUtil.isImage(fi.getName())) && (fi.length()<getMaxLength())) {
-				String objectName = FSUtil.getBaseName(fi.getName())+"-"+String.valueOf(Double.valueOf((Math.abs(Math.random()*100000))).intValue());
-				objectName = getClient().normalizeObjectName(objectName);
+			getClient().putObject(bucketName, objectName, file0);
+			logger.debug("putObject -> b: " + bucketName + " o:" + objectName);
+			testFiles.put(bucketName + "-" + objectName, new TestFile(file0, bucketName, objectName));
 
-				try {
-					getClient().putObject(bucketName, objectName, fi);
-					counter++;
-					testFiles.put(bucketName+"-"+objectName, new TestFile(fi, bucketName, objectName));
-					
-					sleep();
-					
-					if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-						logger.info( "putObject -> " + String.valueOf(getCounter()));
-						showStatus = OffsetDateTime.now();
-					}
-					
-					
-				} catch (ODClientException e) {
-					error(String.valueOf(e.getHttpStatus())+ " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
-				}
-			}
+		} catch (ODClientException e) {
+			error(String.valueOf(e.getHttpStatus()) + " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
 		}
-		
-		logger.info( "putObject total -> " + String.valueOf(getCounter()));
-		getMap().put("putObject", "ok "  + String.valueOf(counter));
-		
+
+		try {
+			// version 1
+			
+			File file1 = new File(baseDir, fileNameV1);
+
+			getClient().putObject(bucketName, objectName, file1);
+			logger.debug("putObject new version -> b:" + bucketName + " o:" + objectName);
+			testFiles.get(bucketName + "-" + objectName).addSrcFileVersion(file1);
+
+		} catch (ODClientException e) {
+			error(String.valueOf(e.getHttpStatus()) + " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
+		}
+
+		validateSet(testFiles, "validateSet");
+
+		logger.info(mname + " total -> " + String.valueOf(getCounter()));
+		getMap().put(mname, "ok " + String.valueOf(counter));
+
 		return true;
-		
+
 	}
-	
-	
-	
+
+	/**
+	 * if ( dateTimeDifference( showStatus, OffsetDateTime.now(),
+	 * ChronoUnit.MILLIS)>THREE_SECONDS) { logger.info( mname + " -> " +
+	 * String.valueOf(getCounter())); showStatus = OffsetDateTime.now(); }
+	 * 
+	 * @return
+	 */
+
 	protected int getCounter() {
 		return counter;
 	}
-	
-	
-	
-	private boolean putObjectNewVersion() {
-		
-		counter = 0;
-		 
-		testFiles.forEach((k,v) -> 
-		{
-			String srcname=v.getSrcFile(0).getName();
 
-			String name=FilenameUtils.getBaseName(srcname);
-			String ext=FilenameUtils.getExtension(srcname);
-			
-			String nameNewVersion= getSourceV1Dir() + File.separator + name +"-v1" + "."+ext;
-			
-			try {
-				if ((new File(nameNewVersion)).exists())
-					FileUtils.forceDelete(new File(nameNewVersion));
+	/**
+	 * private boolean putObjectNewVersion(String mname) {
+	 * 
+	 * logger.debug("Starting " + mname);
+	 * 
+	 * counter = 0;
+	 * 
+	 * testFiles.forEach((k, v) -> { String srcname = v.getSrcFile(0).getName();
+	 * 
+	 * String name = FilenameUtils.getBaseName(srcname); String ext =
+	 * FilenameUtils.getExtension(srcname);
+	 * 
+	 * String nameNewVersion = getSourceV1Dir() + File.separator + name + "-v1" +
+	 * "." + ext;
+	 * 
+	 * try { if ((new File(nameNewVersion)).exists()) FileUtils.forceDelete(new
+	 * File(nameNewVersion));
+	 * 
+	 * } catch (IOException e) { error(e.getClass().getName() + " - can not delete
+	 * existing new version locally"); }
+	 * 
+	 * try { Files.copy(v.getSrcFile(0).toPath(), new File(nameNewVersion).toPath(),
+	 * StandardCopyOption.REPLACE_EXISTING); } catch (IOException e) {
+	 * error(e.getClass().getName() + " - can copy version locally"); }
+	 * 
+	 * try {
+	 * 
+	 * 
+	 * 
+	 * getClient().putObject(v.bucketName, v.objectName, new File(nameNewVersion));
+	 * 
+	 * counter++; testFiles.get(v.bucketName + "-" +
+	 * v.objectName).addSrcFileVersion(new File(nameNewVersion));
+	 * 
+	 * sleep();
+	 * 
+	 * if (dateTimeDifference(showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS) >
+	 * THREE_SECONDS) { logger.info(mname + " -> " + String.valueOf(getCounter()));
+	 * showStatus = OffsetDateTime.now(); }
+	 * 
+	 * } catch (ODClientException e) {
+	 * logger.error(String.valueOf(e.getHttpStatus()) + " " + e.getMessage() + " " +
+	 * String.valueOf(e.getErrorCode())); error(e); }
+	 * 
+	 * });
+	 * 
+	 * logger.info(mname + " total -> " + String.valueOf(getCounter()));
+	 * 
+	 * boolean success = validateSet(testFiles);
+	 * 
+	 * if (success) logger.debug(mname + " ok"); else logger.debug(mname + "
+	 * error");
+	 * 
+	 * getMap().put(mname, success ? "ok" : "error");
+	 * 
+	 * return success;
+	 * 
+	 * }
+	 */
+
+	private boolean validateSet(Map<String, TestFile> mv, String mname) {
+
+		logger.debug(" Starting " + mname);
+
+		mv.forEach((k, testFile) -> {
+
+			// download head version -----------------------
+
+			{
+				ObjectMetadata meta = null;
+
+				try {
+
+					meta = getClient().getObjectMetadata(testFile.bucketName, testFile.objectName);
+
+				} catch (ODClientException e) {
+					error(e.getClass().getName() + " | " + e.getMessage());
+				}
+
+				File destFile = new File(downloadDir, meta.fileName);
+
+				try {
+					if ((destFile).exists())
+						FileUtils.forceDelete(destFile);
+
+				} catch (IOException e) {
+					error(e.getClass().getName() + " | FileUtils.forceDelete( " + destFile.getAbsolutePath() + ");");
+				}
+				try {
+					getClient().getObject(meta.bucketName, meta.objectName, destFile.getAbsolutePath());
+
+				} catch (ODClientException | IOException e) {
+					error(e.getClass().getName() + " | " + e.getMessage());
+				}
+				logger.debug("download -> b: " + meta.bucketName + " o:" + meta.objectName + " f: " + destFile.getAbsolutePath());
+
+				try {
+
+					String src_sha = testFile.getSrcFileSha256(meta.version);
+					String new_sha = OdilonFileUtils.calculateSHA256String(destFile);
+
+					if (!src_sha.equals(new_sha)) {
+						logger.error("sha256 are not equal -> b:" + meta.bucketName + " o:" + meta.objectName + " f_src: " + testFile.getSrcFile(meta.version).getAbsolutePath() + " dnload: " + destFile.getAbsolutePath());
+						error("sha256 are not equal -> b:" + meta.bucketName + " o:" + meta.objectName + " f_src: " + testFile.getSrcFile(meta.version).getAbsolutePath() + " dnload: " + destFile.getAbsolutePath());
+					}
+
+				} catch (NoSuchAlgorithmException | IOException e) {
+					error(e.getClass().getName() + " | " + e.getMessage());
+				}
+			}
+			// download previous version -----------------------
+
+
+			{
+				logger.debug("download previous version ");
+
+				
+				ObjectMetadata prev = null;
+
+				try {
+					prev = getClient().getObjectMetadataPreviousVersion(testFile.bucketName, testFile.objectName);
+					logger.debug(prev.toString());
+					logger.debug();
 					
-			} catch (IOException e) {
-				error(e.getClass().getName()+ " - can not delete existing new version locally");
-			}
-			
-			try {
-				Files.copy( v.getSrcFile(0).toPath(), 
-							new File(nameNewVersion).toPath(), 
-							StandardCopyOption.REPLACE_EXISTING );
-			} catch (IOException e) {
-				error(e.getClass().getName() + " - can copy version locally");
-			}
-			
-			try {
+				} catch (ODClientException e) {
+					error(e.getClass().getName() + " | " + e.getMessage());
+				}
+
+				File destPrevFile = new File(downloadDir, prev.fileName);
+
+				InputStream is = null;
 				
-				/**upload new version */
+				try {
 				
-				getClient().putObject(v.bucketName, v.objectName, new File(nameNewVersion));
-
-				counter++;
-				testFiles.get(v.bucketName+"-"+v.objectName).addSrcFileVersion(new File(nameNewVersion));
-
-				sleep();
-
-				if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-					logger.info( "putObjectNewVersion -> " + String.valueOf(getCounter()));
-					showStatus = OffsetDateTime.now();
+						is = getClient().getObjectPreviousVersion(testFile.bucketName, testFile.objectName);
+						FileUtils.copyInputStreamToFile(is, destPrevFile);
+				
+					
+				} catch (ODClientException | IOException e) {
+					error(e.getClass().getName() + " | " + e.getMessage());
 				}
 				
-				
-			} catch (ODClientException e) {
-				logger.error(String.valueOf(e.getHttpStatus())+ " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
-				error(e);
-			}
-			
-		}); 
-
-		logger.info( "putObjectNewVersion total -> " + String.valueOf(getCounter()));
-		
-		
-		boolean success = validateSet(testFiles);
-		
-		if (success)
-			logger.debug("putObjectNewVersion ok");
-		else
-			logger.debug("putObjectNewVersion error");
-
-		getMap().put("putObjectNewVersion", success?"ok":"error");
-		
-		return success;
-		
-	}
-
-	
-	private boolean validateSet(Map<String, TestFile> mv) {
-		
-		mv.forEach((k,v) -> {
-			
-			ObjectMetadata meta = null;
-			
-			try {
-					 meta = getClient().getObjectMetadata(v.bucketName, v.objectName);
+				finally {
+					if (is!=null) {
 					
-			} catch (ODClientException e) {
-					error(e.getClass().getName() + " | " + e.getMessage());
-			}
-				
-			String destFileName = DOWNLOAD_DIR_V1 + File.separator + meta.fileName;
-			
-			try {
-				if ((new File(destFileName)).exists())
-					FileUtils.forceDelete( new File(destFileName));
-				
-			} catch (IOException e) {
-				error(e.getClass().getName() + " | FileUtils.forceDelete( new File(destFileName));");
-			}
-			
-			try {
-					getClient().getObject(meta.bucketName, meta.objectName, destFileName);
-					
-			} catch (ODClientException | IOException e) {
-					error(e.getClass().getName() + " | " + e.getMessage());
-			}
-			
-			try {
-				
-					String src_sha = v.getSrcFileSha256(meta.version);
-					String new_sha = OdilonFileUtils.calculateSHA256String(new File(destFileName));
-					
-					if (!src_sha.equals(new_sha)) {
-						logger.error("sha256 are not equal -> " + meta.bucketName+"-"+meta.objectName);
-						error("Error sha256 are not equal -> " + meta.bucketName+"-"+meta.objectName);
+						try {
+							is.close();
+						} catch (IOException e) {
+							error(e.getClass().getName() + " | " + e.getMessage());
+						}
 					}
-					
-			} catch (NoSuchAlgorithmException | IOException e) {
+				}
+				
+				logger.debug("downloaded ->  b:" + prev.bucketName + " o:" + prev.objectName + " f: " + destPrevFile.getAbsolutePath() + " size: " + destPrevFile.length() + " bytes");
+
+				try {
+
+					String src_sha = testFile.getSrcFileSha256(prev.version);
+					String new_sha = OdilonFileUtils.calculateSHA256String(destPrevFile);
+
+					if (!src_sha.equals(new_sha)) {
+						logger.error("sha256 are not equal -> b:" + prev.bucketName + " o:" + prev.objectName + " f_src: " + testFile.getSrcFile(prev.version).getAbsolutePath() + " dnload: " + destPrevFile.getAbsolutePath());
+						error("sha256 are not equal -> b:" + prev.bucketName + " o:" + prev.objectName + " f_src: " + testFile.getSrcFile(prev.version).getAbsolutePath() + " dnload: " + destPrevFile.getAbsolutePath());
+					}
+
+				} catch (NoSuchAlgorithmException | IOException e) {
 					error(e.getClass().getName() + " | " + e.getMessage());
+				}
+				 
 			}
-			
-			
-			if ( dateTimeDifference( showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS)>THREE_SECONDS) {
-				logger.info( "validateSet -> " + String.valueOf(getCounter()));
+
+			/**
+			if (dateTimeDifference(showStatus, OffsetDateTime.now(), ChronoUnit.MILLIS) > THREE_SECONDS) {
+				logger.info("validateSet -> " + String.valueOf(getCounter()));
 				showStatus = OffsetDateTime.now();
 			}
+			**/
 		});
-						
-		
-		logger.debug("validateSet", "ok");
-		getMap().put("validateSet", "ok");
-		
+
+		logger.debug(mname, "ok");
+		getMap().put(mname, "ok");
+
 		return true;
 	}
-	
 
 }

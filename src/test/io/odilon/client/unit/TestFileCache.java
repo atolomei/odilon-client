@@ -74,6 +74,18 @@ public class TestFileCache extends BaseTest {
 
 		preCondition();
 
+		try {
+			if (getClient().systemInfo().redundancyLevel != RedundancyLevel.RAID_6) {
+				logger.info("Cache can be tested only on RAID 6 | current -> " + getClient().systemInfo().redundancyLevel.getName());
+				showResults();
+
+				return;
+			}
+		} catch (ODClientException e) {
+			error(e.getClass().getName() + " | " + e.getMessage());
+		}
+
+		
 		if (!testFileCache())
 			error("testFileCache()");
 
@@ -313,15 +325,7 @@ public class TestFileCache extends BaseTest {
 			error(e.getClass().getName() + " | " + e.getMessage());
 		}
 
-		try {
-			if (getClient().systemInfo().redundancyLevel != RedundancyLevel.RAID_6) {
-				error("File cache can only be tested for -> " + RedundancyLevel.RAID_6.getName());
-
-			}
-		} catch (ODClientException e) {
-			error(e.getClass().getName() + " | " + e.getMessage());
-		}
-
+		
 		{
 			File tmpdir = new File(super.getDownloadDirHeadVersion());
 
