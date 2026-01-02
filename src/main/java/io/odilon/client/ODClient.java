@@ -95,7 +95,7 @@ import io.odilon.model.list.DataList;
 import io.odilon.model.list.ResultSet;
 import io.odilon.net.ErrorCode;
 import io.odilon.net.ODHttpStatus;
- 
+
 import io.odilon.util.Check;
 import io.odilon.util.FileNameNormalizer;
 import io.odilon.util.OdilonFileUtils;
@@ -208,6 +208,7 @@ public class ODClient implements OdilonClient {
 	/** private static final String NULL_STRING = "(null)"; */
 	private static final String END_HTTP = "----------END-HTTP----------";
 
+	@SuppressWarnings("unused")
 	private static final String macos_home = (new File(System.getProperty("user.dir"))).getPath();
 	private static final String linux_home = (new File(System.getProperty("user.dir"))).getPath();
 	private static final String windows_home = System.getProperty("user.dir");
@@ -283,8 +284,9 @@ public class ODClient implements OdilonClient {
 	}
 
 	public void evictCache() {
-		
+
 	}
+
 	/**
 	 * @param schemeAndHost         can not be null
 	 * @param port                  can not be null (normally default port is 9234)
@@ -317,12 +319,8 @@ public class ODClient implements OdilonClient {
 
 		this.httpClient = new OkHttpClient();
 
-		this.httpClient = this.httpClient.newBuilder().
-				connectTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS).
-				writeTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS).
-				readTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
-				.protocols(protocol).
-				cache(cache).build();
+		this.httpClient = this.httpClient.newBuilder().connectTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS).writeTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS).readTimeout(DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
+				.protocols(protocol).cache(cache).build();
 
 		this.serverSchemaAndHostStr = schemeAndHost;
 		HttpUrl url = HttpUrl.parse(this.serverSchemaAndHostStr);
@@ -409,10 +407,6 @@ public class ODClient implements OdilonClient {
 		return putObjectStream(bucketName, objectName, stream, fileName, size, Optional.empty());
 	}
 
-	/**
-	 * 
-	 * 
-	 */
 	@Override
 	public boolean isValidObjectName(String objectName) {
 		Check.requireNonNullStringArgument(objectName, "objectName can not be null or emtpy");
@@ -426,9 +420,6 @@ public class ODClient implements OdilonClient {
 		return true;
 	}
 
-	/**
-	 * 
-	 */
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType) throws ODClientException {
 		return putObjectStream(bucketName, objectName, stream, fileName, size, contentType, Optional.empty());
 	}
@@ -437,82 +428,6 @@ public class ODClient implements OdilonClient {
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType, Optional<List<String>> customTags) throws ODClientException {
 		return putObjectStreamOkHttp(bucketName, objectName, stream, fileName, size, contentType, customTags);
 	}
-
-	/**
-	 * 
-	 * public ObjectMetadata putObjectStreamV2(String bucketName, String objectName,
-	 * InputStream stream, Optional<String> fileName, Optional<Long> size,
-	 * Optional<String> contentType, Optional<List<String>> customTags) throws
-	 * ODClientException {
-	 * 
-	 * if (!objectName.matches(SharedConstant.object_valid_regex)) throw new
-	 * IllegalArgumentException("objectName must be >0 and <=" +
-	 * String.valueOf(SharedConstant.MAX_OBJECT_CHARS) + ", and must match the java
-	 * regex -> " + SharedConstant.object_valid_regex + " | o:" + objectName);
-	 * 
-	 * String plainCredentials = accessKey + ":" + secretKey;
-	 * 
-	 * String cType = null;
-	 * 
-	 * if (contentType.isPresent()) cType = contentType.get(); else if
-	 * (fileName.isPresent()) cType = getContentType(fileName.get()); else cType =
-	 * DEFAULT_CONTENT_TYPE;
-	 * 
-	 * HttpUrl.Builder urlBuilder = this.serverBaseUrl.newBuilder();
-	 * 
-	 * for (String str : API_OBJECT_UPLOAD) urlBuilder.addEncodedPathSegment(str);
-	 * 
-	 * urlBuilder.addEncodedPathSegment(bucketName);
-	 * urlBuilder.addEncodedPathSegment(objectName);
-	 * 
-	 * if (fileName.isPresent()) { String regex = "[\\{\\}/<>\\*\\?´\\^`\\\\]+";
-	 * String normalizedName = fileName.get().replaceAll(regex, "-");
-	 * 
-	 * urlBuilder.addEncodedQueryParameter("fileName", normalizedName); } else {
-	 * urlBuilder.addEncodedQueryParameter("fileName", objectName); }
-	 * 
-	 * urlBuilder.addEncodedQueryParameter("Content-Type", cType);
-	 * 
-	 * if (customTags.isPresent()) {
-	 * 
-	 * StringBuilder str = new StringBuilder(); customTags.get().forEach(s ->
-	 * str.append(str.length() > 0 ? ("||" + s) : s));
-	 * urlBuilder.addEncodedQueryParameter("customTags", str.toString()); }
-	 * 
-	 * 
-	 * // ----------
-	 * 
-	 * HttpMultipart request = new HttpMultipart(urlBuilder.toString(),
-	 * plainCredentials, this.getCharset(), isSSL(), isAcceptAllCertificates());
-	 * 
-	 * if (getChunkSize() > 0) request.setChunk(getChunkSize());
-	 * 
-	 * long start = System.currentTimeMillis();
-	 * 
-	 * boolean error = false; ObjectMetadata meta = null;
-	 * 
-	 * try (InputStream is = (stream instanceof BufferedInputStream) ? stream : (new
-	 * BufferedInputStream(stream))) { meta = request.exchange(new
-	 * HttpFileEntity(is, objectName, size.orElse(Long.valueOf(-1).longValue())),
-	 * new TypeReference<ObjectMetadata>() { }); return meta;
-	 * 
-	 * } catch (IOException e) { error = true; throw new ODClientException(e); }
-	 * finally { long end = System.currentTimeMillis();
-	 * 
-	 * if (!error) { logger.debug("Upload -> " + "bucketName. " + bucketName + " | "
-	 * + "objectName. " + objectName + " | " + "fileName. " +
-	 * fileName.orElse("null") + " | " + "size. " + (size.isPresent() ?
-	 * String.valueOf(size.get()) : "null") + " | " + "contentType. " +
-	 * contentType.orElse("null") + " | " + "customTags. " + String.join(", ",
-	 * customTags.orElse(List.of("null"))) + " | " + "duration. " +
-	 * String.valueOf(end - start) + " ms" + " | " + ((meta != null) ? ("fileSize. "
-	 * + String.valueOf(meta.getLength()) + " bytes") : "null")); } }
-	 * 
-	 * // ----------
-	 * 
-	 * 
-	 * }
-	 */
 
 	@Override
 	public boolean isAcceptAllCertificates() {
@@ -634,18 +549,17 @@ public class ODClient implements OdilonClient {
 	}
 
 	boolean okHttpCacheEnabled = true;
-	
 
 	@Override
 	public boolean isCacheEnabled() {
 		return this.okHttpCacheEnabled;
 	}
-	
+
 	@Override
-	public void setCacheEnabled ( boolean b) {
-		this.okHttpCacheEnabled=b;
+	public void setCacheEnabled(boolean b) {
+		this.okHttpCacheEnabled = b;
 	}
-	
+
 	@Override
 	public ResultSet<Item<ObjectMetadata>> listObjects(String bucketName, final Optional<String> prefix, final Optional<Integer> pageSize) throws ODClientException {
 
@@ -791,10 +705,7 @@ public class ODClient implements OdilonClient {
 			throw new ODClientException(ODHttpStatus.OK.value(), ErrorCode.INTERNAL_ERROR.getCode(), e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
 	}
-
-	/**
-	 * 
-	 */
+ 
 	@Override
 	public boolean isEmpty(String bucketName) throws ODClientException {
 
@@ -807,9 +718,7 @@ public class ODClient implements OdilonClient {
 		}
 	}
 
-	/**
-	 * 
-	 */
+	 
 	@Override
 	public boolean existsBucket(String bucketName) throws ODClientException {
 		Check.requireNonNullStringArgument(bucketName, "bucketName is null");
@@ -821,9 +730,7 @@ public class ODClient implements OdilonClient {
 		}
 	}
 
-	/**
-	 * 
-	 */
+ 
 	@Override
 	public Bucket getBucket(String bucketName) throws ODClientException {
 		Check.requireNonNullStringArgument(bucketName, "bucketName is null or empty");
@@ -842,9 +749,7 @@ public class ODClient implements OdilonClient {
 		}
 	}
 
-	/**
-	 * 
-	 */
+	 
 	@Override
 	public void createBucket(String bucketName) throws ODClientException {
 		Check.requireNonNullStringArgument(bucketName, "bucketName is null");
@@ -869,9 +774,7 @@ public class ODClient implements OdilonClient {
 
 	}
 
-	/**
-	 * 
-	 */
+	 
 	@Override
 	public void renameBucket(String bucketName, String newBucketName) throws ODClientException {
 
@@ -910,10 +813,7 @@ public class ODClient implements OdilonClient {
 		HttpResponse response = executePost(API_SERVICE_REQUES_ADD, Optional.of(requestClass), Optional.empty(), null, null, data, len, false);
 		response.body().close();
 	}
-
-	/**
-	 * 
-	 */
+ 
 	@Override
 	public void deleteBucket(String bucketName) throws ODClientException {
 		Check.requireNonNullStringArgument(bucketName, "bucketName is null");
@@ -1577,7 +1477,7 @@ public class ODClient implements OdilonClient {
 		String basename = FileNameUtils.getBaseName(name);
 		String extension = FileNameUtils.getExtension(name);
 		if (basename.contains("%")) {
-			basename=basename.replace("%", "-").replace("(", "-").replace(")", "-");
+			basename = basename.replace("%", "-").replace("(", "-").replace(")", "-");
 		}
 		basename = FileNameNormalizer.normalize(basename);
 		return basename + "." + extension;
@@ -1588,7 +1488,6 @@ public class ODClient implements OdilonClient {
 		return FileNameNormalizer.normalizeObjectName(name);
 	}
 
-	
 	@Override
 	public String getFileName(String url) {
 		if (url == null)
@@ -1773,8 +1672,7 @@ public class ODClient implements OdilonClient {
 
 		if (!this.isCacheEnabled())
 			requestBuilder.cacheControl(new CacheControl.Builder().noCache().build());
-	  
-		 
+
 		requestBuilder.url(url);
 
 		String sha256 = null;
@@ -2036,58 +1934,7 @@ public class ODClient implements OdilonClient {
 		}
 	}
 
-	/**
-	 * Uses okhttp3
-	 * 
-	 * private ObjectMetadata putObjectInternal(String bucketName, String
-	 * objectName, File file, String fileName) throws ODClientException {
-	 * 
-	 * Check.requireNonNullStringArgument(bucketName, "bucketName is null or
-	 * empty"); Check.requireNonNullStringArgument(objectName, "object is null or
-	 * empty"); Check.requireNonNullArgument(file, "file is null");
-	 * Check.requireNonNullStringArgument(fileName, "fileName is null");
-	 * 
-	 * if (!objectName.matches(SharedConstant.object_valid_regex)) throw new
-	 * IllegalArgumentException( "objectName must be >0 and
-	 * <"+String.valueOf(SharedConstant.MAX_OBJECT_CHARS) + ", and must match the
-	 * java regex -> " + SharedConstant.object_valid_regex + " | o:" + objectName);
-	 * if (!file.exists()) throw new IllegalArgumentException("file does not exist
-	 * -> " + file.getName());
-	 * 
-	 * Path filePath = file.toPath(); if (!Files.isRegularFile(filePath)) throw new
-	 * IllegalArgumentException("'" + file.getName() + "': not a regular file");
-	 * 
-	 * Map<String, String> headerMap = new HashMap<>(); Map<String,String>
-	 * queryParamMap = new HashMap<String,String>();
-	 * 
-	 * try { headerMap.put("Content-Type",
-	 * Optional.ofNullable(Files.probeContentType(filePath)).orElse(DEFAULT_CONTENT_TYPE));
-	 * } catch (IOException e) { throw new InternalCriticalException(e); }
-	 * 
-	 * long length = file.length();
-	 * 
-	 * queryParamMap.put("fileName", fileName);
-	 * 
-	 * HttpResponse response = null; RandomAccessFile raFile = null;
-	 * 
-	 * try { try { raFile = new RandomAccessFile(filePath.toFile(), "r"); } catch
-	 * (FileNotFoundException e) { throw new InternalCriticalException(e); }
-	 * 
-	 * response = executePost(API_OBJECT_UPLOAD, Optional.of(bucketName),
-	 * Optional.of(objectName), headerMap, queryParamMap, raFile, (int) length,
-	 * true);
-	 * 
-	 * try { String str = response.body().string(); try { return
-	 * this.objectMapper.readValue(str, ObjectMetadata.class);
-	 * 
-	 * } catch (JsonProcessingException e) { throw new InternalCriticalException(e);
-	 * }
-	 * 
-	 * } catch (IOException e) { throw new InternalCriticalException(e); } } finally
-	 * { if (raFile!=null) try { raFile.close(); } catch (IOException e) { throw new
-	 * InternalCriticalException(e); } } }
-	 * 
-	 */
+	
 
 	private String getCacheWorkDir() {
 		return getHomeDirAbsolutePath() + File.separator + "tmp" + File.separator + rand.randomString(6);
@@ -2105,11 +1952,6 @@ public class ODClient implements OdilonClient {
 		return true;
 	}
 
-	/**
-	 * 
-	 * 
-	 * 
-	 */
 	private ObjectMetadata putObjectStreamOkHttp(
 
 			String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType, Optional<List<String>> customTags) throws ODClientException {
@@ -2117,10 +1959,9 @@ public class ODClient implements OdilonClient {
 		if (!objectName.matches(SharedConstant.object_valid_regex))
 			throw new IllegalArgumentException("objectName must be >0 and <=" + String.valueOf(SharedConstant.MAX_OBJECT_CHARS) + ", and must match the java regex ->  " + SharedConstant.object_valid_regex + " | o:" + objectName);
 
-		if (!FileNameNormalizer.isValidObjectName(objectName) )
-			throw new IllegalArgumentException("objectName is not valid  " + " | o:" + objectName +" | FileNameNormalizer.isValidObjectName( objectName ) must return true");
-			
-		
+		if (!FileNameNormalizer.isValidObjectName(objectName))
+			throw new IllegalArgumentException("objectName is not valid  " + " | o:" + objectName + " | FileNameNormalizer.isValidObjectName( objectName ) must return true");
+
 		checkBucketName(bucketName);
 
 		String cType = null;
@@ -2154,7 +1995,7 @@ public class ODClient implements OdilonClient {
 		String fname = null;
 
 		if (fileName.isPresent()) {
-			
+
 			String rawName = this.normalizeFileName(fileName.get());
 
 			String regex = "[\\{\\}/<>\\*\\?´\\^`\\\\]+";
@@ -2305,10 +2146,10 @@ public class ODClient implements OdilonClient {
 				throw (ex);
 
 			} catch (Exception e) {
-				
-				String info = "bucketName. " + bucketName + " | " + "objectName. " + objectName + " | " + "fileName. " + fileName.orElse("null") + " | " + "size. " + (size.isPresent() ? String.valueOf(size.get()) : "null")
-				+ " | " + "contentType. " + contentType.orElse("null") + " | " + "customTags. " + String.join(", ", customTags.orElse(List.of("null")));
-				
+
+				String info = "bucketName. " + bucketName + " | " + "objectName. " + objectName + " | " + "fileName. " + fileName.orElse("null") + " | " + "size. " + (size.isPresent() ? String.valueOf(size.get()) : "null") + " | "
+						+ "contentType. " + contentType.orElse("null") + " | " + "customTags. " + String.join(", ", customTags.orElse(List.of("null")));
+
 				throw new InternalCriticalException(e, (str != null ? str : "") + " |" + info);
 			}
 
@@ -2352,59 +2193,14 @@ public class ODClient implements OdilonClient {
 		}
 		return true;
 	}
-
-	/**
-	 * private ObjectMetadata putObjectInternal(String bucketName, String
-	 * objectName, File file, String fileName) throws ODClientException {
-	 * 
-	 * Check.requireNonNullStringArgument(bucketName, "bucketName is null or
-	 * empty"); Check.requireNonNullStringArgument(objectName, "object is null or
-	 * empty"); Check.requireNonNullArgument(file, "file is null");
-	 * Check.requireNonNullStringArgument(fileName, "fileName is null");
-	 * 
-	 * if (!objectName.matches(SharedConstant.object_valid_regex)) throw new
-	 * IllegalArgumentException( "objectName must be >0 and
-	 * <"+String.valueOf(SharedConstant.MAX_OBJECT_CHARS) + ", and must match the
-	 * java regex -> " + SharedConstant.object_valid_regex + " | o:" + objectName);
-	 * if (!file.exists()) throw new IllegalArgumentException("file does not exist
-	 * -> " + file.getName());
-	 * 
-	 * Path filePath = file.toPath(); if (!Files.isRegularFile(filePath)) throw new
-	 * IllegalArgumentException("'" + file.getName() + "': not a regular file");
-	 * 
-	 * Map<String, String> headerMap = new HashMap<>(); Map<String,String>
-	 * queryParamMap = new HashMap<String,String>();
-	 * 
-	 * try { headerMap.put("Content-Type",
-	 * Optional.ofNullable(Files.probeContentType(filePath)).orElse(DEFAULT_CONTENT_TYPE));
-	 * } catch (IOException e) { throw new InternalCriticalException(e); }
-	 * 
-	 * long length = file.length();
-	 * 
-	 * queryParamMap.put("fileName", fileName);
-	 * 
-	 * HttpResponse response = null; RandomAccessFile raFile = null;
-	 * 
-	 * try { try { raFile = new RandomAccessFile(filePath.toFile(), "r"); } catch
-	 * (FileNotFoundException e) { throw new InternalCriticalException(e); }
-	 * 
-	 * response = executePost(API_OBJECT_UPLOAD, Optional.of(bucketName),
-	 * Optional.of(objectName), headerMap, queryParamMap, raFile, (int) length,
-	 * true);
-	 * 
-	 * try { String str = response.body().string(); try { return
-	 * this.objectMapper.readValue(str, ObjectMetadata.class);
-	 * 
-	 * } catch (JsonProcessingException e) { throw new InternalCriticalException(e);
-	 * }
-	 * 
-	 * } catch (IOException e) { throw new InternalCriticalException(e); } } finally
-	 * { if (raFile!=null) try { raFile.close(); } catch (IOException e) { throw new
-	 * InternalCriticalException(e); } } }
-	 * 
-	 */
-
 }
+
+
+
+
+
+
+
 
 /**
  * @param bucketName
@@ -2417,4 +2213,183 @@ public class ODClient implements OdilonClient {
  *                      String objectName, InputStream objectVersion, String
  *                      fileName, int version) { throw new RuntimeException("not
  *                      implemented"); }
+ */
+
+/**
+ * private ObjectMetadata putObjectInternal(String bucketName, String
+ * objectName, File file, String fileName) throws ODClientException {
+ * 
+ * Check.requireNonNullStringArgument(bucketName, "bucketName is null or
+ * empty"); Check.requireNonNullStringArgument(objectName, "object is null or
+ * empty"); Check.requireNonNullArgument(file, "file is null");
+ * Check.requireNonNullStringArgument(fileName, "fileName is null");
+ * 
+ * if (!objectName.matches(SharedConstant.object_valid_regex)) throw new
+ * IllegalArgumentException( "objectName must be >0 and
+ * <"+String.valueOf(SharedConstant.MAX_OBJECT_CHARS) + ", and must match the
+ * java regex -> " + SharedConstant.object_valid_regex + " | o:" + objectName);
+ * if (!file.exists()) throw new IllegalArgumentException("file does not exist
+ * -> " + file.getName());
+ * 
+ * Path filePath = file.toPath(); if (!Files.isRegularFile(filePath)) throw new
+ * IllegalArgumentException("'" + file.getName() + "': not a regular file");
+ * 
+ * Map<String, String> headerMap = new HashMap<>(); Map<String,String>
+ * queryParamMap = new HashMap<String,String>();
+ * 
+ * try { headerMap.put("Content-Type",
+ * Optional.ofNullable(Files.probeContentType(filePath)).orElse(DEFAULT_CONTENT_TYPE));
+ * } catch (IOException e) { throw new InternalCriticalException(e); }
+ * 
+ * long length = file.length();
+ * 
+ * queryParamMap.put("fileName", fileName);
+ * 
+ * HttpResponse response = null; RandomAccessFile raFile = null;
+ * 
+ * try { try { raFile = new RandomAccessFile(filePath.toFile(), "r"); } catch
+ * (FileNotFoundException e) { throw new InternalCriticalException(e); }
+ * 
+ * response = executePost(API_OBJECT_UPLOAD, Optional.of(bucketName),
+ * Optional.of(objectName), headerMap, queryParamMap, raFile, (int) length,
+ * true);
+ * 
+ * try { String str = response.body().string(); try { return
+ * this.objectMapper.readValue(str, ObjectMetadata.class);
+ * 
+ * } catch (JsonProcessingException e) { throw new InternalCriticalException(e);
+ * }
+ * 
+ * } catch (IOException e) { throw new InternalCriticalException(e); } } finally
+ * { if (raFile!=null) try { raFile.close(); } catch (IOException e) { throw new
+ * InternalCriticalException(e); } } }
+ * 
+ */
+
+/**
+ * 
+ * public ObjectMetadata putObjectStreamV2(String bucketName, String objectName,
+ * InputStream stream, Optional<String> fileName, Optional<Long> size,
+ * Optional<String> contentType, Optional<List<String>> customTags) throws
+ * ODClientException {
+ * 
+ * if (!objectName.matches(SharedConstant.object_valid_regex)) throw new
+ * IllegalArgumentException("objectName must be >0 and <=" +
+ * String.valueOf(SharedConstant.MAX_OBJECT_CHARS) + ", and must match the java
+ * regex -> " + SharedConstant.object_valid_regex + " | o:" + objectName);
+ * 
+ * String plainCredentials = accessKey + ":" + secretKey;
+ * 
+ * String cType = null;
+ * 
+ * if (contentType.isPresent()) cType = contentType.get(); else if
+ * (fileName.isPresent()) cType = getContentType(fileName.get()); else cType =
+ * DEFAULT_CONTENT_TYPE;
+ * 
+ * HttpUrl.Builder urlBuilder = this.serverBaseUrl.newBuilder();
+ * 
+ * for (String str : API_OBJECT_UPLOAD) urlBuilder.addEncodedPathSegment(str);
+ * 
+ * urlBuilder.addEncodedPathSegment(bucketName);
+ * urlBuilder.addEncodedPathSegment(objectName);
+ * 
+ * if (fileName.isPresent()) { String regex = "[\\{\\}/<>\\*\\?´\\^`\\\\]+";
+ * String normalizedName = fileName.get().replaceAll(regex, "-");
+ * 
+ * urlBuilder.addEncodedQueryParameter("fileName", normalizedName); } else {
+ * urlBuilder.addEncodedQueryParameter("fileName", objectName); }
+ * 
+ * urlBuilder.addEncodedQueryParameter("Content-Type", cType);
+ * 
+ * if (customTags.isPresent()) {
+ * 
+ * StringBuilder str = new StringBuilder(); customTags.get().forEach(s ->
+ * str.append(str.length() > 0 ? ("||" + s) : s));
+ * urlBuilder.addEncodedQueryParameter("customTags", str.toString()); }
+ * 
+ * 
+ * // ----------
+ * 
+ * HttpMultipart request = new HttpMultipart(urlBuilder.toString(),
+ * plainCredentials, this.getCharset(), isSSL(), isAcceptAllCertificates());
+ * 
+ * if (getChunkSize() > 0) request.setChunk(getChunkSize());
+ * 
+ * long start = System.currentTimeMillis();
+ * 
+ * boolean error = false; ObjectMetadata meta = null;
+ * 
+ * try (InputStream is = (stream instanceof BufferedInputStream) ? stream : (new
+ * BufferedInputStream(stream))) { meta = request.exchange(new
+ * HttpFileEntity(is, objectName, size.orElse(Long.valueOf(-1).longValue())),
+ * new TypeReference<ObjectMetadata>() { }); return meta;
+ * 
+ * } catch (IOException e) { error = true; throw new ODClientException(e); }
+ * finally { long end = System.currentTimeMillis();
+ * 
+ * if (!error) { logger.debug("Upload -> " + "bucketName. " + bucketName + " | "
+ * + "objectName. " + objectName + " | " + "fileName. " +
+ * fileName.orElse("null") + " | " + "size. " + (size.isPresent() ?
+ * String.valueOf(size.get()) : "null") + " | " + "contentType. " +
+ * contentType.orElse("null") + " | " + "customTags. " + String.join(", ",
+ * customTags.orElse(List.of("null"))) + " | " + "duration. " +
+ * String.valueOf(end - start) + " ms" + " | " + ((meta != null) ? ("fileSize. "
+ * + String.valueOf(meta.getLength()) + " bytes") : "null")); } }
+ * 
+ * // ----------
+ * 
+ * 
+ * }
+ */
+/**
+ * Uses okhttp3
+ * 
+ * private ObjectMetadata putObjectInternal(String bucketName, String
+ * objectName, File file, String fileName) throws ODClientException {
+ * 
+ * Check.requireNonNullStringArgument(bucketName, "bucketName is null or
+ * empty"); Check.requireNonNullStringArgument(objectName, "object is null or
+ * empty"); Check.requireNonNullArgument(file, "file is null");
+ * Check.requireNonNullStringArgument(fileName, "fileName is null");
+ * 
+ * if (!objectName.matches(SharedConstant.object_valid_regex)) throw new
+ * IllegalArgumentException( "objectName must be >0 and
+ * <"+String.valueOf(SharedConstant.MAX_OBJECT_CHARS) + ", and must match the
+ * java regex -> " + SharedConstant.object_valid_regex + " | o:" + objectName);
+ * if (!file.exists()) throw new IllegalArgumentException("file does not exist
+ * -> " + file.getName());
+ * 
+ * Path filePath = file.toPath(); if (!Files.isRegularFile(filePath)) throw new
+ * IllegalArgumentException("'" + file.getName() + "': not a regular file");
+ * 
+ * Map<String, String> headerMap = new HashMap<>(); Map<String,String>
+ * queryParamMap = new HashMap<String,String>();
+ * 
+ * try { headerMap.put("Content-Type",
+ * Optional.ofNullable(Files.probeContentType(filePath)).orElse(DEFAULT_CONTENT_TYPE));
+ * } catch (IOException e) { throw new InternalCriticalException(e); }
+ * 
+ * long length = file.length();
+ * 
+ * queryParamMap.put("fileName", fileName);
+ * 
+ * HttpResponse response = null; RandomAccessFile raFile = null;
+ * 
+ * try { try { raFile = new RandomAccessFile(filePath.toFile(), "r"); } catch
+ * (FileNotFoundException e) { throw new InternalCriticalException(e); }
+ * 
+ * response = executePost(API_OBJECT_UPLOAD, Optional.of(bucketName),
+ * Optional.of(objectName), headerMap, queryParamMap, raFile, (int) length,
+ * true);
+ * 
+ * try { String str = response.body().string(); try { return
+ * this.objectMapper.readValue(str, ObjectMetadata.class);
+ * 
+ * } catch (JsonProcessingException e) { throw new InternalCriticalException(e);
+ * }
+ * 
+ * } catch (IOException e) { throw new InternalCriticalException(e); } } finally
+ * { if (raFile!=null) try { raFile.close(); } catch (IOException e) { throw new
+ * InternalCriticalException(e); } } }
+ * 
  */
