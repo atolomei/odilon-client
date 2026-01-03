@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.odilon.client.unit;
+package io.odilon.client.unit.notused;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +35,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import io.odilon.client.error.ODClientException;
+import io.odilon.client.unit.TestObjectPutGet;
 import io.odilon.client.util.FSUtil;
 import io.odilon.client.util.NumberFormatter;
 import io.odilon.log.Logger;
@@ -221,11 +222,11 @@ public class TestVersionControlUpload extends BaseTest {
 
 		/** put files **/
 
-		logger.debug("uploads up to " + getMax() + " pdf files. This test does not validate uploads ");
+		logger.debug("uploads up to " + getMaxFilesToTest() + " pdf files. This test does not validate uploads ");
 
 		for (File fi : dir.listFiles()) {
 
-			if (counterPutObject.get() == getMax())
+			if (counterPutObject.get() == getMaxFilesToTest())
 				break;
 
 			if (isValid(fi)) {

@@ -136,7 +136,7 @@ public class TestVersionControlWipe extends BaseTest {
 
 		for (File fi : dir.listFiles()) {
 
-			if (counter == getMax())
+			if (counter == getMaxFilesToTest())
 				break;
 
 			if (!fi.isDirectory()

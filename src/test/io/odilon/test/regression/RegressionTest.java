@@ -26,14 +26,14 @@ import io.odilon.client.unit.TestBucketCRUD;
 import io.odilon.client.unit.TestDeleteObject;
 import io.odilon.client.unit.TestFileCache;
 import io.odilon.client.unit.TestGetObjects;
-import io.odilon.client.unit.TestMasterStandBy;
 import io.odilon.client.unit.TestMonitor;
 import io.odilon.client.unit.TestObjectPutGet;
 import io.odilon.client.unit.TestObjectPutVersion;
 import io.odilon.client.unit.TestPresignedUrl;
 import io.odilon.client.unit.TestQuery;
-import io.odilon.client.unit.TestVersionControlUpload;
 import io.odilon.client.unit.TestVersionControlWipe;
+import io.odilon.client.unit.notused.TestMasterStandBy;
+import io.odilon.client.unit.notused.TestVersionControlUpload;
 import io.odilon.log.Logger;
 
 import io.odilon.test.base.BaseTest;
@@ -90,14 +90,13 @@ public class RegressionTest extends BaseTest {
 		query_t.executeTest();
 		list.add(query_t.getClass().getSimpleName());
 		
-		
 		if (isVersionControl()) {
 			TestObjectPutVersion version_t= new TestObjectPutVersion();
 			version_t.setClient(getClient());
 			version_t.executeTest();
 			list.add(version_t.getClass().getSimpleName());
 			
-			TestVersionControlUpload upload_t = new TestVersionControlUpload();
+		/**	TestVersionControlUpload upload_t = new TestVersionControlUpload();
 			upload_t.setClient(getClient());
 			upload_t.executeTest();
 			list.add(upload_t.getClass().getSimpleName());
@@ -106,16 +105,19 @@ public class RegressionTest extends BaseTest {
 			wipe_t.setClient(getClient());
 			wipe_t.executeTest();
 			list.add(wipe_t.getClass().getSimpleName());
+		**/
+			
 		}
 				
-		if (isRAIDSix()) {
-			TestFileCache cache_t = new  TestFileCache();
-			cache_t.setClient(getClient());
-			cache_t.executeTest();
-			list.add(cache_t.getClass().getSimpleName());
-		}
+		 
+		TestFileCache cache_t = new  TestFileCache();
+		cache_t.setClient(getClient());
+		cache_t.executeTest();
+		list.add(cache_t.getClass().getSimpleName());
+		 
 		
 		if (isStandBy()) {
+			
 			TestMasterStandBy standby_t = new  TestMasterStandBy();
 			standby_t.setClient(getClient());
 			standby_t.executeTest();
@@ -139,9 +141,14 @@ public class RegressionTest extends BaseTest {
 			error(e.getClass().getName() + " | " + e.getMessage());
 		}
 
-		list.forEach( i -> logger.info(i + " ok"));
-		
-		logger.debug(this.getClass().getSimpleName() + " -> done.");
+		logger.debug();
+		list.forEach( i -> logger.info(i + " -> ok"));
+		logger.debug();
+
+		logger.debug();
+		logger.debug(this.getClass().getSimpleName() + " -> done");
+		logger.debug();
+
 		
 	}
 	

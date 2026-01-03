@@ -171,7 +171,7 @@ public class TestStress extends BaseTest {
 					if (isElegible(file)) {
 						up.add(file);
 						totalSize += file.length();
-						done = (up.size() == getMax());
+						done = (up.size() == getMaxFilesToTest());
 						if (up.size() % 101 == 0)
 							logger.debug(String.valueOf(up.size()) + " | " + file.getAbsolutePath());
 					}

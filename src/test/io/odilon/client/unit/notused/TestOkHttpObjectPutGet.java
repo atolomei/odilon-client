@@ -14,7 +14,7 @@
  * See the License for the specific languaGetgoverning permissions and
  * limitations under the License.
  */
-package io.odilon.client.unit;
+package io.odilon.client.unit.notused;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -125,7 +125,7 @@ public class TestOkHttpObjectPutGet extends BaseTest {
 		
 		for (File file : dir.listFiles()) {
 				
-				if (counter >=   getMax() )
+				if (counter >=   getMaxFilesToTest() )
 					break;
 				
 				if (isElegible(file)) {
@@ -139,7 +139,7 @@ public class TestOkHttpObjectPutGet extends BaseTest {
 						List<String> customTags = new ArrayList<String>();
 						customTags.add(String.valueOf(counter));
 						
-						ObjectMetadata meta = ((ODClient) getClient()).putObjectStream(
+						ObjectMetadata meta =  getClient().putObjectStream(
 								bucketName, 
 								objectName, 
 								inputStream, 

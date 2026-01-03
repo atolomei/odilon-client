@@ -111,7 +111,7 @@ public class TestManyPresignedUrl extends BaseTest {
 		//
 		for (File fi:dir.listFiles()) {
 			
-			if (counter >= getMax())
+			if (counter >= getMaxFilesToTest())
 				break;
 			
 			if (isElegible(fi)) {

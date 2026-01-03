@@ -123,7 +123,7 @@ public class TestObjectPutGet extends BaseTest {
 		int counter = 0;
 		String bucketName = this.bucket_1.getName();
 
-		int max =  getMax();
+		int max =  getMaxFilesToTest();
 		
 		logger.info("Trying to upload -> " + String.valueOf(max) +  " files" );
 		

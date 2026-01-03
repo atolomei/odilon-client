@@ -83,7 +83,7 @@ public class TestPresignedUrl extends BaseTest {
 				ResultSet<Item<ObjectMetadata>> rs = getClient().listObjects(this.bucket_1.getName());
 				int counter = 0;
 				int total = 0;
-				while (rs.hasNext() && counter++ < getMax()) {
+				while (rs.hasNext() && counter++ < getMaxFilesToTest()) {
 					Item<ObjectMetadata> item = rs.next();
 					if (item.isOk()) {
 						ObjectMetadata meta = item.getObject();
@@ -119,7 +119,7 @@ public class TestPresignedUrl extends BaseTest {
 				ResultSet<Item<ObjectMetadata>> rs = getClient().listObjects(this.bucket_1.getName());
 				int counter = 0;
 				int total = 0;
-				while (rs.hasNext() && counter++ < getMax()) {
+				while (rs.hasNext() && counter++ < getMaxFilesToTest()) {
 					Item<ObjectMetadata> item = rs.next();
 					if (item.isOk()) {
 						ObjectMetadata meta = item.getObject();
@@ -171,7 +171,7 @@ public class TestPresignedUrl extends BaseTest {
 		//
 		for (File fi : dir.listFiles()) {
 
-			if (counter >= getMax())
+			if (counter >= getMaxFilesToTest())
 				break;
 
 			if (isElegible(fi)) {

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.odilon.client.unit;
+package io.odilon.client.unit.notused;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -104,7 +104,7 @@ public class TestTunnelPutGet extends BaseTest {
 
 		for (String url : urls) {
 
-			if (counter >= getMax())
+			if (counter >= getMaxFilesToTest())
 				break;
 
 			HttpURLConnection connection = null;
@@ -153,7 +153,7 @@ public class TestTunnelPutGet extends BaseTest {
 						Optional.of(getClient().getContentType(fileName)),
 						Optional.ofNullable(customTags));
 
-				logger.info(String.valueOf(testFiles.size() + " testTunnel -> " + fileName + " | " + String.valueOf(meta.getLength() / 1000) + "KB"));
+				logger.info(String.valueOf(testFiles.size() + " testTunnel -> " + fileName + " | " + String.valueOf(meta.getSourceLength() / 1000) + "KB"));
 				counter++;
 
 				sleep();
@@ -395,7 +395,7 @@ String bucketName = this.bucket_1.getName();
 
 		testFiles.put(bucketName + "-" + objectName, new TestFile(targetPath.toFile(), bucketName, objectName));
 
-		logger.info(String.valueOf(testFiles.size() + " | test no Tunnel -> " + fileName + " | " + String.valueOf(meta.getLength() / 1000) + " KB"));
+		logger.info(String.valueOf(testFiles.size() + " | test no Tunnel -> " + fileName + " | " + String.valueOf(meta.getSourceLength() / 1000) + " KB"));
 		counter++;
 
 		sleep();

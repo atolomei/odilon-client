@@ -54,12 +54,13 @@ public class TestFileCache extends BaseTest {
 	private String bucketTest = "testcache";
 
 	public TestFileCache() {
+		
 		String max = System.getProperty("max");
 		String maxLength = System.getProperty("maxLength");
 		String lapse = System.getProperty("lapseBetweenPutSeconds");
 
 		if (max != null)
-			setMax(Integer.valueOf(max.trim()));
+			setMaxFilesToTest(Integer.valueOf(max.trim()));
 
 		if (maxLength != null)
 			setMaxLength(Long.valueOf(maxLength.trim()));
@@ -124,13 +125,12 @@ public class TestFileCache extends BaseTest {
 		}
 
 		logger.debug("Cache hit counter -> " + metrics.cacheFileHitCounter);
- 
 
 		// put files
 		//
 		for (File fi : dir.listFiles()) {
 
-			if (counter >= getMax())
+			if (counter >= getMaxFilesToTest())
 				break;
 
 			if (isElegible(fi)) {
@@ -194,21 +194,19 @@ public class TestFileCache extends BaseTest {
 
 			try {
 
-				logger.debug("1. should add to cache -> b:" +  meta.bucketName + " o:" + meta.objectName);
+				logger.debug("1. should add to cache -> b:" + meta.bucketName + " o:" + meta.objectName);
 				getClient().getObject(meta.bucketName, meta.objectName, destFileName);
 
-				
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
-				 
+
 				}
 
-				logger.debug("2. should hit server cache -> b:" +  meta.bucketName + " o:" + meta.objectName);
+				logger.debug("2. should hit server cache -> b:" + meta.bucketName + " o:" + meta.objectName);
 				/** should hit server cache */
 				getClient().getObject(meta.bucketName, meta.objectName, destFileName);
 
-				
 			} catch (ODClientException | IOException e) {
 				error(e);
 			}

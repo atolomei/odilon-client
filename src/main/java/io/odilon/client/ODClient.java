@@ -2161,7 +2161,7 @@ public class ODClient implements OdilonClient {
 			if (!isError) {
 				logger.debug("Upload -> " + "bucketName. " + bucketName + " | " + "objectName. " + objectName + " | " + "fileName. " + fileName.orElse("null") + " | " + "size. " + (size.isPresent() ? String.valueOf(size.get()) : "null")
 						+ " | " + "contentType. " + contentType.orElse("null") + " | " + "customTags. " + String.join(", ", customTags.orElse(List.of("null"))) + " | " + "duration. " + String.valueOf(end - start) + " ms" + " | "
-						+ ((ometa != null) ? ("fileSize. " + NumberFormatter.formatNumber(ometa.getLength()) + " bytes") : "fileSize. null"));
+						+ ((ometa != null) ? ("fileSize. " + NumberFormatter.formatNumber(ometa.getSourceLength()) + " bytes") : "fileSize. null"));
 			}
 		}
 	}
@@ -2334,7 +2334,7 @@ public class ODClient implements OdilonClient {
  * contentType.orElse("null") + " | " + "customTags. " + String.join(", ",
  * customTags.orElse(List.of("null"))) + " | " + "duration. " +
  * String.valueOf(end - start) + " ms" + " | " + ((meta != null) ? ("fileSize. "
- * + String.valueOf(meta.getLength()) + " bytes") : "null")); } }
+ * + String.valueOf(meta.getSourceLength()) + " bytes") : "null")); } }
  * 
  * // ----------
  * 

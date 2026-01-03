@@ -44,9 +44,9 @@ public class TestManyUploads extends BaseTest {
 
 		String max = System.getProperty("manymax");
 		if (max!=null)
-			setMax(Integer.valueOf(max.trim()));
+			setMaxFilesToTest(Integer.valueOf(max.trim()));
 		else
-			setMax(4000);
+			setMaxFilesToTest(4000);
 	}
 	
 
@@ -66,8 +66,8 @@ public class TestManyUploads extends BaseTest {
 
 	
 	@Override
-	protected int getMax() {
-		return super.getMax();
+	protected int getMaxFilesToTest() {
+		return super.getMaxFilesToTest();
 	}
 	
 	/**
@@ -104,7 +104,7 @@ public class TestManyUploads extends BaseTest {
 		long processstart = System.currentTimeMillis();
 
 		
-		while ((testFiles.size()<getMax()) && hasHope) {
+		while ((testFiles.size()<getMaxFilesToTest()) && hasHope) {
 			
 				hasHope = false;
 		
@@ -115,7 +115,7 @@ public class TestManyUploads extends BaseTest {
 				
 				for (File file: dir.listFiles()) {
 					
-					if (testFiles.size() >= getMax())
+					if (testFiles.size() >= getMaxFilesToTest())
 						break;
 					
 					if (isElegible(file)) {

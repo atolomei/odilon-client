@@ -19,17 +19,15 @@ package io.odilon.client.unit;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+ 
 import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
+ 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.hamcrest.core.Is;
+ 
 
 import io.odilon.client.error.ODClientException;
 import io.odilon.client.util.FSUtil;
@@ -66,8 +64,8 @@ public class TestObjectPutVersion extends BaseTest {
 	public TestObjectPutVersion() {
 	}
 
-	String baseDir = "/opt/dev-data/test-files/test-version";
-	String downloadDir = "/opt/dev-data/test-files/test-version/download";
+	String baseDir = super.getVersion_control_source_dir(); // "/opt/dev-data/test-files/test-version";
+	String downloadDir = super.getVersion_control_source_dir()+File.separator+"download"; // "/opt/dev-data/test-files/test-version/download";
 
 	String fileNameV0 = "tolomei.jpg";
 	String fileNameV1 = "tolomei-v1.jpg";
@@ -118,12 +116,12 @@ public class TestObjectPutVersion extends BaseTest {
 
 		File file = new File(baseDir, fileNameV0);
 		if ((!file.exists()) || (file.isDirectory())) {
-			error(" not exists or is Dir ->  " + fileNameV0);
+			error(" not exists  ->  " + fileNameV0);
 		}
 
-		File file1 = new File(baseDir, fileNameV0);
+		File file1 = new File(baseDir, fileNameV1);
 		if ((!file1.exists()) || (file1.isDirectory())) {
-			error(" not exists or is Dir ->  " + fileNameV1);
+			error(" not exists  ->  " + fileNameV1);
 		}
 
 		try {
@@ -203,8 +201,8 @@ public class TestObjectPutVersion extends BaseTest {
 
 		validateSet(testFiles, "validateSet");
 
-		logger.info(mname + " total -> " + String.valueOf(getCounter()));
-		getMap().put(mname, "ok " + String.valueOf(counter));
+		logger.info(mname + " total -> " + String.valueOf(testFiles.size()));
+		getMap().put(mname, "ok " + String.valueOf(testFiles.size()));
 
 		return true;
 

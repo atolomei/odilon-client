@@ -65,7 +65,7 @@ public class TestGetObjects extends BaseTest {
 			try {
 				resultSet = getClient().listObjects(bucket_1.getName(), Optional.empty(), Optional.empty());
 				
-				while (resultSet.hasNext() && counter++< getMax()) {
+				while (resultSet.hasNext() && counter++< getMaxFilesToTest()) {
 					
 					Item<ObjectMetadata> item = resultSet.next();
 		    		if (item.isOk()) {
@@ -74,9 +74,9 @@ public class TestGetObjects extends BaseTest {
 		    				getClient().getObject(meta.bucketName, meta.objectName, super.getDownloadDirHeadVersion() + File.separator + meta.fileName);
 
 		    				File file = new File(getDownloadDirHeadVersion(), meta.fileName);
-		    				if (meta.getLength() - file.length()!=0) {
+		    				if (meta.getSourceLength() - file.length()!=0) {
 			    				error(String.valueOf(counter) + " ->  o:" + item.getObject().objectName + " f: " + meta.fileName  +" | file size: " 
-			    						+ file.length() + " |  metadata size: " + meta.getLength());
+			    						+ file.length() + " |  metadata size: " + meta.getSourceLength());
 		    					
 			    				return false;
 		    				}
