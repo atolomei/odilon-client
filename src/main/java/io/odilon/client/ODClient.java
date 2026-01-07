@@ -426,9 +426,16 @@ public class ODClient implements OdilonClient {
 
 	@Override
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType, Optional<List<String>> customTags) throws ODClientException {
-		return putObjectStreamOkHttp(bucketName, objectName, stream, fileName, size, contentType, customTags);
+		return putObjectStreamOkHttp(bucketName, objectName, stream, fileName, size, contentType, customTags, true);
 	}
 
+	 
+	public ObjectMetadata putReplicateObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType, Optional<List<String>> customTags) throws ODClientException {
+		return putObjectStreamOkHttp(bucketName, objectName, stream, fileName, size, contentType, customTags, false);
+	}
+
+	
+	
 	@Override
 	public boolean isAcceptAllCertificates() {
 		return this.acceptAllCertificates;
@@ -1952,16 +1959,25 @@ public class ODClient implements OdilonClient {
 		return true;
 	}
 
+	
 	private ObjectMetadata putObjectStreamOkHttp(
 
-			String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType, Optional<List<String>> customTags) throws ODClientException {
+			String bucketName, 
+			String objectName, 
+			InputStream stream, 
+			Optional<String> fileName, 
+			Optional<Long> size, 
+			Optional<String> contentType, 
+			Optional<List<String>> customTags, 
+			boolean checkValidObjectName) throws ODClientException {
 
 		if (!objectName.matches(SharedConstant.object_valid_regex))
 			throw new IllegalArgumentException("objectName must be >0 and <=" + String.valueOf(SharedConstant.MAX_OBJECT_CHARS) + ", and must match the java regex ->  " + SharedConstant.object_valid_regex + " | o:" + objectName);
 
-		if (!FileNameNormalizer.isValidObjectName(objectName))
-			throw new IllegalArgumentException("objectName is not valid  " + " | o:" + objectName + " | FileNameNormalizer.isValidObjectName( objectName ) must return true");
-
+		if (checkValidObjectName) {
+			if (!FileNameNormalizer.isValidObjectName(objectName))
+				throw new IllegalArgumentException("objectName is not valid  " + " | o:" + objectName + " | FileNameNormalizer.isValidObjectName( objectName ) must return true");
+		}
 		checkBucketName(bucketName);
 
 		String cType = null;
