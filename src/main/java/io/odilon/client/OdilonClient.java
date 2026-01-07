@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 
 import io.odilon.client.error.ODClientException;
-import io.odilon.client.util.FSUtil;
 import io.odilon.model.Bucket;
 import io.odilon.model.MetricsValues;
 import io.odilon.model.ObjectMetadata;
@@ -1419,9 +1418,9 @@ public interface OdilonClient {
 	 * 
 	 * <p>Example:
 	 * 
-	 	String url = "http://localhost:8087/webdav/aerolineas-btv/content/files/document/2022/06/13fa7b90-e1ac-11ec-abf9-0050569415cd/reporte%20y%20seguimiento%20da%F1os%20a%20aeronaves%20firmas%20(1).pdf";
-		 String fileName=getFileName(url);
-		 
+	 *	String url = "http://localhost:8087/webdav/aerolineas-btv/content/files/document/2022/06/13fa7b90-e1ac-11ec-abf9-0050569415cd/reporte%20y%20seguimiento%20da%F1os%20a%20aeronaves%20firmas%20(1).pdf";
+	 *	 String fileName=getFileName(url);
+	 *	 
 	 * </p>
 	 * 
 	 * @param url
@@ -1430,8 +1429,14 @@ public interface OdilonClient {
 	public String getFileName(String url);
 
 	
+	/** OKHttp local cache */
+	
 	/**
+	 * 
 	 * <p>Client local cache for GET requests. By default it is true.</p>
+	 * 
+	 * @return whether OKHttp local cache is enabled
+	 * 
 	 */
 	public boolean isCacheEnabled();
 
@@ -1439,11 +1444,11 @@ public interface OdilonClient {
 	 * <p>Client local cache for GET requests</p>
 	 * <p>
 	 * In some situations, such as after a user clicks a 'refresh' button, it may be
-	 * necessary to skip the cache, and fetch data directly from the server. To
-	 * force a full refresh, add the `no-cache` directive
+	 * necessary to skip the cache, and fetch data directly from the server. 
+	 * To force a full refresh, add the `no-cache` directive
 	 * </p>
 	 * 
-	 * @param enabled
+	 * @param enabled if false the cache is disabled, to re-enable local cache this method must be called with true
 	 */
 	public void setCacheEnabled(boolean enabled);
 
