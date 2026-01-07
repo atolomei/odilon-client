@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import io.odilon.client.error.ODClientException;
-
+import io.odilon.client.util.FSUtil;
 import io.odilon.model.Bucket;
 import io.odilon.model.MetricsValues;
 import io.odilon.model.ObjectMetadata;
@@ -1349,34 +1349,47 @@ public interface OdilonClient {
 	 */
 	public boolean isValidPresignedUrl(String presignedUrl);
 
+	
+	/*
+	 * ======================================= UTILITY  ==========================================
+	 */
+	
 	/**
 	 * 
 	 * <p>
 	 * Examples:<br/>
 	 * 
 	 * <ul>
-	 * <li>application/pdf</li>
-	 * <li>image/jpeg</li>
-	 * <li>image/svg+xml</li>
-	 * <li>image/png</li>
-	 * <li>video/mp4</li>
-	 * <li>audio/mp3</li>
-	 * <li>application/octet-stream</li>
-	 * 
+	 * <li>{@code application/pdf}</li>
+	 * <li>{@code image/jpeg}</li>
+	 * <li>{@code image/svg+xml}</li>
+	 * <li>{@code image/png}</li>
+	 * <li>{@code video/mp4}</li>
+	 * <li>{@code audio/mp3}</li>
+	 * <li>{@code application/octet-stream}</li>
 	 * </ul>
 	 * 
-	 * Default value is application/octet-stream
-	 * 
+	 * Default value is {@code application/octet-stream}
 	 * </p>
 	 * 
-	 * @param filename
-	 * @return
+	 * @param filename	the name of the file
+	 * @return the MIME content type
 	 */
 	public String getContentType(String filename);
 
 
 	/**
-	 * <p>This method is used internally by the client to normalize file names to be sent to the Server.</p>
+	 * <p>This method is used internally by the client to normalize file names to be sent over to the Server.
+	 * 
+	 *	Example:
+	 *
+	 *	String url = "http://localhost:8087/webdav/aerolineas-btv/content/files/document/2022/06/13fa7b90-e1ac-11ec-abf9-0050569415cd/reporte%20y%20seguimiento%20da%F1os%20a%20aeronaves%20firmas%20(1).pdf";
+	 *
+	 *  String fileName = getClient().normalizeFileName( getFileName(url));
+	  
+	  fileName is -> 
+	 *
+	 * </p>
 	 *
 	 * @param name
 	 * @return
@@ -1387,12 +1400,33 @@ public interface OdilonClient {
 	 * <p>This method can be used to check if the object name provided is valid.
 	 * the objectName provided must be equal to nrmalizeObjectName.
 	 * </p>
+	 * 
+	 * <p>Example:
+	 *		
+	 *	objectName = getClient().normalizeObjectName(objectName);
+     *
+	 * </p>
 	 *
 	 * @param name
 	 * @return
 	 */
 	public String normalizeObjectName(String objectName);
 
+	
+	/**
+	 * <p>Simple utility method to extract the file name from a url 
+	 * </p>
+	 * 
+	 * <p>Example:
+	 * 
+	 	String url = "http://localhost:8087/webdav/aerolineas-btv/content/files/document/2022/06/13fa7b90-e1ac-11ec-abf9-0050569415cd/reporte%20y%20seguimiento%20da%F1os%20a%20aeronaves%20firmas%20(1).pdf";
+		 String fileName=getFileName(url);
+		 
+	 * </p>
+	 * 
+	 * @param url
+	 * @return
+	 */
 	public String getFileName(String url);
 
 	

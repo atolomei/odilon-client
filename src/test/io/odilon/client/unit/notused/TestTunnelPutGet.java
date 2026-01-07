@@ -15,21 +15,16 @@
  * limitations under the License.
  */
 package io.odilon.client.unit.notused;
-
-import java.io.BufferedInputStream;
+ 
 import java.io.File;
-import java.io.FileInputStream;
+ 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.security.NoSuchAlgorithmException;
+ 
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -38,8 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.apache.commons.compress.utils.FileNameUtils;
+ 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
@@ -52,7 +46,7 @@ import io.odilon.model.Bucket;
 import io.odilon.model.ObjectMetadata;
 import io.odilon.test.base.BaseTest;
 import io.odilon.test.base.TestFile;
-import io.odilon.util.OdilonFileUtils;
+ 
 
 /**
  * 
