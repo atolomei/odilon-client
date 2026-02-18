@@ -178,6 +178,8 @@ public class ODClient implements OdilonClient {
 	private static final String API_OBJECT_DELETE[] = { "object", "delete" };
 	private static final String API_OBJECT_DELETE_ALL_PREVIOUS_VERSION[] = { "object", "deleteallpreviousversion" };
 
+	
+	private static final String API_OBJECT_GET_PERMANENTPRESIGNEDURL[] = { "object", "get", "static" };
 	private static final String API_OBJECT_GET_PRESIGNEDURL[] = { "object", "get", "presignedurl" };
 	private static final String API_OBJECT_GET_METADATA[] = { "object", "getmetadata" };
 
@@ -185,8 +187,12 @@ public class ODClient implements OdilonClient {
 	private static final String API_OBJECT_GET_METADATA_PREVIOUS_VERSION[] = { "object", "getmetadatapreviousversion" };
 
 	private static final String API_OBJECT_GET_METADATA_VERSION_ALL[] = { "object", "getmetadatapreviousversionall" };
-	private static final String API_OBJECT_URL_PRESIGNES_PREFIX[] = { "presigned", "object" };
 
+	private static final String API_OBJECT_URL_PRESIGNED_PREFIX[] 			= { "presigned", "object" };
+	private static final String API_OBJECT_URL_PERMANENTPRESIGNED_PREFIX[] 	= { "static", "object" };
+	
+	
+	
 	private static final String API_OBJECT_UPLOAD[] = { "object", "upload" };
 	private static final String API_OBJECT_RESTORE_PREVIOUS_VERSION[] = { "object", "restorepreviousversion" };
 
@@ -1046,6 +1052,63 @@ public class ODClient implements OdilonClient {
 	}
 
 	@Override
+	public String getPermanentPresignedObjectUrl(String bucketName, String objectName) throws ODClientException {
+		 
+		Check.requireNonNullStringArgument(bucketName, "bucketName is null or empty");
+		Check.requireNonNullStringArgument(objectName, "objectName can not be null or empty | b:" + bucketName);
+
+		HttpResponse httpResponse = null;
+
+		 
+		Map<String, String> reqParams = new HashMap<String, String>();
+
+		//reqParams.put("durationSeconds", String.valueOf(urlExpiresInSeconds.orElse(DEFAULT_EXPIRY_TIME)));
+
+		//if (objectCacheExpiresInSeconds.isPresent())
+		//	reqParams.put("objectCacheExpiresSeconds", String.valueOf(objectCacheExpiresInSeconds.get()));
+
+		Multimap<String, String> queryParamMultiMap = Multimaps.forMap(reqParams);
+		httpResponse = executeGetReq(API_OBJECT_GET_PERMANENTPRESIGNEDURL, Optional.of(bucketName), Optional.of(objectName), null, queryParamMultiMap);
+
+		String str = null;
+
+		try {
+			str = httpResponse.body().string();
+		} catch (IOException e) {
+			throw new ODClientException(e);
+		}
+
+		StringBuilder url = new StringBuilder();
+
+		url.append(this.getPresignedUrl());
+
+		for (String leg : API_OBJECT_URL_PERMANENTPRESIGNED_PREFIX)
+			url.append("/" + leg);
+		String urlEncoded = null;
+		try {
+			urlEncoded = URLEncoder.encode(str, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new InternalCriticalException(e);
+		}
+
+		return url.toString() + "?token=" + urlEncoded;
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	
+	}
+	
+	
+	@Override
 	public boolean existsObject(String bucketName, String objectName) throws ODClientException, IOException {
 		Check.requireNonNullStringArgument(bucketName, "bucketName is null or empty");
 		Check.requireNonNullStringArgument(objectName, "objectName can not be null or empty | b:" + bucketName);
@@ -1616,7 +1679,7 @@ public class ODClient implements OdilonClient {
 
 		url.append(this.getPresignedUrl());
 
-		for (String leg : API_OBJECT_URL_PRESIGNES_PREFIX)
+		for (String leg : API_OBJECT_URL_PRESIGNED_PREFIX)
 			url.append("/" + leg);
 		String urlEncoded = null;
 		try {
@@ -1628,6 +1691,25 @@ public class ODClient implements OdilonClient {
 		return url.toString() + "?token=" + urlEncoded;
 	}
 
+	
+
+	 
+	 
+
+ 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	private String getPresignedUrl() {
 		return (this.presignedSSL ? "https" : "http") + "://" + this.presignedSchemeAndHost + this.presignedPortStr;
 	}

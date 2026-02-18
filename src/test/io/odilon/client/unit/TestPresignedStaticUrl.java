@@ -30,6 +30,7 @@ import io.odilon.model.SharedConstant;
 import io.odilon.model.list.Item;
 import io.odilon.model.list.ResultSet;
 import io.odilon.test.base.BaseTest;
+ 
 
 /**
  * <p>
@@ -39,13 +40,14 @@ import io.odilon.test.base.BaseTest;
  * </p>
  *
  */
-public class TestPresignedUrl extends BaseTest {
+public class TestPresignedStaticUrl extends BaseTest {
 
-	private static final Logger logger = Logger.getLogger(TestPresignedUrl.class.getName());
+	private static final Logger logger = Logger.getLogger(TestPresignedStaticUrl.class.getName());
 
 	private Bucket bucket_1;
+	
 
-	public TestPresignedUrl() {
+	public TestPresignedStaticUrl() {
 	}
 
 	@Override
@@ -75,8 +77,7 @@ public class TestPresignedUrl extends BaseTest {
 
 			{
 				
-				logger.debug("url -> 120 seconds expire time. binary object -> 120 secs. cache duration");
-
+				 
 				List<String> list = new ArrayList<String>();
 				
 				ResultSet<Item<ObjectMetadata>> rs = getClient().listObjects(this.bucket_1.getName());
@@ -86,51 +87,17 @@ public class TestPresignedUrl extends BaseTest {
 					Item<ObjectMetadata> item = rs.next();
 					if (item.isOk()) {
 						ObjectMetadata meta = item.getObject();
-					
-						String str = getClient().getPresignedObjectUrl(meta.bucketName, meta.objectName, Optional.of(120), Optional.of(120));
+						String str = getClient().getPermanentPresignedObjectUrl(meta.bucketName, meta.objectName);
 						list.add(str);
 						logger.debug(meta.bucketName + " / " + meta.objectName + " -> " + str);
 						total++;
 					}
 				}
 
-				/**
-				try {					
-					Thread.sleep(60000);
-				} catch (InterruptedException e) {
-				}
-				
-				list.forEach( item -> {
-						logger.debug( item + "  | valid -> " + getClient().isValidPresignedUrl( item ) );
-				});
-				**/
-				getMap().put("presigned test (60 seconds) -> " + String.valueOf(total), "ok");
+				 
+				getMap().put("presigned static test  -> " + String.valueOf(total), "ok");
 			}
-
-			logger.debug("");
-			logger.debug("");
-			
-			{
-				
-				logger.debug("14 days expire time");
-
-				
-				ResultSet<Item<ObjectMetadata>> rs = getClient().listObjects(this.bucket_1.getName());
-				int counter = 0;
-				int total = 0;
-				while (rs.hasNext() && counter++ < getMaxFilesToTest()) {
-					Item<ObjectMetadata> item = rs.next();
-					if (item.isOk()) {
-						ObjectMetadata meta = item.getObject();
-						logger.debug(meta.bucketName + " / " + meta.objectName + " -> "
-								+ getClient().getPresignedObjectUrl(meta.bucketName, meta.objectName));
-						total++;
-					}
-				}
-				getMap().put("presigned test (default value: " + String.valueOf(SharedConstant.DEFAULT_EXPIRY_TIME/3600)  + " hours ) -> " + String.valueOf(total), "ok");
-			}
-			
-			logger.debug("");
+ 
 
 			showResults();
 

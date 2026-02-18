@@ -637,6 +637,31 @@ public interface OdilonClient {
 	 */
 	public String getPresignedObjectUrl(String bucketName, String objectName) throws ODClientException;
 
+	
+	
+	
+	/**
+	 * <p>
+	 * Returns a temporary URL to access or download the binary data of an Object
+	 * without authentication
+	 * </p>
+	 * <p>
+	 * This is method should be used for resources that are public</p>
+	 * 
+	 * @param bucketName can not be null
+	 * @param objectName can not be null
+	 * 
+	 * @return temporary url to download the file without authentication
+	 * 
+	 */
+	public String getPermanentPresignedObjectUrl(String bucketName, String objectName) throws ODClientException;
+	
+	
+	
+	
+	
+	
+	
 	/**
 	 * <p>
 	 * Returns a temporary URL to access or download the binary data of an Object
