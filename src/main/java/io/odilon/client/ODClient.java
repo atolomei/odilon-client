@@ -1529,6 +1529,10 @@ public class ODClient implements OdilonClient {
 		if (FSUtil.isAudio(filename))
 			return "audio/" + FilenameUtils.getExtension(filename);
 
+		
+		if (FSUtil.isZip(filename))
+			return "application/zip";
+		
 		return DEFAULT_CONTENT_TYPE;
 	}
 

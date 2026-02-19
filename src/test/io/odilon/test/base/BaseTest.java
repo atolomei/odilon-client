@@ -441,8 +441,14 @@ public abstract class BaseTest {
 		if (file.length() > max_length)
 			return false;
 
-		if (FSUtil.isText(file.getName()) || FSUtil.isPdf(file.getName()) || FSUtil.isImage(file.getName()) || FSUtil.isMSOffice(file.getName()) || FSUtil.isJar(file.getName()) || FSUtil.isAudio(file.getName())
-				|| FSUtil.isVideo(file.getName()) || FSUtil.isZip(file.getName()))
+		if (    FSUtil.isText(file.getName()) || 
+				FSUtil.isPdf(file.getName()) ||
+				FSUtil.isImage(file.getName()) ||
+				FSUtil.isMSOffice(file.getName()) 
+				|| FSUtil.isJar(file.getName()) || 
+				FSUtil.isAudio(file.getName())
+				|| FSUtil.isVideo(file.getName()) || 
+				FSUtil.isZip(file.getName()))
 
 			return true;
 

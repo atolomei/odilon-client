@@ -72,7 +72,7 @@ import io.odilon.net.ODHttpStatus;
  */
 public interface OdilonClient {
 
-	final public String VERSION = "1.15";
+	final public String VERSION = "1.16";
 
 	/*
 	 * ======================================= SHUTDOWN
@@ -642,26 +642,20 @@ public interface OdilonClient {
 	
 	/**
 	 * <p>
-	 * Returns a temporary URL to access or download the binary data of an Object
-	 * without authentication
+	 * Returns a static URL to access or download the binary data of an Object
+	 * without authentication.
 	 * </p>
 	 * <p>
-	 * This is method should be used for resources that are public</p>
+	 * This static url does not expire, therefore it should be used for resources that are public</p>
 	 * 
 	 * @param bucketName can not be null
 	 * @param objectName can not be null
 	 * 
-	 * @return temporary url to download the file without authentication
-	 * 
+	 * @return static url to download the file without authentication
 	 */
 	public String getPermanentPresignedObjectUrl(String bucketName, String objectName) throws ODClientException;
 	
-	
-	
-	
-	
-	
-	
+		
 	/**
 	 * <p>
 	 * Returns a temporary URL to access or download the binary data of an Object
