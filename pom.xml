@@ -44,7 +44,7 @@
 		<maven-jar-plugin-version>3.3.0</maven-jar-plugin-version>
 		<maven-source-plugin-version>3.3.1</maven-source-plugin-version>
 		<maven.test.skip>true</maven.test.skip>
-		<odilon-model-version>1.15</odilon-model-version>
+		<odilon-model-version>1.16</odilon-model-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 

@@ -480,6 +480,18 @@ public interface OdilonClient {
 	 */
 	public ObjectMetadata getObjectMetadata(String bucketName, String objectName) throws ODClientException;
 
+	
+	
+	
+	
+	public ObjectMetadata setPublicAccess(String bucketName, String objectName, boolean publicAccess) throws ODClientException;
+
+	
+	
+	
+	
+	
+	
 	/**
 	 * <p>
 	 * Returns the binary data (File) of this Object
@@ -655,6 +667,23 @@ public interface OdilonClient {
 	 */
 	public String getPermanentPresignedObjectUrl(String bucketName, String objectName) throws ODClientException;
 	
+	
+	/**
+	 * <p>
+	 * Same as the permanent url but for public objects.
+	 * ObjectMetadata meta;
+	 * meta.isPublicAccess() must be true
+	 * </p>
+	 * <p>
+	 * This public url never expires</p>
+	 * 
+	 * @param bucketName can not be null
+	 * @param objectName can not be null
+	 * 
+	 * @return static url to download the file without authentication
+	 */
+	public String getPublicObjectUrl(String bucketName, String objectName) throws ODClientException;
+	
 		
 	/**
 	 * <p>
@@ -803,8 +832,17 @@ public interface OdilonClient {
 	 */
 	public ObjectMetadata putObject(String bucketName, String objectName, File file) throws ODClientException;
 
+	
+
 	/**
 	 * 
+	 * <p>
+	 * Calls #1
+	 * </p>
+	 */
+	public ObjectMetadata putObject(String bucketName, String objectName, Optional<List<String>> customTags,  File file) throws ODClientException;
+	
+	/**
 	 * <p>
 	 * Uploads a File or any other binary stream to the server. It will create a new
 	 * object or update an existing one.
@@ -818,10 +856,11 @@ public interface OdilonClient {
 	 * @param objectName
 	 * @param customTags Optional List of user defined tags
 	 * @param file
+	 * @param o_public true if the object can be accesed on a public url without authentication
 	 * @return
 	 * @throws ODClientException
 	 */
-	public ObjectMetadata putObject(String bucketName, String objectName, Optional<List<String>> customTags, File file) throws ODClientException;
+	public ObjectMetadata putObject(String bucketName, String objectName, Optional<List<String>> customTags, Optional<Boolean> o_public, File file) throws ODClientException;
 
 	/**
 	 * <p>
@@ -887,8 +926,11 @@ public interface OdilonClient {
 	 */
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size) throws ODClientException;
 
+	
+	
+	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType, Optional<List<String>> customTags) throws ODClientException;
+	
 	/**
-	 * 
 	 * <p>
 	 * Uploads a File or any other binary stream to the server. It will create a new
 	 * object or update an existing one.
@@ -904,10 +946,12 @@ public interface OdilonClient {
 	 * @param size
 	 * @param contentType
 	 * @param customTags
+	 * @param o_public 	if TRUE the file will be accessible on a public url (useful for CDN and http caches)
+	 * 
 	 * @return
 	 * @throws ODClientException
 	 */
-	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType, Optional<List<String>> customTags) throws ODClientException;
+	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType, Optional<List<String>> customTags, Optional<Boolean> o_public) throws ODClientException;
 
 	/*
 	 * ----------------------- OBJECT delete ------------------------

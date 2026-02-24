@@ -76,7 +76,6 @@ public class TestPresignedStaticUrl extends BaseTest {
 					this.bucket_1 == null || (getClient().isEmpty(this.bucket_1.getName())));
 
 			{
-				
 				 
 				List<String> list = new ArrayList<String>();
 				
