@@ -27,8 +27,10 @@ import io.odilon.client.unit.TestDeleteObject;
 import io.odilon.client.unit.TestFileCache;
 import io.odilon.client.unit.TestGetObjects;
 import io.odilon.client.unit.TestMonitor;
+import io.odilon.client.unit.TestObjectPublicPutGet;
 import io.odilon.client.unit.TestObjectPutGet;
 import io.odilon.client.unit.TestObjectPutVersion;
+import io.odilon.client.unit.TestPresignedStaticUrl;
 import io.odilon.client.unit.TestPresignedUrl;
 import io.odilon.client.unit.TestQuery;
 import io.odilon.client.unit.TestVersionControlWipe;
@@ -79,11 +81,22 @@ public class RegressionTest extends BaseTest {
 		delete_object_t.executeTest();
 		list.add(delete_object_t.getClass().getSimpleName());
 		
-		
 		TestPresignedUrl presigned_t = new  TestPresignedUrl();
 		presigned_t.setClient(getClient());
 		presigned_t.executeTest();
 		list.add(presigned_t.getClass().getSimpleName());
+	
+		TestObjectPublicPutGet testObjectPublicPutGet_t = new  TestObjectPublicPutGet();
+		testObjectPublicPutGet_t.setClient(getClient());
+		testObjectPublicPutGet_t.executeTest();
+		list.add(testObjectPublicPutGet_t.getClass().getSimpleName());
+	
+	
+		TestPresignedStaticUrl testPresignedStaticUrl_t = new  TestPresignedStaticUrl();
+		testPresignedStaticUrl_t.setClient(getClient());
+		testPresignedStaticUrl_t.executeTest();
+		list.add(testPresignedStaticUrl_t.getClass().getSimpleName());
+	
 		
 		TestQuery query_t=new TestQuery();
 		query_t.setClient(getClient());

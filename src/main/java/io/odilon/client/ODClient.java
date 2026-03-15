@@ -1134,6 +1134,13 @@ public class ODClient implements OdilonClient {
 			
 			str = httpResponse.body().string();
 			
+			if (logger.isDebugEnabled()) {
+				ObjectMetadata meta = getObjectMetadata(bucketName, objectName);
+				if (!meta.isPublicAccess()) {
+					logger.debug("b:" + bucketName + " o:" + objectName + " -> 	is not public access");
+				}
+			}
+			
 		} catch (IOException e) {
 			logger.error("HttpResponse -> " + str);	
 			throw new ODClientException(e);
