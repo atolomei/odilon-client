@@ -480,18 +480,8 @@ public interface OdilonClient {
 	 */
 	public ObjectMetadata getObjectMetadata(String bucketName, String objectName) throws ODClientException;
 
-	
-	
-	
-	
 	public ObjectMetadata setPublicAccess(String bucketName, String objectName, boolean publicAccess) throws ODClientException;
 
-	
-	
-	
-	
-	
-	
 	/**
 	 * <p>
 	 * Returns the binary data (File) of this Object
@@ -649,16 +639,15 @@ public interface OdilonClient {
 	 */
 	public String getPresignedObjectUrl(String bucketName, String objectName) throws ODClientException;
 
-	
-	
-	
 	/**
 	 * <p>
 	 * Returns a static URL to access or download the binary data of an Object
 	 * without authentication.
 	 * </p>
 	 * <p>
-	 * This static url does not expire, therefore it should be used for resources that are public</p>
+	 * This static url does not expire, therefore it should be used for resources
+	 * that are public
+	 * </p>
 	 * 
 	 * @param bucketName can not be null
 	 * @param objectName can not be null
@@ -666,16 +655,15 @@ public interface OdilonClient {
 	 * @return static url to download the file without authentication
 	 */
 	public String getPermanentPresignedObjectUrl(String bucketName, String objectName) throws ODClientException;
-	
-	
+
 	/**
 	 * <p>
-	 * Same as the permanent url but for public objects.
-	 * ObjectMetadata meta;
+	 * Same as the permanent url but for public objects. ObjectMetadata meta;
 	 * meta.isPublicAccess() must be true
 	 * </p>
 	 * <p>
-	 * This public url never expires</p>
+	 * This public url never expires
+	 * </p>
 	 * 
 	 * @param bucketName can not be null
 	 * @param objectName can not be null
@@ -683,8 +671,7 @@ public interface OdilonClient {
 	 * @return static url to download the file without authentication
 	 */
 	public String getPublicObjectUrl(String bucketName, String objectName) throws ODClientException;
-	
-		
+
 	/**
 	 * <p>
 	 * Returns a temporary URL to access or download the binary data of an Object
@@ -832,16 +819,14 @@ public interface OdilonClient {
 	 */
 	public ObjectMetadata putObject(String bucketName, String objectName, File file) throws ODClientException;
 
-	
-
 	/**
 	 * 
 	 * <p>
 	 * Calls #1
 	 * </p>
 	 */
-	public ObjectMetadata putObject(String bucketName, String objectName, Optional<List<String>> customTags,  File file) throws ODClientException;
-	
+	public ObjectMetadata putObject(String bucketName, String objectName, Optional<List<String>> customTags, File file) throws ODClientException;
+
 	/**
 	 * <p>
 	 * Uploads a File or any other binary stream to the server. It will create a new
@@ -856,7 +841,8 @@ public interface OdilonClient {
 	 * @param objectName
 	 * @param customTags Optional List of user defined tags
 	 * @param file
-	 * @param o_public true if the object can be accesed on a public url without authentication
+	 * @param o_public   true if the object can be accesed on a public url without
+	 *                   authentication
 	 * @return
 	 * @throws ODClientException
 	 */
@@ -926,10 +912,8 @@ public interface OdilonClient {
 	 */
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size) throws ODClientException;
 
-	
-	
 	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType, Optional<List<String>> customTags) throws ODClientException;
-	
+
 	/**
 	 * <p>
 	 * Uploads a File or any other binary stream to the server. It will create a new
@@ -946,12 +930,14 @@ public interface OdilonClient {
 	 * @param size
 	 * @param contentType
 	 * @param customTags
-	 * @param o_public 	if TRUE the file will be accessible on a public url (useful for CDN and http caches)
+	 * @param o_public    if TRUE the file will be accessible on a public url
+	 *                    (useful for CDN and http caches)
 	 * 
 	 * @return
 	 * @throws ODClientException
 	 */
-	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType, Optional<List<String>> customTags, Optional<Boolean> o_public) throws ODClientException;
+	public ObjectMetadata putObjectStream(String bucketName, String objectName, InputStream stream, Optional<String> fileName, Optional<Long> size, Optional<String> contentType, Optional<List<String>> customTags, Optional<Boolean> o_public)
+			throws ODClientException;
 
 	/*
 	 * ----------------------- OBJECT delete ------------------------
@@ -1411,11 +1397,11 @@ public interface OdilonClient {
 	 */
 	public boolean isValidPresignedUrl(String presignedUrl);
 
-	
 	/*
-	 * ======================================= UTILITY  ==========================================
+	 * ======================================= UTILITY
+	 * ==========================================
 	 */
-	
+
 	/**
 	 * 
 	 * <p>
@@ -1434,22 +1420,24 @@ public interface OdilonClient {
 	 * Default value is {@code application/octet-stream}
 	 * </p>
 	 * 
-	 * @param filename	the name of the file
+	 * @param filename the name of the file
 	 * @return the MIME content type
 	 */
 	public String getContentType(String filename);
 
-
 	/**
-	 * <p>This method is used internally by the client to normalize file names to be sent over to the Server.
+	 * <p>
+	 * This method is used internally by the client to normalize file names to be
+	 * sent over to the Server.
 	 * 
-	 *	Example:
+	 * Example:
 	 *
-	 *	String url = "http://localhost:8087/webdav/aerolineas-btv/content/files/document/2022/06/13fa7b90-e1ac-11ec-abf9-0050569415cd/reporte%20y%20seguimiento%20da%F1os%20a%20aeronaves%20firmas%20(1).pdf";
+	 * String url =
+	 * "http://localhost:8087/webdav/aerolineas-btv/content/files/document/2022/06/13fa7b90-e1ac-11ec-abf9-0050569415cd/reporte%20y%20seguimiento%20da%F1os%20a%20aeronaves%20firmas%20(1).pdf";
 	 *
-	 *  String fileName = getClient().normalizeFileName( getFileName(url));
-	  
-	  fileName is -> 
+	 * String fileName = getClient().normalizeFileName( getFileName(url));
+	 * 
+	 * fileName is ->
 	 *
 	 * </p>
 	 *
@@ -1459,14 +1447,16 @@ public interface OdilonClient {
 	public String normalizeFileName(String name);
 
 	/**
-	 * <p>This method can be used to check if the object name provided is valid.
-	 * the objectName provided must be equal to nrmalizeObjectName.
+	 * <p>
+	 * This method can be used to check if the object name provided is valid. the
+	 * objectName provided must be equal to nrmalizeObjectName.
 	 * </p>
 	 * 
-	 * <p>Example:
-	 *		
-	 *	objectName = getClient().normalizeObjectName(objectName);
-     *
+	 * <p>
+	 * Example:
+	 * 
+	 * objectName = getClient().normalizeObjectName(objectName);
+	 *
 	 * </p>
 	 *
 	 * @param name
@@ -1474,16 +1464,18 @@ public interface OdilonClient {
 	 */
 	public String normalizeObjectName(String objectName);
 
-	
 	/**
-	 * <p>Simple utility method to extract the file name from a url 
+	 * <p>
+	 * Simple utility method to extract the file name from a url
 	 * </p>
 	 * 
-	 * <p>Example:
+	 * <p>
+	 * Example:
 	 * 
-	 *	String url = "http://localhost:8087/webdav/aerolineas-btv/content/files/document/2022/06/13fa7b90-e1ac-11ec-abf9-0050569415cd/reporte%20y%20seguimiento%20da%F1os%20a%20aeronaves%20firmas%20(1).pdf";
-	 *	 String fileName=getFileName(url);
-	 *	 
+	 * String url =
+	 * "http://localhost:8087/webdav/aerolineas-btv/content/files/document/2022/06/13fa7b90-e1ac-11ec-abf9-0050569415cd/reporte%20y%20seguimiento%20da%F1os%20a%20aeronaves%20firmas%20(1).pdf";
+	 * String fileName=getFileName(url);
+	 * 
 	 * </p>
 	 * 
 	 * @param url
@@ -1491,12 +1483,13 @@ public interface OdilonClient {
 	 */
 	public String getFileName(String url);
 
-	
 	/** OKHttp local cache */
-	
+
 	/**
 	 * 
-	 * <p>Client local cache for GET requests. By default it is true.</p>
+	 * <p>
+	 * Client local cache for GET requests. By default it is true.
+	 * </p>
 	 * 
 	 * @return whether OKHttp local cache is enabled
 	 * 
@@ -1504,14 +1497,17 @@ public interface OdilonClient {
 	public boolean isCacheEnabled();
 
 	/**
-	 * <p>Client local cache for GET requests</p>
+	 * <p>
+	 * Client local cache for GET requests
+	 * </p>
 	 * <p>
 	 * In some situations, such as after a user clicks a 'refresh' button, it may be
-	 * necessary to skip the cache, and fetch data directly from the server. 
-	 * To force a full refresh, add the `no-cache` directive
+	 * necessary to skip the cache, and fetch data directly from the server. To
+	 * force a full refresh, add the `no-cache` directive
 	 * </p>
 	 * 
-	 * @param enabled if false the cache is disabled, to re-enable local cache this method must be called with true
+	 * @param enabled if false the cache is disabled, to re-enable local cache this
+	 *                method must be called with true
 	 */
 	public void setCacheEnabled(boolean enabled);
 
