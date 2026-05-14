@@ -60,13 +60,6 @@ import javax.net.ssl.X509TrustManager;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.apache.commons.io.FilenameUtils;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
@@ -95,7 +88,6 @@ import io.odilon.model.list.DataList;
 import io.odilon.model.list.ResultSet;
 import io.odilon.net.ErrorCode;
 import io.odilon.net.ODHttpStatus;
-
 import io.odilon.util.Check;
 import io.odilon.util.FileNameNormalizer;
 import io.odilon.util.OdilonFileUtils;
@@ -110,6 +102,13 @@ import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 /**
  * <p>
@@ -246,6 +245,7 @@ public class ODClient implements OdilonClient {
 	private final OffsetDateTime created = OffsetDateTime.now();
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
+
 	private int chunkSize = 0;
 
 	private boolean isLogStream = false;
@@ -321,7 +321,8 @@ public class ODClient implements OdilonClient {
 		this.objectMapper.registerModule(new JavaTimeModule());
 		this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		this.objectMapper.registerModule(new Jdk8Module());
-
+		
+	
 		List<Protocol> protocol = new ArrayList<>();
 		protocol.add(Protocol.HTTP_1_1);
 
@@ -638,6 +639,7 @@ public class ODClient implements OdilonClient {
 					}
 					return rl;
 				} catch (Exception e) {
+					logger.error(e);
 					throw new InternalCriticalException(e, "Error mapping response JSON to " + DataList.class.getSimpleName() + " object");
 				}
 			}
