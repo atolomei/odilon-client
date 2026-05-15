@@ -72,7 +72,7 @@ import io.odilon.net.ODHttpStatus;
  */
 public interface OdilonClient {
 
-	final public String VERSION = "1.16";
+	final public String VERSION = "1.15.2";
 
 	/*
 	 * ======================================= SHUTDOWN
@@ -1403,9 +1403,10 @@ public interface OdilonClient {
 	 */
 
 	/**
-	 * 
 	 * <p>
 	 * Examples:<br/>
+	 * Default value is {@code application/octet-stream}
+	 * </p>
 	 * 
 	 * <ul>
 	 * <li>{@code application/pdf}</li>
@@ -1416,9 +1417,6 @@ public interface OdilonClient {
 	 * <li>{@code audio/mp3}</li>
 	 * <li>{@code application/octet-stream}</li>
 	 * </ul>
-	 * 
-	 * Default value is {@code application/octet-stream}
-	 * </p>
 	 * 
 	 * @param filename the name of the file
 	 * @return the MIME content type
@@ -1459,7 +1457,7 @@ public interface OdilonClient {
 	 *
 	 * </p>
 	 *
-	 * @param name
+	 * @param objectName
 	 * @return
 	 */
 	public String normalizeObjectName(String objectName);
