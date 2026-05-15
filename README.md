@@ -23,8 +23,7 @@ A typical architecture for a Web Application is</p>
 <br/>
 <br/>
 <p>In order to access the Odilon server from a Java Application you have to include Odilon client JAR in the classpath. The interaction is managed by an instance of <b>OdilonClient</b> that connects to the server using the credentials: <b>AccessKey</b> (ie. username) and <b>SecretKey</b> (ie. password)</p>
-<br/>
-<br/>
+
 
 
 ```java
@@ -107,6 +106,17 @@ try {
 ```
 <br/>
 <br/>
+
+
+
+<h2>Maven Central</h2>
+<p>
+<a href="https://central.sonatype.com/artifact/io.odilon/odilon-model">odilon-model</a> <br/>
+<a href="https://central.sonatype.com/artifact/io.odilon/odilon-client">odilon-client</a>
+</p>
+<br/>
+<br/>
+
 
 <h2>Sample Programs</h2>
 
