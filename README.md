@@ -117,14 +117,9 @@ try {
 <li>
 <a target="_blank" href="https://central.sonatype.com/artifact/io.odilon/odilon-client">odilon-client</a>
 </li>
-<br/>
-<br/>
-
+</ul>
 
 <h2>Sample Programs</h2>
-
-
-
 <ul>
 <li><a href="https://github.com/atolomei/odilon-client/blob/main/src/test/io/odilon/demo/SampleBucketCreation.java">Create Bucket</a></li>	
 <li><a href="https://github.com/atolomei/odilon-client/blob/main/src/test/io/odilon/demo/SampleListBuckets.java">List Buckets</a></li>	
