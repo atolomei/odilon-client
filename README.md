@@ -110,10 +110,13 @@ try {
 
 
 <h2>Maven Central</h2>
-<p>
-<a target="_blank" href="https://central.sonatype.com/artifact/io.odilon/odilon-model">odilon-model</a> <br/> <br/>
+<ul>
+<li>
+<a target="_blank" href="https://central.sonatype.com/artifact/io.odilon/odilon-model">odilon-model</a> </li>
+	
+<li>
 <a target="_blank" href="https://central.sonatype.com/artifact/io.odilon/odilon-client">odilon-client</a>
-</p>
+</li>
 <br/>
 <br/>
 
