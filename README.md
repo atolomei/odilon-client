@@ -7,6 +7,12 @@
 <p> <a href="https://odilon.io">Odilon</a> is a scalable and lightweight Open Source Object Storage that runs on standard hardware.</p>
 <p>It is an infrastructure software designed to be used by applications that need to store to store terabytes of medium to large size objects (like photos, pdfs, audio, video) securely and safely through encryption, replication and redundancy. </p> 
 <p>It has a simple single-level folder structure similar to the Bucket / Object model of Amazon S3. It is small and easy to integrate, offers encryption, data protection and fault tolerance (software RAID and Erasure Codes) and detection of silent data degradation. Odilon also supports version control and master - standby replication over the Internet for disaster recovery and ransomware recovery.</p>
+
+<p>Odilon client version 1.x requires Java 11	
+</p>
+<p>Odilon client version 2.x requires Java 17	
+</p>
+
 <p>
 For more info visit Odilon's website <a href="https://odilon.io/development.html">Java Development with Odilon SDK</a> and also <a href="https://githug.com/odilon-server.html"> GitHub page</a> 	
 </p>
