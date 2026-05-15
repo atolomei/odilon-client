@@ -119,6 +119,15 @@ try {
 </li>
 </ul>
 
+<h2>MVN Repository</h2>
+<ul>
+<li>
+<a target="_blank" href="https://mvnrepository.com/artifact/io.odilon/odilon-model">odilon-model</a> </li>
+<li>
+<a target="_blank" href="https://mvnrepository.com/artifact/io.odilon/odilon-client">odilon-client</a>
+</li>
+</ul>
+
 <h2>Sample Programs</h2>
 <ul>
 <li><a href="https://github.com/atolomei/odilon-client/blob/main/src/test/io/odilon/demo/SampleBucketCreation.java">Create Bucket</a></li>	
