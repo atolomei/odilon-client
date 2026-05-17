@@ -1,6 +1,6 @@
 /*
  * Odilon Java SDK 
- * (C) 2023 Novamens 
+ * (C) 2026 kbee 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

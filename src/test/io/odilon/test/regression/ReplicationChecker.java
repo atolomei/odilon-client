@@ -31,10 +31,18 @@ import io.odilon.test.base.BaseTest;
 public class ReplicationChecker extends BaseTest {
 	
 	private static final Logger logger = Logger.getLogger(ReplicationChecker.class.getName());
-	
+	static final int PAGESIZE = SharedConstant.DEFAULT_PAGE_SIZE;
 	
 	@Override
 	public void executeTest() {
+		
+		
+		logger.debug("Starting ReplicationChecker test");
+		logger.debug( getClient().getSchemaAndHost() + " <-> " + getStandByClient().getSchemaAndHost());
+		logger.debug("");
+		logger.debug("");
+		
+		
 		checkBuckets(); 
 		
 		checkObjects();
@@ -52,6 +60,9 @@ public class ReplicationChecker extends BaseTest {
 
 		List<String> bucketsLocalNotRemote = new ArrayList<String>();
 		List<String> bucketsRemoteNotLocal = new ArrayList<String>();
+		
+		logger.debug("Starting checkBuckets");
+		
 		
 		try {
 			for (Bucket bucket: getClient().listBuckets()) {
@@ -79,11 +90,16 @@ public class ReplicationChecker extends BaseTest {
 			error(e);
 		}
 		
+		logger.debug(" buckets local not remote -> " + bucketsLocalNotRemote.size());
+		logger.debug(" buckets remote not local -> " + bucketsRemoteNotLocal.size());
+		
+		
 		if ((bucketsLocalNotRemote.size()==0) && (bucketsRemoteNotLocal.size()==0)) {
 			logger.info("checkBuckets ok");
 			getMap().put("checkBuckets", "ok");
 		}
 		else {
+			
 			logger.error("checkBuckets error: ");
 			
 			if (bucketsLocalNotRemote.size()>0) {
@@ -101,6 +117,8 @@ public class ReplicationChecker extends BaseTest {
 
 	protected void checkObjects() {
 		
+		logger.debug("Starting checkObjects");
+			
 		try {
 			for (Bucket bucket: getClient().listBuckets()) {
 				 checkBucket(bucket); 
@@ -112,7 +130,7 @@ public class ReplicationChecker extends BaseTest {
 	}
 	
 	
-	static final int PAGESIZE = SharedConstant.DEFAULT_PAGE_SIZE;
+	
 	
 	protected void checkBucket(Bucket bucket) {
 		
@@ -189,23 +207,26 @@ public class ReplicationChecker extends BaseTest {
 		
 		boolean error = false;
 		if (localNotRemote.size()>0) {
+			
+			logger.error("localNotRemote: ");
 			localNotRemote.forEach(n -> logger.error(n));
 			error=true;
 		}
 		
 		if (remoteNotLocal.size()>0) {
+			logger.error("remoteNotLocal: ");
 			remoteNotLocal.forEach(n -> logger.error(n));
 			error=true;
 		}
 		
 		if (versionDiffs.size()>0) {
+			logger.error("versionDiffs: ");
 			versionDiffs.forEach(n -> logger.error(n));
 			error=true;
 		}
 		
-		
 		if (error) {
-			error("checkBuckets error");
+			error("checkBucket error -> " + bucket.getName());
 		}
 		else {
 			logger.info("checkBucket b:" + bucket.getName() + " ok");

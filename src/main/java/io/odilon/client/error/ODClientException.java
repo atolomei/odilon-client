@@ -22,11 +22,12 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+//import com.fasterxml.jackson.databind.DeserializationFeature;
+//import com.fasterxml.jackson.databind.ObjectMapper;
+//import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.odilon.net.ErrorCode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * <p>
@@ -51,8 +52,8 @@ public class ODClientException extends Exception {
     static private ObjectMapper mapper = new ObjectMapper();
 
     static {
-    	mapper.registerModule(new JavaTimeModule());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    	//mapper.registerModule(new JavaTimeModule());
+        //mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     @JsonProperty("httpStatus")

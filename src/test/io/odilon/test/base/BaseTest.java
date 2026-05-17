@@ -155,6 +155,13 @@ public abstract class BaseTest {
 		source_dir_v1 = source_dir + File.separator + "v1";
 		File dir_v1 = new File(source_dir_v1);
 
+		
+		long lapse = 0;
+		lapse = (properties.get("lapse.between.operations.milliseconds") != null) ? Long.valueOf((properties.get("lapse.between.operations.milliseconds").toString().trim())) : 0;
+		this.setSleepDurationMills(lapse);
+		
+		
+		
 		if ((!dir_v1.exists()) || (!dir_v1.isDirectory())) {
 			try {
 				FileUtils.forceMkdir(dir_v1);
@@ -279,6 +286,12 @@ public abstract class BaseTest {
 				try {
 					this.standByHost = getClient().systemInfo().standbyUrl;
 					this.standByPort = Integer.valueOf(getClient().systemInfo().standbyPort);
+					
+					
+					logger.debug("StandBy Host -> " + this.standByHost);
+					logger.debug("StandBy Port -> " + this.standByPort);
+					
+					
 				} catch (ODClientException e) {
 					error(e);
 				}

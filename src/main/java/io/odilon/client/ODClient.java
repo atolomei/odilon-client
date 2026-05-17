@@ -1,6 +1,6 @@
 /*
  * Odilon Java SDK 
- * (C) 2023 Novamens 
+ * (C) 2026 kbee 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,13 +60,6 @@ import javax.net.ssl.X509TrustManager;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.apache.commons.io.FilenameUtils;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 
@@ -95,7 +88,6 @@ import io.odilon.model.list.DataList;
 import io.odilon.model.list.ResultSet;
 import io.odilon.net.ErrorCode;
 import io.odilon.net.ODHttpStatus;
-
 import io.odilon.util.Check;
 import io.odilon.util.FileNameNormalizer;
 import io.odilon.util.OdilonFileUtils;
@@ -110,6 +102,10 @@ import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * <p>
@@ -244,7 +240,9 @@ public class ODClient implements OdilonClient {
 	private PrintWriter traceStream;
 
 	private final OffsetDateTime created = OffsetDateTime.now();
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	private final ObjectMapper objectMapper = JsonMapper.builder()
+			.disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
+			.build();
 
 	private int chunkSize = 0;
 
@@ -318,9 +316,10 @@ public class ODClient implements OdilonClient {
 		this.acceptAllCertificates = acceptAllCertificates;
 		this.isSSL = isSecure;
 
-		this.objectMapper.registerModule(new JavaTimeModule());
-		this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		this.objectMapper.registerModule(new Jdk8Module());
+		//this.objectMapper.registerModule(new JavaTimeModule());
+		//this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		//this.objectMapper.registerModule(new Jdk8Module());
+		// Note: ObjectMapper is now OdilonObjectMapper (configured for Jackson 3)
 
 		List<Protocol> protocol = new ArrayList<>();
 		protocol.add(Protocol.HTTP_1_1);
@@ -638,6 +637,7 @@ public class ODClient implements OdilonClient {
 					}
 					return rl;
 				} catch (Exception e) {
+					logger.error(e);
 					throw new InternalCriticalException(e, "Error mapping response JSON to " + DataList.class.getSimpleName() + " object");
 				}
 			}
@@ -2199,7 +2199,9 @@ public class ODClient implements OdilonClient {
 		if (customTags.isPresent()) {
 			StringBuilder str = new StringBuilder();
 			customTags.get().forEach(s -> str.append(str.length() > 0 ? ("||" + s) : s));
-			urlBuilder.addEncodedQueryParameter("customTags", str.toString());
+			// Use addQueryParameter (not addEncodedQueryParameter) so OkHttp percent-encodes
+			// the '|' separator — Tomcat 10+ (Spring Boot 3/4) rejects raw '|' in URLs (HTTP 400)
+			urlBuilder.addQueryParameter("customTags", str.toString());
 		}
 
 		HttpUrl url = urlBuilder.build();
@@ -2295,7 +2297,7 @@ public class ODClient implements OdilonClient {
 			 * ----------------------------
 			 */
 
-			String str;
+			String str = null;
 
 			try {
 
@@ -2313,6 +2315,14 @@ public class ODClient implements OdilonClient {
 
 			if (httpCode == ODHttpStatus.UNAUTHORIZED.value())
 				throw new ODClientException(ODHttpStatus.UNAUTHORIZED.value(), ErrorCode.AUTHENTICATION_ERROR.value(), ErrorCode.AUTHENTICATION_ERROR.getMessage());
+
+			if (httpCode == ODHttpStatus.BAD_REQUEST.value()) {
+				// Tomcat/server returned HTML for a 400 — don't try to parse it as JSON
+				String info = "bucketName. " + bucketName + " | objectName. " + objectName + " | fileName. " + fileName.orElse("null")
+						+ " | customTags. " + String.join(", ", customTags.orElse(List.of("null")));
+				throw new ODClientException(ODHttpStatus.BAD_REQUEST.value(), ErrorCode.INTERNAL_ERROR.value(),
+						"HTTP 400 Bad Request from standby server | " + info + " | body: " + (str != null ? str : ""));
+			}
 
 			if (httpCode == ODHttpStatus.INTERNAL_SERVER_ERROR.value()) {
 				throw new ODClientException(ODHttpStatus.INTERNAL_SERVER_ERROR.value(), ErrorCode.INTERNAL_ERROR.value(), response.toString());

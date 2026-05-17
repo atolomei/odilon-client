@@ -1,6 +1,6 @@
 /*
  * Odilon Java SDK for Odilon Object Storage,
- * (C) 2023 Novamens 
+ * (C) 2026 kbee 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ import io.odilon.net.ODHttpStatus;
  */
 public interface OdilonClient {
 
-	final public String VERSION = "1.16";
+	final public String VERSION = "2.0";
 
 	/*
 	 * ======================================= SHUTDOWN
@@ -1406,6 +1406,9 @@ public interface OdilonClient {
 	 * 
 	 * <p>
 	 * Examples:<br/>
+	 * Default value is {@code application/octet-stream}
+	 * </p>
+
 	 * 
 	 * <ul>
 	 * <li>{@code application/pdf}</li>
@@ -1417,8 +1420,6 @@ public interface OdilonClient {
 	 * <li>{@code application/octet-stream}</li>
 	 * </ul>
 	 * 
-	 * Default value is {@code application/octet-stream}
-	 * </p>
 	 * 
 	 * @param filename the name of the file
 	 * @return the MIME content type
@@ -1459,7 +1460,7 @@ public interface OdilonClient {
 	 *
 	 * </p>
 	 *
-	 * @param name
+	 * @param objectName
 	 * @return
 	 */
 	public String normalizeObjectName(String objectName);

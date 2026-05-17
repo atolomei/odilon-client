@@ -316,6 +316,14 @@ public class TestObjectPutGet extends BaseTest {
 		try {
 			if (!getClient().existsBucket(bucketTest)) {
 				getClient().createBucket(bucketTest);
+				logger.debug("Bucket " + bucketTest + " created");
+				
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+				 
+				}
+				
 			}
 
 			this.bucket_1 = getClient().getBucket(bucketTest);
