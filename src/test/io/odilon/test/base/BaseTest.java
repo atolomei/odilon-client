@@ -185,7 +185,7 @@ public abstract class BaseTest {
 		DOWNLOAD_DIR_V2 = download_dir + File.separator + "v2";
 
 		DOWNLOAD_DIR_RESTORED = download_dir + File.separator + "restored";
-		DOWNLOAD_STAND_BY_DIR = "d:" + File.separator + "test-files-standby-download";
+		DOWNLOAD_STAND_BY_DIR = "./" + File.separator + "test-files-standby-download";
 
 		setClient(client);
 
