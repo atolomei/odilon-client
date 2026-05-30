@@ -72,7 +72,7 @@ import io.odilon.net.ODHttpStatus;
  */
 public interface OdilonClient {
 
-	final public String VERSION = "2.0";
+	final public String VERSION = "2.1";
 
 	/*
 	 * ======================================= SHUTDOWN
