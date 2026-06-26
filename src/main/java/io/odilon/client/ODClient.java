@@ -82,6 +82,7 @@ import io.odilon.model.MetricsValues;
 import io.odilon.model.ObjectMetadata;
 import io.odilon.model.SharedConstant;
 import io.odilon.model.SystemInfo;
+import io.odilon.model.VersionControl;
 import io.odilon.model.list.Item;
 import io.odilon.model.list.CachedDataProvider;
 import io.odilon.model.list.DataList;
@@ -315,11 +316,6 @@ public class ODClient implements OdilonClient {
 
 		this.acceptAllCertificates = acceptAllCertificates;
 		this.isSSL = isSecure;
-
-		//this.objectMapper.registerModule(new JavaTimeModule());
-		//this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		//this.objectMapper.registerModule(new Jdk8Module());
-		// Note: ObjectMapper is now OdilonObjectMapper (configured for Jackson 3)
 
 		List<Protocol> protocol = new ArrayList<>();
 		protocol.add(Protocol.HTTP_1_1);
@@ -963,9 +959,19 @@ public class ODClient implements OdilonClient {
 	 */
 	@Override
 	public boolean isVersionControl() throws ODClientException {
-		return systemInfo().isVersionControl();
+		return systemInfo().getVersionControl()!=VersionControl.DISABLED;
 	}
 
+	
+	/**
+	 * 
+	 */
+	@Override
+	public VersionControl  getVersionControl() throws ODClientException {
+		return systemInfo().getVersionControl();
+	}
+	
+	
 	@Override
 	public boolean isHTTPS() {
 		return isSSL(); // this.scheme == Scheme.HTTPS;

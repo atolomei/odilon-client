@@ -28,6 +28,7 @@ import io.odilon.model.Bucket;
 import io.odilon.model.MetricsValues;
 import io.odilon.model.ObjectMetadata;
 import io.odilon.model.SystemInfo;
+import io.odilon.model.VersionControl;
 import io.odilon.model.list.Item;
 import io.odilon.model.list.ResultSet;
 import io.odilon.net.ErrorCode;
@@ -1280,8 +1281,37 @@ public interface OdilonClient {
 	 * 
 	 * @return true if the server has version control enabled
 	 */
+	@Deprecated
 	public boolean isVersionControl() throws ODClientException;
 
+	
+	/**
+	 * <p>
+	 * get Servers' version control setting:
+	
+	Version Control
+	Disabled
+	Standard
+	Protected Versioning
+
+	Where:
+	
+	Setting		New Versions	Delete Previous Versions 
+	----------------------------------------------------
+	Disabled	No				N/A
+	Standard	Yes				Yes
+	Protected	Yes				No
+  
+ * </p>
+ * 
+	 * </p>
+	 * 
+	 * @return true if the server has version control enabled
+	 */
+	public VersionControl getVersionControl() throws ODClientException;
+
+	
+	
 	/**
 	 * <p>
 	 * Returns the url of the Odilon server
