@@ -959,6 +959,11 @@ public class ODClient implements OdilonClient {
 	 */
 	@Override
 	public boolean isVersionControl() throws ODClientException {
+		
+		logger.debug("checking if server supports Version Control: ");
+		logger.debug(systemInfo().toString());
+		logger.debug("");
+		
 		return systemInfo().getVersionControl()!=VersionControl.DISABLED;
 	}
 

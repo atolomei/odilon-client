@@ -149,15 +149,29 @@ public class RegressionTest extends BaseTest {
 		}
 
 		try {
+			logger.debug();
+			logger.debug("Metrics");
+			logger.debug(getClient().metrics().toString());
+			logger.debug();
+		} catch (ODClientException e) {
+			 error(e.getClass().getName() + " | " + e.getMessage());
+		}
+
+
+		
+		try {
 			getClient().close();
 		} catch (ODClientException e) {
 			error(e.getClass().getName() + " | " + e.getMessage());
 		}
-
+		
+		
+		
 		logger.debug();
 		list.forEach( i -> logger.info(i + " -> ok"));
 		logger.debug();
 
+		
 		logger.debug();
 		logger.debug(this.getClass().getSimpleName() + " -> done");
 		logger.debug();
