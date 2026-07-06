@@ -79,7 +79,7 @@ public class TestFileCache extends BaseTest {
 			getClient().setCacheEnabled(false);
 
 			try {
-				if (getClient().systemInfo().redundancyLevel != RedundancyLevel.RAID_6) {
+				if (getClient().systemInfo().redundancyLevel != RedundancyLevel.ERASURE_CODING) {
 					logger.info("Cache can be tested only on RAID 6 | current -> " + getClient().systemInfo().redundancyLevel.getName());
 					showResults();
 					return;

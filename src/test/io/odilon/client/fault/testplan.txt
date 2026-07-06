@@ -1,0 +1,18 @@
+RAID 0
+------
+
+
+RAID 1
+------
+remove a data dir. 
+restart server
+wait till it completes the rebuild
+check that the data is still accessible and correct (check_raid1_dirs.sh)
+
+
+RAID 6
+------
+remove a data dir. 
+restart server
+wait till it completes the rebuild
+check that the data is still accessible and correct (check_raid6_dirs.sh)

@@ -140,6 +140,10 @@ public class ODClient implements OdilonClient {
 	private static final String API_METRICS[] = { "metrics" };
 	private static final String API_SYSTEM_INFO[] = { "systeminfo" };
 
+	
+	private static final String API_CHECK_INTEGRITY[] = { "checkintegrity" };
+
+	
 	/**
 	 * BUCKET
 	 */
@@ -1034,6 +1038,38 @@ public class ODClient implements OdilonClient {
 		}
 	}
 
+	
+
+	/**
+	 * 
+	 * @return String "ok" or the error reported by the Server.
+	 */
+	
+	public String checkIntegrity() {
+		return checkIntegrity(false);
+	}
+	
+	
+	public String checkIntegrity(boolean forceCheck) {
+		try {
+			 
+			Map<String, String> reqParams = new HashMap<String, String>();
+			reqParams.put("forceAll", String.valueOf(Boolean.valueOf(forceCheck)));
+			Multimap<String, String> queryParamMultiMap = Multimaps.forMap(reqParams);
+			HttpResponse httpResponse = executeGetReq(API_CHECK_INTEGRITY, Optional.empty(), Optional.empty(), null, queryParamMultiMap);
+			
+			return httpResponse.body().string();
+
+			
+		} catch (ODClientException e) {
+			return e.toString();
+		} catch (IOException e1) {
+			logger.error(e1);
+			throw new InternalCriticalException(e1);
+		}
+	}
+	
+	
 	@Override
 	public boolean isValidPresignedUrl(String url) {
 

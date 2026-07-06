@@ -345,7 +345,7 @@ public abstract class BaseTest {
 				map.put("ping  " + getClient().getSchemaAndHost(), "ok");
 			}
 		} catch (Exception e) {
-			error(e.getClass().getName() + " | " + e.getMessage());
+		 error(e.getClass().getName() + " | " + e.getMessage());
 		}
 		return true;
 	}
@@ -581,18 +581,25 @@ public abstract class BaseTest {
 	}
 
 	/**
-	 * 
-	 * 
+	 * Returns {@code true} when the server is running in ErasureCoding (Reed-Solomon) mode.
 	 */
-	protected boolean isRAIDSix() {
+	protected boolean isErasureCoding() {
 		if (getClient() != null) {
 			try {
-				return (getClient().systemInfo().redundancyLevel == RedundancyLevel.RAID_6);
+				return (getClient().systemInfo().redundancyLevel == RedundancyLevel.ERASURE_CODING);
 			} catch (ODClientException e) {
 				error(e);
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * @deprecated Use {@link #isErasureCoding()} instead.
+	 */
+	@Deprecated
+	protected boolean isRAIDSix() {
+		return isErasureCoding();
 	}
 
 	/**
