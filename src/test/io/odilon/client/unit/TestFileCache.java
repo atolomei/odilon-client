@@ -80,7 +80,7 @@ public class TestFileCache extends BaseTest {
 
 			try {
 				if (getClient().systemInfo().redundancyLevel != RedundancyLevel.ERASURE_CODING) {
-					logger.info("Cache can be tested only on RAID 6 | current -> " + getClient().systemInfo().redundancyLevel.getName());
+					logger.info("Cache can be tested only on ErasureCoding | current -> " + getClient().systemInfo().redundancyLevel.getName());
 					showResults();
 					return;
 				}
