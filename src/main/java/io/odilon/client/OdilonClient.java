@@ -1542,4 +1542,24 @@ public interface OdilonClient {
 	 */
 	public void setCacheEnabled(boolean enabled);
 
+	/**
+	 * <p>Returns a new {@link ODClient.Builder} to construct an {@link OdilonClient}
+	 * using a fluent API.</p>
+	 *
+	 * <b>Example</b>
+	 * <pre>{@code
+	 * OdilonClient client = OdilonClient.builder()
+	 *         .endpoint("http://localhost")
+	 *         .port(9234)
+	 *         .accessKey("odilon")
+	 *         .secretKey("odilon")
+	 *         .build();
+	 * }</pre>
+	 *
+	 * @return a new {@link ODClient.Builder}
+	 */
+	static ODClient.Builder builder() {
+		return ODClient.builder();
+	}
+
 }

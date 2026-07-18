@@ -297,10 +297,7 @@ public class ODClient implements OdilonClient {
 		this(schemeAndHost, port, accessKey, secretKey, secure, false);
 	}
 
-	public void evictCache() {
-
-	}
-
+	
 	/**
 	 * @param schemeAndHost         can not be null
 	 * @param port                  can not be null (normally default port is 9234)
@@ -401,6 +398,11 @@ public class ODClient implements OdilonClient {
 		this.presignedSSL = presignedSSL;
 	}
 
+	public void evictCache() {
+
+	}
+
+	
 	/**
 	 * 
 	 */
@@ -2438,7 +2440,117 @@ public class ODClient implements OdilonClient {
 		return true;
 	}
 
-	
+	// =========================================================
+	// BUILDER
+	// =========================================================
+
+	/**
+	 * <p>Returns a new {@link Builder} to construct an {@link ODClient} instance
+	 * using a fluent API.</p>
+	 *
+	 * <b>Example</b>
+	 * <pre>{@code
+	 * OdilonClient client = ODClient.builder()
+	 *         .endpoint("http://localhost")
+	 *         .port(9234)
+	 *         .accessKey("odilon")
+	 *         .secretKey("odilon")
+	 *         .build();
+	 * }</pre>
+	 */
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	/**
+	 * <p>Fluent builder for {@link ODClient}.</p>
+	 *
+	 * <p>Required fields: {@code endpoint}, {@code port}, {@code accessKey},
+	 * {@code secretKey}.</p>
+	 */
+	public static final class Builder {
+
+		private String endpoint;
+		private int port = 9234;
+		private String accessKey;
+		private String secretKey;
+		private boolean secure = false;
+		private boolean acceptAllCertificates = false;
+
+		private Builder() {}
+
+		/**
+		 * Sets the server endpoint (scheme + host), e.g. {@code "http://localhost"}.
+		 * @param endpoint cannot be null or empty
+		 */
+		public Builder endpoint(String endpoint) {
+			this.endpoint = endpoint;
+			return this;
+		}
+
+		/**
+		 * Sets the server port (default {@code 9234}).
+		 * @param port must be in the range 1–65535
+		 */
+		public Builder port(int port) {
+			this.port = port;
+			return this;
+		}
+
+		/**
+		 * Sets the access key (default server value is {@code "odilon"}).
+		 * @param accessKey cannot be null or empty
+		 */
+		public Builder accessKey(String accessKey) {
+			this.accessKey = accessKey;
+			return this;
+		}
+
+		/**
+		 * Sets the secret key (default server value is {@code "odilon"}).
+		 * @param secretKey cannot be null or empty
+		 */
+		public Builder secretKey(String secretKey) {
+			this.secretKey = secretKey;
+			return this;
+		}
+
+		/**
+		 * Enables TLS/SSL (default {@code false}).
+		 * @param secure {@code true} to use HTTPS
+		 */
+		public Builder secure(boolean secure) {
+			this.secure = secure;
+			return this;
+		}
+
+		/**
+		 * Accepts all SSL certificates, including self-signed ones
+		 * (default {@code false}).
+		 * @param acceptAllCertificates {@code true} to skip certificate validation
+		 */
+		public Builder acceptAllCertificates(boolean acceptAllCertificates) {
+			this.acceptAllCertificates = acceptAllCertificates;
+			return this;
+		}
+
+		/**
+		 * Builds and returns a new {@link ODClient} instance.
+		 *
+		 * @return a configured {@link ODClient}
+		 * @throws IllegalStateException if {@code endpoint}, {@code accessKey} or
+		 *                               {@code secretKey} have not been set
+		 */
+		public ODClient build() {
+			if (endpoint == null || endpoint.isBlank())
+				throw new IllegalStateException("endpoint must be set");
+			if (accessKey == null || accessKey.isBlank())
+				throw new IllegalStateException("accessKey must be set");
+			if (secretKey == null || secretKey.isBlank())
+				throw new IllegalStateException("secretKey must be set");
+			return new ODClient(endpoint, port, accessKey, secretKey, secure, acceptAllCertificates);
+		}
+	}
 }
 
  
