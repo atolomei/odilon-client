@@ -70,6 +70,9 @@ import io.odilon.client.http.HttpResponse;
 import io.odilon.client.http.Method;
 import io.odilon.client.http.ResponseHeader;
 import io.odilon.client.http.Scheme;
+import io.odilon.client.search.IndexStatus;
+import io.odilon.client.search.SearchQuery;
+import io.odilon.client.search.SearchResult;
 import io.odilon.client.upload.InputStreamRequestBody;
 import io.odilon.client.util.FSUtil;
 import io.odilon.client.util.InetAddressValidator;
@@ -121,6 +124,9 @@ import tools.jackson.databind.json.JsonMapper;
  * @author atolomei@novamens.com (Alejandro Tolomei)
  * @author aferraria@novamens.com (Alejo Ferraria)
  * 
+ * 
+ * client.search(new SearchQuery().bucketName("docs").fileName("tolomei*").meta("department", "legal").maxResults(50));
+ * 
  */
 public class ODClient implements OdilonClient {
 
@@ -142,6 +148,13 @@ public class ODClient implements OdilonClient {
 
 	
 	private static final String API_CHECK_INTEGRITY[] = { "checkintegrity" };
+
+	/**
+	 * SEARCH
+	 */
+	private static final String API_SEARCH[] = { "search" };
+	private static final String API_SEARCH_STATUS[] = { "search", "status" };
+	private static final String API_SEARCH_REBUILD[] = { "search", "rebuild" };
 
 	
 	/**
@@ -958,6 +971,99 @@ public class ODClient implements OdilonClient {
 			throw new ODClientException(ODHttpStatus.OK.value(), ErrorCode.INTERNAL_ERROR.getCode(),
 					"error parsing " + MetricsValues.class.getName() + " from Server response" + " | " + e.getClass().getSimpleName() + " - " + e.getMessage());
 		}
+	}
+
+	/**
+	 * <p>
+	 * Searches objects using the server's search index (<code>GET /search</code>).
+	 * </p>
+	 */
+	@Override
+	public List<SearchResult> search(SearchQuery query) throws ODClientException {
+		Check.requireNonNullArgument(query, "query is null");
+
+		Map<String, String> params = new java.util.LinkedHashMap<String, String>();
+		putParam(params, "bucket", query.bucketName);
+		putParam(params, "q", query.q);
+		putParam(params, "objectName", query.objectName);
+		putParam(params, "fileName", query.fileName);
+		if (query.lastModifiedFrom != null)
+			putParam(params, "lastModifiedFrom", query.lastModifiedFrom.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+		if (query.lastModifiedTo != null)
+			putParam(params, "lastModifiedTo", query.lastModifiedTo.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+		if (query.metadata != null)
+			query.metadata.forEach((k, v) -> putParam(params, "meta." + k, v));
+		params.put("offset", String.valueOf(Math.max(0, query.offset)));
+		params.put("maxResults", String.valueOf(query.maxResults > 0 ? query.maxResults : 100));
+
+		HttpResponse httpResponse = execute(API_SEARCH, Method.GET, Optional.empty(), Optional.empty(), null, params, null, -1, false);
+		String str = null;
+		try {
+			str = httpResponse.body().string();
+		} catch (IOException e1) {
+			throw new ODClientException(ODHttpStatus.OK.value(), ErrorCode.INTERNAL_ERROR.getCode(), e1.getClass().getSimpleName() + " - " + e1.getMessage());
+		}
+		try {
+			return this.objectMapper.readValue(str, new TypeReference<List<SearchResult>>() {
+			});
+		} catch (Exception e) {
+			throw new ODClientException(ODHttpStatus.OK.value(), ErrorCode.INTERNAL_ERROR.getCode(),
+					"error parsing " + SearchResult.class.getName() + " from Server response" + " | " + e.getClass().getSimpleName() + " - " + e.getMessage());
+		}
+	}
+
+	/**
+	 * <p>
+	 * Returns the status of the server's search index (<code>GET /search/status</code>).
+	 * </p>
+	 */
+	@Override
+	public IndexStatus searchStatus() throws ODClientException {
+		HttpResponse httpResponse = executeGetReq(API_SEARCH_STATUS);
+		String str = null;
+		try {
+			str = httpResponse.body().string();
+		} catch (IOException e1) {
+			throw new ODClientException(ODHttpStatus.OK.value(), ErrorCode.INTERNAL_ERROR.getCode(), e1.getClass().getSimpleName() + " - " + e1.getMessage());
+		}
+		try {
+			return this.objectMapper.readValue(str, IndexStatus.class);
+		} catch (Exception e) {
+			throw new ODClientException(ODHttpStatus.OK.value(), ErrorCode.INTERNAL_ERROR.getCode(),
+					"error parsing " + IndexStatus.class.getName() + " from Server response" + " | " + e.getClass().getSimpleName() + " - " + e.getMessage());
+		}
+	}
+
+	/**
+	 * <p>
+	 * Triggers a full rebuild of the search index (<code>POST /search/rebuild</code>).
+	 * </p>
+	 * 
+	 * @return true if the rebuild was started, false if one is already running
+	 */
+	@Override
+	public boolean searchRebuild() throws ODClientException {
+		Map<String, String> headers = new HashMap<String, String>();
+		headers.put("Content-Type", APPLICATION_JSON);
+		try {
+			HttpResponse response = executePost(API_SEARCH_REBUILD, Optional.empty(), Optional.empty(), headers, null, new byte[0], 0, false);
+			response.body().close();
+			return true;
+		} catch (ODClientException e) {
+			if (e.getHttpStatus() == 409)
+				return false;
+			throw e;
+		}
+	}
+
+	private static void putParam(Map<String, String> params, String key, String value) {
+		if (value == null || value.isBlank())
+			return;
+		params.put(urlEncode(key), urlEncode(value));
+	}
+
+	private static String urlEncode(String value) {
+		return URLEncoder.encode(value, StandardCharsets.UTF_8);
 	}
 
 	/**

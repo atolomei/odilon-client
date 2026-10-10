@@ -189,6 +189,8 @@ public class TestObjectPutVersion extends BaseTest {
 		try {
 			// version 1
 			
+			Thread.sleep(2000); // wait 1 second to have a different timestamp for the new version
+			
 			File file1 = new File(baseDir, fileNameV1);
 
 			getClient().putObject(bucketName, objectName, file1);
@@ -197,6 +199,8 @@ public class TestObjectPutVersion extends BaseTest {
 
 		} catch (ODClientException e) {
 			error(String.valueOf(e.getHttpStatus()) + " " + e.getMessage() + " " + String.valueOf(e.getErrorCode()));
+		} catch (InterruptedException e) {
+			error(e);
 		}
 
 		validateSet(testFiles, "validateSet");

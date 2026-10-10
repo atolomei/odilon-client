@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Optional;
 
 import io.odilon.client.error.ODClientException;
+import io.odilon.client.search.IndexStatus;
+import io.odilon.client.search.SearchQuery;
+import io.odilon.client.search.SearchResult;
 import io.odilon.model.Bucket;
 import io.odilon.model.MetricsValues;
 import io.odilon.model.ObjectMetadata;
@@ -73,7 +76,7 @@ import io.odilon.net.ODHttpStatus;
  */
 public interface OdilonClient {
 
-	final public String VERSION = "2.1";
+	final public String VERSION = "2.2";
 
 	/*
 	 * ======================================= SHUTDOWN
@@ -1276,15 +1279,36 @@ public interface OdilonClient {
 
 	/**
 	 * <p>
-	 * Checks if the server has version control enabled
+	 * Searches objects using the server's search index. Requires
+	 * {@code search.enabled=true} on the server.
 	 * </p>
 	 * 
-	 * @return true if the server has version control enabled
+	 * <pre>{@code
+	 * List<SearchResult> list = client.search(new SearchQuery().bucketName("docs").fileName("tolomei*").meta("department", "legal").maxResults(50));
+	 * }</pre>
+	 * 
+	 * @param query can not be null
+	 * @return the hits, possibly empty
+	 * @throws ODClientException
 	 */
-	@Deprecated
-	public boolean isVersionControl() throws ODClientException;
+	public List<SearchResult> search(SearchQuery query) throws ODClientException;
 
-	
+	/**
+	 * @return the status of the server's search index (documents, pending queue,
+	 *         last indexed, last rebuild, state)
+	 * @throws ODClientException
+	 */
+	public IndexStatus searchStatus() throws ODClientException;
+
+	/**
+	 * Triggers a full rebuild of the search index. It runs in background on the
+	 * server, progress can be followed with {@link #searchStatus()}.
+	 * 
+	 * @return true if the rebuild was started, false if one is already running
+	 * @throws ODClientException
+	 */
+	public boolean searchRebuild() throws ODClientException;
+
 	/**
 	 * <p>
 	 * get Servers' version control setting:
@@ -1309,6 +1333,12 @@ public interface OdilonClient {
 	 * @return true if the server has version control enabled
 	 */
 	public VersionControl getVersionControl() throws ODClientException;
+
+	/**
+	 * @return true if the server has version control enabled (any mode other than
+	 *         disabled)
+	 */
+	public boolean isVersionControl() throws ODClientException;
 
 	
 	
