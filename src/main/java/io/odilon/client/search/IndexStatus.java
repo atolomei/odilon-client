@@ -35,11 +35,37 @@ public class IndexStatus implements Serializable {
 	@JsonProperty("errors")
 	public long errors;
 
+	@JsonProperty("rebuildRunning")
+	public boolean rebuildRunning;
+
+	@JsonProperty("rebuildTotalBuckets")
+	public int rebuildTotalBuckets;
+
+	@JsonProperty("rebuildProcessedBuckets")
+	public int rebuildProcessedBuckets;
+
+	@JsonProperty("rebuildCurrentBucket")
+	public String rebuildCurrentBucket;
+
+	@JsonProperty("rebuildProcessedObjects")
+	public long rebuildProcessedObjects;
+
+	@JsonProperty("rebuildIndexed")
+	public long rebuildIndexed;
+
+	@JsonProperty("rebuildRemoved")
+	public long rebuildRemoved;
+
+	@JsonProperty("rebuildStartedAt")
+	public long rebuildStartedAt;
+
 	public IndexStatus() {
 	}
 
 	@Override
 	public String toString() {
-		return "IndexStatus [status=" + status + ", documents=" + documents + ", lastIndexed=" + lastIndexed + ", lastRebuild=" + lastRebuild + ", pending=" + pending + ", errors=" + errors + "]";
+		return "IndexStatus [status=" + status + ", documents=" + documents + ", lastIndexed=" + lastIndexed + ", lastRebuild=" + lastRebuild + ", pending=" + pending + ", errors=" + errors
+				+ ", rebuildRunning=" + rebuildRunning + ", rebuildTotalBuckets=" + rebuildTotalBuckets + ", rebuildProcessedBuckets=" + rebuildProcessedBuckets + ", rebuildCurrentBucket="
+				+ rebuildCurrentBucket + ", rebuildProcessedObjects=" + rebuildProcessedObjects + ", rebuildIndexed=" + rebuildIndexed + ", rebuildRemoved=" + rebuildRemoved + "]";
 	}
 }

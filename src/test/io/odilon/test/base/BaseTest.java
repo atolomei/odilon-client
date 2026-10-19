@@ -54,6 +54,7 @@ public abstract class BaseTest {
 	public static long THREE_SECONDS = 3000;
 
 	private String source_dir;
+	private String large_source_dir;
 	private String source_dir_v1;
 	private String source_dir_v2;
 
@@ -147,6 +148,10 @@ public abstract class BaseTest {
 		this.presignedSSL = (properties.get("odilon.server.isPresignedSSL") != null) ? Boolean.valueOf((properties.get("odilon.server.isPresignedSSL").toString().trim())) : this.isSSL;
 
 		this.source_dir = (properties.get("source.dir") != null) ? properties.get("source.dir").toString().trim() : "./source";
+
+		this.large_source_dir = (properties.get("large.source.dir") != null) ? properties.get("large.source.dir").toString().trim() : "./largesource";
+
+		
 		this.download_dir = (properties.get("download.dir") != null) ? properties.get("download.dir").toString().trim() : "./download";
 
 		this.version_control_source_dir = (properties.get("version.control.source.dir") != null) ? properties.get("version.control.source.dir").toString().trim() : "./source";
@@ -695,6 +700,12 @@ public abstract class BaseTest {
 		return this.source_dir;
 	}
 
+	
+	public String getLargeObjectsSourceDir() {
+		return this.large_source_dir;
+	}
+	
+	
 	public String getSourceV1Dir() {
 		return source_dir_v1;
 	}
