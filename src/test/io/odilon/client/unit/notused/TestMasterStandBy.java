@@ -224,10 +224,10 @@ public class TestMasterStandBy extends BaseTest {
 			}
 
 			if (metaMaster.version != metaStandBy.version)
-				error("version error " + metaMaster.bucketName + " o:  " + metaMaster.objectName + " -> vMaster" + String.valueOf(metaMaster.version) + " vStandby:" + String.valueOf(metaStandBy.version));
+				error("version error " + metaMaster.bucketName + " o:  " + metaMaster.objectName + " -> vMaster" + String.valueOf(metaMaster.version) + " | vStandby:" + String.valueOf(metaStandBy.version));
 
-			if (metaMaster.length != metaStandBy.length)
-				error("length error " + metaMaster.bucketName + " o:  " + metaMaster.objectName + " -> lengthMaster" + String.valueOf(metaMaster.length) + " vStandby:" + String.valueOf(metaStandBy.length));
+			if (metaMaster.getSourceLength() != metaStandBy.getSourceLength())
+				error("length error " + metaMaster.bucketName + " o:  " + metaMaster.objectName + " -> getSourceLength()" + String.valueOf(metaMaster.length) + " | vStandby:" + String.valueOf(metaStandBy.length));
 		});
 
 		getMap().put("testVersions", "ok");
@@ -244,6 +244,10 @@ public class TestMasterStandBy extends BaseTest {
 	public boolean testReadObjectsFromStandBy(int ver) {
 
 		testFiles.forEach((k, v) -> {
+
+			// replication to the standby is asynchronous: wait until this object
+			// (at the expected version) has arrived before reading it
+			waitForStandby(v.bucketName, v.objectName, ver);
 
 			ObjectMetadata meta = null;
 
@@ -291,6 +295,38 @@ public class TestMasterStandBy extends BaseTest {
 
 		getMap().put("testReadObjectsFromStandBy" + " | (" + String.valueOf(testFiles.size()) + ") | version: " + String.valueOf(ver), "ok");
 		return true;
+	}
+
+	private static final long STANDBY_WAIT_MS = 60_000;
+
+	/**
+	 * Polls the standby until the object exists with version >= {@code minVersion},
+	 * or STANDBY_WAIT_MS elapses (then reports an error). Replication master ->
+	 * standby is asynchronous, so reading right after the upload races it.
+	 */
+	private void waitForStandby(String bucketName, String objectName, int minVersion) {
+		long deadline = System.currentTimeMillis() + STANDBY_WAIT_MS;
+		while (true) {
+			try {
+				if (getStandByClient().existsObject(bucketName, objectName)) {
+					ObjectMetadata m = getStandByClient().getObjectMetadata(bucketName, objectName);
+					if (m != null && m.version >= minVersion)
+						return;
+				}
+			} catch (Exception ignored) {
+				// not there yet, or transient error: keep polling
+			}
+			if (System.currentTimeMillis() > deadline) {
+				error("Object not replicated to standby after " + STANDBY_WAIT_MS + " ms -> b:" + bucketName + " o:" + objectName + " v>=" + minVersion);
+				return;
+			}
+			try {
+				Thread.sleep(250);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				return;
+			}
+		}
 	}
 
 	public boolean testAddObjects() {

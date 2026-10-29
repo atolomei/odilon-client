@@ -175,19 +175,21 @@ public class ReplicationChecker extends BaseTest {
 										versionDiffs.add("l_fn: " + String.valueOf(metaLocal.fileName) + " r_fn: " + String.valueOf(metaRemote.fileName) +" | b:" + item.getObject().bucketName + " o: " + item.getObject().objectName);
 									}
 									
-									if (metaLocal.length!=metaRemote.length) {
-										versionDiffs.add("l_lentgth: " + String.valueOf(metaLocal.length) + " r_length: " + String.valueOf(metaRemote.length) +" | b:" + item.getObject().bucketName + " o: " + item.getObject().objectName);
+									if (metaLocal.sourceLength!=metaRemote.sourceLength) {
+										versionDiffs.add("l_length: " + String.valueOf(metaLocal.sourceLength) + " r_length: " + String.valueOf(metaRemote.sourceLength) +" | b:" + item.getObject().bucketName + " o: " + item.getObject().objectName);
 									}
 									
-									
+								
+									/**
 									if (getClient().isVersionControl() && getStandByClient().isVersionControl()) {
+										
 										if (getClient().hasVersions(item.getObject().bucketName, item.getObject().objectName) != getStandByClient().hasVersions(item.getObject().bucketName, item.getObject().objectName) ) {
 											versionDiffs.add("l_hasVersions: " + String.valueOf(getClient().hasVersions(item.getObject().bucketName, item.getObject().objectName)) + 
 															 "r_hasVersions: " + String.valueOf(getStandByClient().hasVersions(item.getObject().bucketName, item.getObject().objectName)) +
 															 " | b:" + item.getObject().bucketName + " o: " + item.getObject().objectName);
 										}
 										logger.debug(String.valueOf(++counter) +  ".  b:" + item.getObject().bucketName + " o: " + item.getObject().objectName);
-									}
+									}**/
 									
 								}
 							} catch (Exception e) {

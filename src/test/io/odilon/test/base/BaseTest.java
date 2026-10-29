@@ -63,6 +63,12 @@ public abstract class BaseTest {
 
 	private String download_dir;
 
+	/** plaintext bytes per encryption record of the v2 record-based AES-GCM-SIV format (server side setting) */
+	private long encryptionRecordSize;
+
+	/** directory where {@code TestRecordSizePutGet} generates its source files */
+	private String encryptionRecordSizeSourceDir;
+
 	public String DOWNLOAD_DIR_V0;
 	public String DOWNLOAD_DIR_V1;
 	public String DOWNLOAD_DIR_V2;
@@ -153,6 +159,9 @@ public abstract class BaseTest {
 
 		
 		this.download_dir = (properties.get("download.dir") != null) ? properties.get("download.dir").toString().trim() : "./download";
+
+		this.encryptionRecordSize = (properties.get("encryption.recordSize") != null) ? Long.valueOf(properties.get("encryption.recordSize").toString().trim()) : 4194304L;
+		this.encryptionRecordSizeSourceDir = (properties.get("encryption.recordSize.source.dir") != null) ? properties.get("encryption.recordSize.source.dir").toString().trim() : "./source-recordsize";
 
 		this.version_control_source_dir = (properties.get("version.control.source.dir") != null) ? properties.get("version.control.source.dir").toString().trim() : "./source";
 		this.version_control_download_dir = (properties.get("version.control.download.dir") != null) ? properties.get("version.control.download.dir").toString().trim() : "./download";
@@ -608,6 +617,22 @@ public abstract class BaseTest {
 	}
 
 	/**
+	 * <p>
+	 * Returns {@code true} when the server has encryption enabled.
+	 * </p>
+	 */
+	protected boolean isEncryptionEnabled() {
+		if (getClient() != null) {
+			try {
+				return (getClient().systemInfo().isEncryptEnabled != null) && getClient().systemInfo().isEncryptEnabled.equalsIgnoreCase("true");
+			} catch (ODClientException e) {
+				error(e);
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * 
 	 * 
 	 */
@@ -698,6 +723,27 @@ public abstract class BaseTest {
 
 	public String getSourceDir() {
 		return this.source_dir;
+	}
+
+	public String getDownloadDir() {
+		return this.download_dir;
+	}
+
+	/**
+	 * @return plaintext bytes per encryption record (server's
+	 *         {@code encryption.recordSize}), as configured for this test via the
+	 *         {@code encryption.recordSize} property in application.properties
+	 */
+	public long getEncryptionRecordSize() {
+		return this.encryptionRecordSize;
+	}
+
+	/**
+	 * @return directory where {@code TestRecordSizePutGet} generates its source
+	 *         files, configured via {@code encryption.recordSize.source.dir}
+	 */
+	public String getEncryptionRecordSizeSourceDir() {
+		return this.encryptionRecordSizeSourceDir;
 	}
 
 	

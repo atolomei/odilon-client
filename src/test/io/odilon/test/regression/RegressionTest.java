@@ -33,6 +33,7 @@ import io.odilon.client.unit.TestObjectPutVersion;
 import io.odilon.client.unit.TestPresignedStaticUrl;
 import io.odilon.client.unit.TestPresignedUrl;
 import io.odilon.client.unit.TestQuery;
+import io.odilon.client.unit.TestRecordSizePutGet;
 import io.odilon.client.unit.TestVersionControlWipe;
 import io.odilon.client.unit.notused.TestMasterStandBy;
 import io.odilon.client.unit.notused.TestVersionControlUpload;
@@ -65,6 +66,14 @@ public class RegressionTest extends BaseTest {
 		object_t.setClient(getClient());
 		object_t.executeTest();
 		list.add(object_t.getClass().getSimpleName());
+		
+		
+		
+		TestRecordSizePutGet t = new  TestRecordSizePutGet();
+		t.setClient(getClient());
+		t.executeTest();
+		list.add(t.getClass().getSimpleName());
+		
 		
 		TestMonitor monitor_t = new  TestMonitor();
 		monitor_t.setClient(getClient());
